@@ -823,9 +823,19 @@ namespace iText.Kernel.Pdf {
         }
 
         protected internal virtual void ReadObjectStream(PdfStream objectStream) {
-            int objectStreamNumber = objectStream.GetIndirectReference().GetObjNumber();
-            int first = objectStream.GetAsNumber(PdfName.First).IntValue();
-            int n = objectStream.GetAsNumber(PdfName.N).IntValue();
+            // Hacky fix implemented by Matthew K - July 26th 2019 to stop getting object indirect ref errors on mostly valid PDF's
+            int objectStreamNumber = 0;
+            int first = 0;
+            int n = 0;
+
+            try
+            {
+                objectStreamNumber = objectStream.GetIndirectReference().GetObjNumber();
+                first = objectStream.GetAsNumber(PdfName.First).IntValue();
+                n = objectStream.GetAsNumber(PdfName.N).IntValue();
+            }
+            catch { return; }
+
             byte[] bytes = ReadStreamBytes(objectStream, true);
             PdfTokenizer saveTokens = tokens;
             try {
