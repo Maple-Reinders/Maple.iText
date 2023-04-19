@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>itext7</id>
+    <id>Maple.itext7</id>
     <version>7.2.5</version>
-    <title>iText 7 Community</title>
+    <title>Maple fork of iText 7 Community</title>
     <authors>iText Software</authors>
     <owners>iText Software</owners>
     <licenseUrl>https://www.gnu.org/licenses/agpl.html</licenseUrl>
@@ -18,7 +18,7 @@
     <tags>itext itext7 itextsharp c# .net csharp pdf itextcore core fdf xfa acroform forms svg digital-signatures signing security accessibility opensource open source</tags>
 	<repository type="git" url="https://github.com/itext/itext7-dotnet.git" />
     <dependencies>
-      <group targetFramework="net461">
+      <group targetFramework="net48">
         <dependency id="itext7.commons" version="7.2.5" />
         <dependency id="Microsoft.Extensions.Logging" version="5.0.0" />
         <dependency id="Portable.BouncyCastle" version="1.8.9" />
@@ -44,24 +44,24 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="itext\itext.io\bin\Release\net461\itext.io.dll" target="lib\net461" />
-    <file src="itext\itext.io\bin\Release\net461\itext.io.xml" target="lib\net461" />
-    <file src="itext\itext.kernel\bin\Release\net461\itext.kernel.dll" target="lib\net461" />
-    <file src="itext\itext.kernel\bin\Release\net461\itext.kernel.xml" target="lib\net461" />
-    <file src="itext\itext.layout\bin\Release\net461\itext.layout.dll" target="lib\net461" />
-    <file src="itext\itext.layout\bin\Release\net461\itext.layout.xml" target="lib\net461" />
-    <file src="itext\itext.pdfa\bin\Release\net461\itext.pdfa.dll" target="lib\net461" />
-    <file src="itext\itext.pdfa\bin\Release\net461\itext.pdfa.xml" target="lib\net461" />
-    <file src="itext\itext.forms\bin\Release\net461\itext.forms.dll" target="lib\net461" />
-    <file src="itext\itext.forms\bin\Release\net461\itext.forms.xml" target="lib\net461" />
-    <file src="itext\itext.barcodes\bin\Release\net461\itext.barcodes.dll" target="lib\net461" />
-    <file src="itext\itext.barcodes\bin\Release\net461\itext.barcodes.xml" target="lib\net461" />
-    <file src="itext\itext.sign\bin\Release\net461\itext.sign.dll" target="lib\net461" />
-    <file src="itext\itext.sign\bin\Release\net461\itext.sign.xml" target="lib\net461" />
-    <file src="itext\itext.styledxmlparser\bin\Release\net461\itext.styledxmlparser.dll" target="lib\net461" />
-    <file src="itext\itext.styledxmlparser\bin\Release\net461\itext.styledxmlparser.xml" target="lib\net461" />
-    <file src="itext\itext.svg\bin\Release\net461\itext.svg.dll" target="lib\net461" />
-    <file src="itext\itext.svg\bin\Release\net461\itext.svg.xml" target="lib\net461" />
+    <file src="itext\itext.io\bin\Release\net48\itext.io.dll" target="lib\net48" />
+    <file src="itext\itext.io\bin\Release\net48\itext.io.xml" target="lib\net48" />
+    <file src="itext\itext.kernel\bin\Release\net48\itext.kernel.dll" target="lib\net48" />
+    <file src="itext\itext.kernel\bin\Release\net48\itext.kernel.xml" target="lib\net48" />
+    <file src="itext\itext.layout\bin\Release\net48\itext.layout.dll" target="lib\net48" />
+    <file src="itext\itext.layout\bin\Release\net48\itext.layout.xml" target="lib\net48" />
+    <file src="itext\itext.pdfa\bin\Release\net48\itext.pdfa.dll" target="lib\net48" />
+    <file src="itext\itext.pdfa\bin\Release\net48\itext.pdfa.xml" target="lib\net48" />
+    <file src="itext\itext.forms\bin\Release\net48\itext.forms.dll" target="lib\net48" />
+    <file src="itext\itext.forms\bin\Release\net48\itext.forms.xml" target="lib\net48" />
+    <file src="itext\itext.barcodes\bin\Release\net48\itext.barcodes.dll" target="lib\net48" />
+    <file src="itext\itext.barcodes\bin\Release\net48\itext.barcodes.xml" target="lib\net48" />
+    <file src="itext\itext.sign\bin\Release\net48\itext.sign.dll" target="lib\net48" />
+    <file src="itext\itext.sign\bin\Release\net48\itext.sign.xml" target="lib\net48" />
+    <file src="itext\itext.styledxmlparser\bin\Release\net48\itext.styledxmlparser.dll" target="lib\net48" />
+    <file src="itext\itext.styledxmlparser\bin\Release\net48\itext.styledxmlparser.xml" target="lib\net48" />
+    <file src="itext\itext.svg\bin\Release\net48\itext.svg.dll" target="lib\net48" />
+    <file src="itext\itext.svg\bin\Release\net48\itext.svg.xml" target="lib\net48" />
     <file src="itext\itext.io\bin\Release\netstandard2.0\itext.io.dll" target="lib\netstandard2.0" />
     <file src="itext\itext.io\bin\Release\netstandard2.0\itext.io.xml" target="lib\netstandard2.0" />
     <file src="itext\itext.kernel\bin\Release\netstandard2.0\itext.kernel.dll" target="lib\netstandard2.0" />
