@@ -54,21 +54,21 @@ steps:
     searchFolder: '$(System.DefaultWorkingDirectory)'
     publishRunAttachments: false
 
-#- task: NuGetCommand@2
-#  inputs:
-#    command: 'pack'
-#    packagesToPack: '**/itext/itext.commons/itext7-commons.nuspec'
-#    versioningScheme: 'off'
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/itext/itext.commons/itext7-commons.nuspec'
+    versioningScheme: 'off'
 
-#- task: NuGetCommand@2
-#  inputs:
-#    command: 'pack'
-#    packagesToPack: '**/itext7.nuspec'
-#    versioningScheme: 'off'
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/itext7.nuspec'
+    versioningScheme: 'off'
 
-#- task: NuGetCommand@2
-#  inputs:
-#    command: 'push'
-#    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-#    nuGetFeedType: 'internal'
-#    publishVstsFeed: 'e786d536-6655-44c0-be8c-e893a91d0e8e/528f8f46-d747-443c-90d8-7bcaed97c514'
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'e786d536-6655-44c0-be8c-e893a91d0e8e/528f8f46-d747-443c-90d8-7bcaed97c514'
