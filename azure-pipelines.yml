@@ -44,6 +44,16 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
+- task: VSTest@2
+  inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\Maple.iText.ProblemPDF.tests.dll
+      !**\*TestAdapter.dll
+      !**\obj\**
+    searchFolder: '$(System.DefaultWorkingDirectory)'
+    publishRunAttachments: false
+
 #- task: NuGetCommand@2
 #  inputs:
 #    command: 'pack'
