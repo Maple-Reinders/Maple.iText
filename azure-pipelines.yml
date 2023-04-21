@@ -1,3 +1,11 @@
+resources:
+  repositories:
+    - repository: Maple.iText.ProblemPDFs
+      type: github
+      endpoint: Maple-Reinders
+      name: Maple-Reinders/Maple.iText.ProblemPDFs
+      ref: main
+
 trigger:
 - maple-package
 
@@ -10,6 +18,19 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- checkout: self
+  path: s\Maple.iText
+  persistCredentials: true
+  clean: true
+- checkout: Maple.iText.ProblemPDFs
+  path: s\Maple.iText\ProblemPDFs
+
+- task: CmdLine@2
+  inputs:
+    script: |
+      git fetch --unshallow
+    workingDirectory: '$(Build.SourcesDirectory)/Maple.iText'
+
 - task: NuGetToolInstaller@1
 
 - task: NuGetCommand@2
