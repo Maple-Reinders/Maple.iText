@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.IO;
 
 namespace iText.ProblemPDF.tests
@@ -10,12 +9,8 @@ namespace iText.ProblemPDF.tests
         [TestMethod]
         public void TestProblemPDFs()
         {
-            // Arrange
-            string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-
-            string strWorkPath = GetParent(strExeFilePath, "ProblemPDFs");
-            Console.WriteLine($"Path: {strWorkPath}");
-            DirectoryInfo d = new DirectoryInfo($"{strWorkPath}");
+            // Arrange - Use hardcoded path used by agent:
+            DirectoryInfo d = new DirectoryInfo("D:\\a\\1\\s\\Maple.iText\\ProblemPDFs");
 
             FileInfo[] Files = d.GetFiles("*.pdf");
 
@@ -36,23 +31,6 @@ namespace iText.ProblemPDF.tests
 
             // Sanity check to make sure PDF files are processed
             Assert.IsTrue(hitFile);
-        }
-
-        private string GetParent(string path, string parentName)
-        {
-            var dir = new DirectoryInfo(path);
-
-            if (dir.Parent == null)
-            {
-                return null;
-            }
-
-            if (dir.Parent.Name == parentName)
-            {
-                return dir.Parent.FullName;
-            }
-
-            return GetParent(dir.Parent.FullName, parentName);
         }
     }
 }
