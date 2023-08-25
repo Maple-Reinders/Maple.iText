@@ -1,7 +1,7 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 iText Group NV
-Authors: iText Software.
+Copyright (c) 1998-2023 Apryse Group NV
+Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
 For commercial licensing, contact us at https://itextpdf.com/sales.  For AGPL licensing, see below.
@@ -21,6 +21,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
+using System.Text.RegularExpressions;
 using iText.StyledXmlParser.Css;
 using iText.StyledXmlParser.Css.Validate;
 
@@ -36,6 +37,9 @@ namespace iText.StyledXmlParser.Css.Util {
         //  Add new relative units to array and move this array to the CommonCssConstants
         private static readonly String[] RELATIVE_MEASUREMENTS_VALUES = new String[] { CommonCssConstants.PERCENTAGE
             , CommonCssConstants.EM, CommonCssConstants.EX, CommonCssConstants.REM };
+
+        private static readonly Regex BASE64_PATTERN = iText.Commons.Utils.StringUtil.RegexCompile("^data:[^\\s]+;base64,"
+            );
 
         /// <summary>
         /// Creates a new
@@ -69,7 +73,7 @@ namespace iText.StyledXmlParser.Css.Util {
         /// <param name="data">the data</param>
         /// <returns>true, if the data is base 64 encoded</returns>
         public static bool IsBase64Data(String data) {
-            return data.Matches("^data:([^\\s]*);base64,([^\\s]*)");
+            return iText.Commons.Utils.Matcher.Match(BASE64_PATTERN, data).Find();
         }
 
         /// <summary>Checks if a value is a color property.</summary>
@@ -157,6 +161,17 @@ namespace iText.StyledXmlParser.Css.Util {
         public static bool IsNumber(String value) {
             return value != null && (value.Matches("^[-+]?\\d\\d*\\.\\d*$") || value.Matches("^[-+]?\\d\\d*$") || value
                 .Matches("^[-+]?\\.\\d\\d*$"));
+        }
+
+        /// <summary>Checks whether a string matches an integer numeric value (e.g. 123, 23).</summary>
+        /// <remarks>
+        /// Checks whether a string matches an integer numeric value (e.g. 123, 23). All these metric values are allowed in
+        /// HTML/CSS.
+        /// </remarks>
+        /// <param name="value">the string that needs to be checked</param>
+        /// <returns>boolean true if value contains an allowed metric value</returns>
+        public static bool IsIntegerNumber(String value) {
+            return value != null && value.Matches("^[-+]?\\d\\d*$");
         }
 
         /// <summary>Checks whether a string contains a percentage value</summary>

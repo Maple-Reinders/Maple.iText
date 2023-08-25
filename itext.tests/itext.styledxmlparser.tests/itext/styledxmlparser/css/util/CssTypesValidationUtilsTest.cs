@@ -1,7 +1,7 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 iText Group NV
-Authors: iText Software.
+Copyright (c) 1998-2023 Apryse Group NV
+Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
 For commercial licensing, contact us at https://itextpdf.com/sales.  For AGPL licensing, see below.
@@ -91,6 +91,19 @@ namespace iText.StyledXmlParser.Css.Util {
             NUnit.Framework.Assert.IsFalse(CssTypesValidationUtils.IsNumber("12f"));
             NUnit.Framework.Assert.IsFalse(CssTypesValidationUtils.IsNumber("f1.2"));
             NUnit.Framework.Assert.IsFalse(CssTypesValidationUtils.IsNumber(".12f"));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void ValidateIntegerNumericValue() {
+            NUnit.Framework.Assert.IsTrue(CssTypesValidationUtils.IsIntegerNumber("1"));
+            NUnit.Framework.Assert.IsTrue(CssTypesValidationUtils.IsIntegerNumber("+12"));
+            NUnit.Framework.Assert.IsTrue(CssTypesValidationUtils.IsIntegerNumber("-12"));
+            NUnit.Framework.Assert.IsFalse(CssTypesValidationUtils.IsIntegerNumber(".12"));
+            NUnit.Framework.Assert.IsFalse(CssTypesValidationUtils.IsIntegerNumber("1.2"));
+            NUnit.Framework.Assert.IsFalse(CssTypesValidationUtils.IsIntegerNumber("1,2"));
+            NUnit.Framework.Assert.IsFalse(CssTypesValidationUtils.IsIntegerNumber("12f"));
+            NUnit.Framework.Assert.IsFalse(CssTypesValidationUtils.IsIntegerNumber("f1.2"));
+            NUnit.Framework.Assert.IsFalse(CssTypesValidationUtils.IsIntegerNumber(".12f"));
         }
 
         [NUnit.Framework.Test]

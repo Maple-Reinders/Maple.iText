@@ -1,7 +1,7 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 iText Group NV
-Authors: iText Software.
+Copyright (c) 1998-2023 Apryse Group NV
+Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
 For commercial licensing, contact us at https://itextpdf.com/sales.  For AGPL licensing, see below.
@@ -56,6 +56,8 @@ namespace iText.Layout.Exceptions {
              + "is not mapped to any standard role.";
 
         public const String INLINE_VERTICAL_ALIGNMENT_DOESN_T_NEED_A_VALUE = "Inline vertical alignment \"{0}\" doesn't need a value";
+
+        public const String INVALID_COLUMN_PROPERTIES = "Invalid column-count/column-width/column-gap properties, they're absent or have negative value";
 
         private LayoutExceptionMessageConstant() {
         }
