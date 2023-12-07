@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>Maple.itext7</id>
+    <id>Maple.itext</id>
     <version>8.0.1.1</version>
-    <title>Maple fork of iText 7 Community</title>
+    <title>Maple fork of iText Community</title>
     <authors>Apryse Software</authors>
     <owners>Apryse Software</owners>
     <licenseUrl>https://www.gnu.org/licenses/agpl.html</licenseUrl>
@@ -12,18 +12,18 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>iText represents the next level of SDKs for developers that want to take advantage of the benefits PDF can bring. Equipped with a better document engine, high- and low-level programming capabilities and the ability to create, edit and enhance PDF documents, iText can be a boon to nearly every workflow. iText allows you to build custom PDF scenarios for web, mobile, desktop or cloud apps in .NET.</description>
     <summary>iText for .NET is a library for PDF generation written entirely in C# for the .NET platform.</summary>
-    <releaseNotes>https://itextpdf.com/itext7release</releaseNotes>
+    <releaseNotes>https://itextpdf.com</releaseNotes>
     <copyright>Copyright (c) 1998-2023 Apryse Group NV</copyright>
     <language>en-US</language>
-    <tags>itext itext7 itextsharp c# .net csharp pdf itextcore core fdf xfa acroform forms svg digital-signatures signing security accessibility opensource open source</tags>
+    <tags>itext itextsharp c# .net csharp pdf itextcore core fdf xfa acroform forms svg digital-signatures signing security accessibility opensource open source</tags>
 	<repository type="git" url="https://github.com/itext/itext7-dotnet.git" />
     <dependencies>
       <group targetFramework="net48">
-        <dependency id="Maple.itext7.commons" version="8.0.1.1" />
+        <dependency id="Maple.itext.commons" version="8.0.1.1" />
         <dependency id="Microsoft.Extensions.Logging" version="5.0.0" />
       </group>
       <group targetFramework="netstandard2.0">
-        <dependency id="Maple.itext7.commons" version="8.0.1" />
+        <dependency id="Maple.itext.commons" version="8.0.1" />
         <dependency id="Microsoft.Extensions.Logging" version="5.0.0" />
         <dependency id="System.Diagnostics.Process" version="4.3.0" />
         <dependency id="System.Globalization.Extensions" version="4.3.0" />

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>Maple.itext7.commons</id>
+    <id>Maple.itext.commons</id>
 	<version>8.0.1.1</version>
-    <title>Maple fork of iText 7 commons module</title>
+    <title>Maple fork of iText commons module</title>
     <authors>Apryse Software</authors>
     <owners>Apryse Software</owners>
     <licenseUrl>https://www.gnu.org/licenses/agpl.html</licenseUrl>
@@ -12,10 +12,10 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Commons module</description>
     <summary />
-    <releaseNotes>https://itextpdf.com/itext7release</releaseNotes>
+    <releaseNotes>https://itextpdf.com/</releaseNotes>
     <copyright>Copyright (c) 1998-2023 Apryse Group NV</copyright>
     <language>en-US</language>
-    <tags>itext itext7 itextsharp c# .net csharp</tags>
+    <tags>itext itextsharp c# .net csharp</tags>
     <dependencies>
       <group targetFramework="net48">
 		<dependency id="Newtonsoft.Json" version="13.0.1" />
