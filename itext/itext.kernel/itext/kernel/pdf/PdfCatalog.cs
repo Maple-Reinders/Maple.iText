@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -327,6 +327,13 @@ namespace iText.Kernel.Pdf {
                 nameTrees.Put(treeType, tree);
             }
             return tree;
+        }
+
+        /// <summary>This method checks Names tree for specified tree type.</summary>
+        /// <param name="treeType">type of tree which existence should be checked</param>
+        /// <returns>true if such tree exists, false otherwise</returns>
+        public virtual bool NameTreeContainsKey(PdfName treeType) {
+            return nameTrees.ContainsKey(treeType);
         }
 
         /// <summary>This method returns the NumberTree of Page Labels</summary>

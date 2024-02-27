@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,7 +29,6 @@ namespace iText.Signatures {
     /// Interface that needs to be implemented if you want to embed
     /// Certificate Revocation Lists (CRL) into your PDF.
     /// </summary>
-    /// <author>Paulo Soares</author>
     public interface ICrlClient {
         /// <summary>Gets an encoded byte array.</summary>
         /// <param name="checkCert">The certificate which a CRL URL can be obtained from.</param>

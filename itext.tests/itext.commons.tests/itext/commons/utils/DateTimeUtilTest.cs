@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2023 Apryse Group NV
+    Copyright (c) 1998-2024 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -51,6 +51,15 @@ namespace iText.Commons.Utils {
 
             long offset = DateTimeUtil.GetCurrentTimeZoneOffset(date);
             Assert.AreEqual(1588636800000d - offset, millisFromEpochTo2020_05_05, ZERO_DELTA);
+        }
+
+        [Test]
+        public void AddMillisToDateTest() {
+            DateTime almostCurrentTime = DateTime.Now.AddMilliseconds(-2000);
+            long twoSeconds = 2000;
+            Assert.AreEqual(DateTimeUtil.GetRelativeTime(DateTime.Now),
+                DateTimeUtil.GetRelativeTime(DateTimeUtil.AddMillisToDate(almostCurrentTime, twoSeconds)),
+                ONE_SECOND_DELTA);
         }
 
         [Test]

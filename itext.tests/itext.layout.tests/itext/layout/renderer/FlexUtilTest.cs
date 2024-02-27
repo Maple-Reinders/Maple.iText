@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -92,13 +92,13 @@ namespace iText.Layout.Renderer {
             FlexContainerRenderer flexContainerRenderer = new FlexContainerRenderer(div);
             flexContainerRenderer.SetParent(documentRenderer);
             div.SetNextRenderer(flexContainerRenderer);
-            for (int i = 0; i < flexBasisValues.Count; i++) {
+            foreach (UnitValue flexBasisValue in flexBasisValues) {
                 Div flexItem = new Div().Add(new Paragraph("x"));
                 AbstractRenderer flexItemRenderer = (AbstractRenderer)flexItem.CreateRendererSubTree().SetParent(flexContainerRenderer
                     );
                 flexItemRenderer.SetProperty(Property.FLEX_GROW, 0f);
                 flexItemRenderer.SetProperty(Property.FLEX_SHRINK, 0.1f);
-                flexItemRenderer.SetProperty(Property.FLEX_BASIS, flexBasisValues[i]);
+                flexItemRenderer.SetProperty(Property.FLEX_BASIS, flexBasisValue);
                 flexContainerRenderer.AddChild(flexItemRenderer);
             }
             IList<IList<FlexItemInfo>> rectangleTable = FlexUtil.CalculateChildrenRectangles(bBox, (FlexContainerRenderer

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -26,7 +26,6 @@ using iText.Test;
 
 namespace iText.StyledXmlParser.Jsoup.Select {
     /// <summary>Tests that the selector selects correctly.</summary>
-    /// <author>Jonathan Hedley, jonathan@hedley.net</author>
     [NUnit.Framework.Category("UnitTest")]
     public class SelectorTest : ExtendedITextTest {
         [NUnit.Framework.Test]

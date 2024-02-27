@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -90,6 +90,9 @@ namespace iText.Layout.Renderer {
             elementRenderer.SetParent(this);
             MulticolRenderer.MulticolLayoutResult layoutResult = LayoutInColumns(layoutContext, actualBBox);
             if (layoutResult.GetSplitRenderers().IsEmpty()) {
+                foreach (IRenderer child in elementRenderer.GetChildRenderers()) {
+                    child.SetParent(elementRenderer);
+                }
                 return new LayoutResult(LayoutResult.NOTHING, null, null, this, layoutResult.GetCauseOfNothing());
             }
             else {
@@ -207,7 +210,7 @@ namespace iText.Layout.Renderer {
         }
 
         private void SetOverflowForAllChildren(IRenderer renderer) {
-            if (renderer == null) {
+            if (renderer == null || renderer is AreaBreakRenderer) {
                 return;
             }
             renderer.SetProperty(Property.OVERFLOW_X, OverflowPropertyValue.VISIBLE);

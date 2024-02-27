@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -31,7 +31,6 @@ namespace iText.IO.Font {
     /// Classes implementing this interface can create custom encodings or
     /// replace existing ones. It is used in the context of <c>PdfEncoding</c>.
     /// </remarks>
-    /// <author>Paulo Soares</author>
     public interface IExtraEncoding {
         /// <summary>Converts an Unicode string to a byte array according to some encoding.</summary>
         /// <param name="text">the Unicode string</param>

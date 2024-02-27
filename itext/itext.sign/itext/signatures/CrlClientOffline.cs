@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,7 +30,6 @@ namespace iText.Signatures {
     /// An implementation of the CrlClient that handles offline
     /// Certificate Revocation Lists.
     /// </summary>
-    /// <author>Paulo Soares</author>
     public class CrlClientOffline : ICrlClient {
         /// <summary>The CRL as a byte array.</summary>
         private IList<byte[]> crls = new List<byte[]>();

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,7 +29,6 @@ namespace iText.Signatures {
     /// For instance: you'll have to implement this interface if you want
     /// to sign a PDF using a smart card.
     /// </remarks>
-    /// <author>Paulo Soares</author>
     public interface IExternalSignature {
         /// <summary>Returns the digest algorithm.</summary>
         /// <returns>The digest algorithm (e.g. "SHA-1", "SHA-256,...").</returns>

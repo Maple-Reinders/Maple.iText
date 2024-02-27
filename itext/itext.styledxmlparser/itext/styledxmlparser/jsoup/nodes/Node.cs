@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -31,7 +31,6 @@ using iText.StyledXmlParser.Jsoup.Select;
 namespace iText.StyledXmlParser.Jsoup.Nodes {
     /// <summary>The base, abstract Node model.</summary>
     /// <remarks>The base, abstract Node model. Elements, Documents, Comments etc are all Node instances.</remarks>
-    /// <author>Jonathan Hedley, jonathan@hedley.net</author>
     public abstract class Node
 #if !NETSTANDARD2_0
  : ICloneable

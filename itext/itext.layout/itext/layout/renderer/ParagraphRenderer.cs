@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -284,8 +284,9 @@ namespace iText.Layout.Renderer {
                         bool keepTogether = IsKeepTogether(result.GetCauseOfNothing());
                         if (keepTogether) {
                             floatRendererAreas.RetainAll(nonChildFloatingRendererAreas);
-                            return new MinMaxWidthLayoutResult(LayoutResult.NOTHING, null, null, this, null == result.GetCauseOfNothing
-                                () ? this : result.GetCauseOfNothing());
+                            // Use paragraph as a cause of nothing because parent relationship between TextRenderer
+                            // and ParagraphRenderer can be broken by ParagraphRenderer#updateParentLines method.
+                            return new MinMaxWidthLayoutResult(LayoutResult.NOTHING, null, null, this, this);
                         }
                         else {
                             if (marginsCollapsingEnabled) {

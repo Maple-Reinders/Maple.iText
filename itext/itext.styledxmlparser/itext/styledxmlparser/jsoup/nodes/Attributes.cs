@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2023 Apryse Group NV
+    Copyright (c) 1998-2024 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -43,7 +43,6 @@ namespace iText.StyledXmlParser.Jsoup.Nodes {
     /// normalized to lower-case on parsing. That means you should use lower-case strings when referring to attributes by
     /// name.
     /// </remarks>
-    /// <author>Jonathan Hedley, jonathan@hedley.net</author>
     public class Attributes : IEnumerable<iText.StyledXmlParser.Jsoup.Nodes.Attribute>
 #if !NETSTANDARD2_0
  , ICloneable

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,16 +28,21 @@ using iText.IO.Source;
 using iText.IO.Util;
 
 namespace iText.IO.Font.Cmap {
-    /// <author>psoares</author>
     public class CMapLocationResource : ICMapLocation {
         public virtual PdfTokenizer GetLocation(String location) {
-            String fullName = FontResources.CMAPS + location;
+            String fullName = GetLocationPath() + location;
             Stream inp = ResourceUtil.GetResourceStream(fullName);
             if (inp == null) {
                 throw new iText.IO.Exceptions.IOException(IoExceptionMessageConstant.CMAP_WAS_NOT_FOUND).SetMessageParams(
                     fullName);
             }
             return new PdfTokenizer(new RandomAccessFileOrArray(new RandomAccessSourceFactory().CreateSource(inp)));
+        }
+
+        /// <summary>Retrieve base folder path where CMaps are located.</summary>
+        /// <returns>CMaps location path.</returns>
+        public virtual String GetLocationPath() {
+            return FontResources.CMAPS;
         }
     }
 }

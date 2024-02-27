@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2023 Apryse Group NV
+    Copyright (c) 1998-2024 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -45,7 +45,6 @@ namespace iText.StyledXmlParser.Jsoup.Select {
     /// <see cref="iText.StyledXmlParser.Jsoup.Nodes.Element.Select(System.String)"/>
     /// method.
     /// </remarks>
-    /// <author>Jonathan Hedley, jonathan@hedley.net</author>
     public class Elements : List<iText.StyledXmlParser.Jsoup.Nodes.Element> {
         public Elements() {
         }

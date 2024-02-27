@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -134,7 +134,9 @@ namespace iText.IO.Font {
             kernpairs = input.ReadIntLE();
             res2 = input.ReadIntLE();
             fontname = input.ReadIntLE();
-            if (h_len != input.Length() || extlen != 30 || fontname < 75 || fontname > 512) {
+            //Those checks come from an old C implementation of pfm2afm, when reading the specs
+            //Nothing indicates the fontnameOffset should be max 512
+            if (h_len != input.Length() || extlen != 30 || fontname < 75 || fontname > 1024) {
                 throw new System.IO.IOException("not.a.valid.pfm.file");
             }
             input.Seek(psext + 14);

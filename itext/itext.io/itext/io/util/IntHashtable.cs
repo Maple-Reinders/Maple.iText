@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -32,11 +32,6 @@ namespace iText.IO.Util {
     /// not be supported in future releases of Jakarta Commons Lang.  Utilities of
     /// this sort may be included in future releases of Jakarta Commons Collections.
     /// </remarks>
-    /// <author>Justin Couch</author>
-    /// <author>Alex Chaffee (alex@apache.org)</author>
-    /// <author>Stephen Colebourne</author>
-    /// <author>Bruno Lowagie (change Objects as keys into int values)</author>
-    /// <author>Paulo Soares (added extra methods)</author>
     public class IntHashtable
 #if !NETSTANDARD2_0
  : ICloneable

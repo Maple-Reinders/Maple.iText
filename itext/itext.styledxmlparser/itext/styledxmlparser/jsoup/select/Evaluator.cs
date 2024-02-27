@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -606,7 +606,6 @@ namespace iText.StyledXmlParser.Jsoup.Select {
         }
 
         /// <summary>Abstract evaluator for sibling index matching</summary>
-        /// <author>ant</author>
         public abstract class IndexEvaluator : Evaluator {
             internal int index;
 

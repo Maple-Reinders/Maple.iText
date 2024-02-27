@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -99,7 +99,7 @@ namespace iText.IO.Font {
             foreach (Object key in p.Keys) {
                 String value = p.GetProperty((String)key);
                 String[] sp = iText.Commons.Utils.StringUtil.Split(value, " ");
-                ICollection<String> hs = new HashSet<String>();
+                ICollection<String> hs = new LinkedHashSet<String>();
                 foreach (String s in sp) {
                     if (s.Length > 0) {
                         hs.Add(s);

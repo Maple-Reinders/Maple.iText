@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,6 +28,7 @@ using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Utils;
 using iText.Kernel.Exceptions;
 using iText.Signatures;
+using iText.Signatures.Testutils;
 using iText.Signatures.Testutils.Builder;
 
 namespace iText.Signatures.Testutils.Client {
@@ -46,7 +47,7 @@ namespace iText.Signatures.Testutils.Client {
 
         public virtual iText.Signatures.Testutils.Client.TestCrlClient AddBuilderForCertIssuer(IX509Certificate issuerCert
             , IPrivateKey issuerPrivateKey) {
-            DateTime yesterday = DateTimeUtil.GetCurrentUtcTime().AddDays(-1);
+            DateTime yesterday = TimeTestUtil.TEST_DATE_TIME.AddDays(-1);
             crlBuilders.Add(new TestCrlBuilder(issuerCert, issuerPrivateKey, yesterday));
             return this;
         }

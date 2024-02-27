@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,7 +22,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 namespace iText.Barcodes.Qrcode {
     /// <summary>These are a set of hints that you may pass to Writers to specify their behavior.</summary>
-    /// <author>dswitkin@google.com (Daniel Switkin)</author>
     public sealed class EncodeHintType {
         /// <summary>Specifies what degree of error correction to use, for example in QR Codes (type Integer).</summary>
         public static readonly iText.Barcodes.Qrcode.EncodeHintType ERROR_CORRECTION = new iText.Barcodes.Qrcode.EncodeHintType

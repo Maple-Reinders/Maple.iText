@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2023 Apryse Group NV
+    Copyright (c) 1998-2024 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -175,6 +175,10 @@ namespace iText.Commons.Utils {
         
         public static FileStream GetInputStreamForFile(String path) {
             return new FileStream(path, FileMode.Open, FileAccess.Read);
+        }
+
+        public static FileStream GetInputStreamForFile(FileInfo fileInfo) {
+            return fileInfo.OpenRead();
         }
 
         public static FileStream GetFileOutputStream(String path) {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -58,7 +58,13 @@ namespace iText.Forms.Exceptions {
 
         public const String INDEX_OUT_OF_BOUNDS = "Index: {0}, Size: {1}";
 
+        public const String SEPARATOR_SHOULD_BE_A_VALID_VALUE = "Separator should be a valid value. Values that are "
+             + "not allowed are null,empty string, or . ";
+
+        public const String FIELD_NAME_ALREADY_EXISTS_IN_FORM = "Field name {0} already exists in the form.";
+
         private FormsExceptionMessageConstant() {
         }
+        // empty constructor
     }
 }

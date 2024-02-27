@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -26,7 +26,7 @@ using iText.Test;
 
 namespace iText.Forms.Form.Element {
     [NUnit.Framework.Category("UnitTest")]
-    public class SelectFieldItemTest : ITextTest {
+    public class SelectFieldItemTest : ExtendedITextTest {
         [NUnit.Framework.Test]
         public virtual void NewSelectFieldItem2ParamConstructorTest() {
             SelectFieldItem item = new SelectFieldItem("exportValue", "displayValue");

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,7 +25,6 @@ using iText.Kernel.Pdf;
 
 namespace iText.Signatures {
     /// <summary>Dictionary that stores signature build properties.</summary>
-    /// <author>Kwinten Pisman</author>
     public class PdfSignatureBuildProperties : PdfObjectWrapper<PdfDictionary> {
         /// <summary>Creates new PdfSignatureBuildProperties.</summary>
         public PdfSignatureBuildProperties()

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,7 +28,6 @@ using iText.IO.Source;
 
 namespace iText.IO.Font {
     /// <summary>Subsets a True Type font by removing the unneeded glyphs from the font.</summary>
-    /// <author>Paulo Soares</author>
     internal class TrueTypeFontSubset {
         // If it's a regular font subset, we should not add `name` and `post`,
         // because information in these tables maybe irrelevant for a subset.

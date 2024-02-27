@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -42,7 +42,6 @@ namespace iText.StyledXmlParser.Jsoup.Parser {
     /// Usage example:
     /// <c>Document xmlDoc = Jsoup.parse(html, baseUrl, Parser.xmlParser());</c>
     /// </remarks>
-    /// <author>Jonathan Hedley</author>
     public class XmlTreeBuilder : TreeBuilder {
         internal override ParseSettings DefaultSettings() {
             return ParseSettings.preserveCase;

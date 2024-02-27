@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -37,8 +37,6 @@ namespace iText.Barcodes.Qrcode {
     /// The ordering of bits is row-major. Within each int, the least significant bits are used first,
     /// meaning they represent lower x values. This is compatible with BitArray's implementation.
     /// </remarks>
-    /// <author>Sean Owen</author>
-    /// <author>dswitkin@google.com (Daniel Switkin)</author>
     internal sealed class BitMatrix {
         private readonly int width;
 

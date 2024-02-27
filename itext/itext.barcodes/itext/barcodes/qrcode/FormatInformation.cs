@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,7 +27,6 @@ namespace iText.Barcodes.Qrcode {
     /// Encapsulates a QR Code's format information, including the data mask used and
     /// error correction level.
     /// </summary>
-    /// <author>Sean Owen</author>
     /// <seealso cref="ErrorCorrectionLevel"/>
     internal sealed class FormatInformation {
         private const int FORMAT_INFO_MASK_QR = 0x5412;

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,7 +28,6 @@ using iText.Test;
 
 namespace iText.StyledXmlParser.Jsoup.Parser {
     /// <summary>Test suite for attribute parser.</summary>
-    /// <author>Jonathan Hedley, jonathan@hedley.net</author>
     [NUnit.Framework.Category("UnitTest")]
     public class AttributeParseTest : ExtendedITextTest {
         [NUnit.Framework.Test]

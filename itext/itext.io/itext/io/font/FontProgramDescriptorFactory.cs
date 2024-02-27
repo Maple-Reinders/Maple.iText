@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -35,7 +35,7 @@ namespace iText.IO.Font {
             String baseName = FontProgram.TrimFontStyle(fontName);
             //yes, we trying to find built-in standard font with original name, not baseName.
             bool isBuiltinFonts14 = StandardFonts.IsStandardFont(fontName);
-            bool isCidFont = !isBuiltinFonts14 && FontCache.IsPredefinedCidFont(baseName);
+            bool isCidFont = !isBuiltinFonts14 && CjkResourceLoader.IsPredefinedCidFont(baseName);
             FontProgramDescriptor fontDescriptor = null;
             if (FETCH_CACHED_FIRST) {
                 fontDescriptor = FetchCachedDescriptor(fontName, null);
@@ -172,7 +172,7 @@ namespace iText.IO.Font {
         }
 
         private static FontProgramDescriptor FetchCidFontDescriptor(String fontName) {
-            CidFont font = new CidFont(fontName, null);
+            CidFont font = new CidFont(fontName, null, null);
             return new FontProgramDescriptor(font.GetFontNames(), font.GetFontMetrics());
         }
 

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,7 +30,6 @@ using iText.StyledXmlParser.Jsoup.Select;
 
 namespace iText.StyledXmlParser.Jsoup.Nodes {
     /// <summary>A HTML Document.</summary>
-    /// <author>Jonathan Hedley, jonathan@hedley.net</author>
     public class Document : iText.StyledXmlParser.Jsoup.Nodes.Element {
         private iText.StyledXmlParser.Jsoup.Nodes.OutputSettings outputSettings = new iText.StyledXmlParser.Jsoup.Nodes.OutputSettings
             ();
