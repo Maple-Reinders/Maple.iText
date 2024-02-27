@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -294,7 +294,7 @@ namespace iText.IO.Font.Otf {
         /// </remarks>
         /// <returns>the Unicode char sequence that corresponds to this glyph</returns>
         public virtual char[] GetUnicodeChars() {
-            if (chars != null) {
+            if (chars != null && chars.Length > 0) {
                 return chars;
             }
             else {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -258,7 +258,7 @@ namespace iText.IO.Font {
 
         /// <summary>
         /// Converts a
-        /// <c>String</c>
+        /// <c>char</c>
         /// to a
         /// <c>byte</c>
         /// array according
@@ -276,7 +276,7 @@ namespace iText.IO.Font {
         /// representing the conversion according to the font's encoding
         /// </returns>
         public static byte[] ConvertToBytes(char ch, String encoding) {
-            if (encoding == null || encoding.Length == 0) {
+            if (encoding == null || encoding.Length == 0 || "symboltt".Equals(encoding)) {
                 return new byte[] { (byte)ch };
             }
             IntHashtable hash = null;

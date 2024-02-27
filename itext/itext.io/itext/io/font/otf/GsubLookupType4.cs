@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,7 +24,6 @@ using System.Collections.Generic;
 
 namespace iText.IO.Font.Otf {
     /// <summary>LookupType 4: Ligature Substitution Subtable</summary>
-    /// <author>psoares</author>
     public class GsubLookupType4 : OpenTableLookup {
         /// <summary>The key is the first character.</summary>
         /// <remarks>

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,8 +23,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using iText.Barcodes.Exceptions;
 
 namespace iText.Barcodes.Qrcode {
-    /// <author>satorux@google.com (Satoru Takabayashi) - creator</author>
-    /// <author>dswitkin@google.com (Daniel Switkin) - ported from C++</author>
     internal sealed class MatrixUtil {
         private MatrixUtil() {
         }

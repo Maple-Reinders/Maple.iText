@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,7 +22,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 namespace iText.StyledXmlParser.Jsoup.Select {
     /// <summary>Collects a list of elements that match the supplied criteria.</summary>
-    /// <author>Jonathan Hedley</author>
     public class Collector {
         private Collector() {
         }

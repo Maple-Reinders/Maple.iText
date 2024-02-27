@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,7 +23,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 
 namespace iText.IO.Font.Otf {
-    /// <author><a href="mailto:paawak@gmail.com">Palash Ray</a></author>
     public class FontReadingException : System.IO.IOException {
         public FontReadingException(String message)
             : base(message) {

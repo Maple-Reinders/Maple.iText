@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -305,6 +305,39 @@ namespace iText.Kernel.Colors {
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfException), () => Color.MakeColor(new ColorTest.CustomPdfSpecialCs
                 (new PdfArray())));
             NUnit.Framework.Assert.AreEqual("Unknown color space.", e.Message);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CreateColorWithColorSpaceRgb() {
+            NUnit.Framework.Assert.AreEqual(ColorConstants.BLACK, Color.CreateColorWithColorSpace(new float[] { 0.0F, 
+                0.0F, 0.0F }));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CreateColorWithColorSpaceGraySpace() {
+            NUnit.Framework.Assert.AreEqual(new DeviceGray(), Color.CreateColorWithColorSpace(new float[] { 0.0F }));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CreateColorWithColorSpaceCmyk() {
+            NUnit.Framework.Assert.AreEqual(new DeviceCmyk(), Color.CreateColorWithColorSpace(new float[] { 0.0F, 0.0F
+                , 0.0F, 1F }));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CreateColorWithInvalidValueNull() {
+            NUnit.Framework.Assert.IsNull(Color.CreateColorWithColorSpace(null));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CreateColorWithInvalidNoValues() {
+            NUnit.Framework.Assert.IsNull(Color.CreateColorWithColorSpace(new float[] {  }));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CreateColorWithInvalidMoreThen4Values() {
+            NUnit.Framework.Assert.IsNull(Color.CreateColorWithColorSpace(new float[] { 0.0F, 0.0F, 0.0F, 0.0F, 0.0F }
+                ));
         }
 
         private class CustomDeviceCs : PdfDeviceCs {

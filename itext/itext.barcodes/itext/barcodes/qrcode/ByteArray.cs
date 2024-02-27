@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,7 +24,6 @@ using System;
 
 namespace iText.Barcodes.Qrcode {
     /// <summary>This class implements an array of unsigned bytes.</summary>
-    /// <author>dswitkin@google.com (Daniel Switkin)</author>
     internal sealed class ByteArray {
         private const int INITIAL_SIZE = 32;
 

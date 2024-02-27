@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,7 +25,6 @@ using System.Text;
 
 namespace iText.Barcodes.Qrcode {
     /// <summary>A simple, fast array of bits, represented compactly by an array of ints internally.</summary>
-    /// <author>Sean Owen</author>
     internal sealed class BitArray {
         private int[] bits;
 

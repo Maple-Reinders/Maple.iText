@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,7 +27,6 @@ using iText.StyledXmlParser.Jsoup.Internal;
 
 namespace iText.StyledXmlParser.Jsoup.Parser {
     /// <summary>HTML Tag capabilities.</summary>
-    /// <author>Jonathan Hedley, jonathan@hedley.net</author>
     public class Tag
 #if !NETSTANDARD2_0
  : ICloneable

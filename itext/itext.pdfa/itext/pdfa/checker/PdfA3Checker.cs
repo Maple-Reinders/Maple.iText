@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -57,33 +57,33 @@ namespace iText.Pdfa.Checker {
         protected internal override void CheckFileSpec(PdfDictionary fileSpec) {
             PdfName relationship = fileSpec.GetAsName(PdfName.AFRelationship);
             if (relationship == null || !allowedAFRelationships.Contains(relationship)) {
-                throw new PdfAConformanceException(PdfAConformanceException.FILE_SPECIFICATION_DICTIONARY_SHALL_CONTAIN_ONE_OF_THE_PREDEFINED_AFRELATIONSHIP_KEYS
+                throw new PdfAConformanceException(PdfaExceptionMessageConstant.FILE_SPECIFICATION_DICTIONARY_SHALL_CONTAIN_ONE_OF_THE_PREDEFINED_AFRELATIONSHIP_KEYS
                     );
             }
             if (fileSpec.ContainsKey(PdfName.EF)) {
                 if (!fileSpec.ContainsKey(PdfName.F) || !fileSpec.ContainsKey(PdfName.UF) || !fileSpec.ContainsKey(PdfName
                     .Desc)) {
-                    throw new PdfAConformanceException(PdfAConformanceException.FILE_SPECIFICATION_DICTIONARY_SHALL_CONTAIN_F_KEY_AND_UF_KEY
+                    throw new PdfAConformanceException(PdfaExceptionMessageConstant.FILE_SPECIFICATION_DICTIONARY_SHALL_CONTAIN_F_KEY_AND_UF_KEY
                         );
                 }
                 PdfDictionary ef = fileSpec.GetAsDictionary(PdfName.EF);
                 PdfStream embeddedFile = ef.GetAsStream(PdfName.F);
                 if (embeddedFile == null) {
-                    throw new PdfAConformanceException(PdfAConformanceException.EF_KEY_OF_FILE_SPECIFICATION_DICTIONARY_SHALL_CONTAIN_DICTIONARY_WITH_VALID_F_KEY
+                    throw new PdfAConformanceException(PdfaExceptionMessageConstant.EF_KEY_OF_FILE_SPECIFICATION_DICTIONARY_SHALL_CONTAIN_DICTIONARY_WITH_VALID_F_KEY
                         );
                 }
                 if (!embeddedFile.ContainsKey(PdfName.Subtype)) {
-                    throw new PdfAConformanceException(PdfAConformanceException.MIME_TYPE_SHALL_BE_SPECIFIED_USING_THE_SUBTYPE_KEY_OF_THE_FILE_SPECIFICATION_STREAM_DICTIONARY
+                    throw new PdfAConformanceException(PdfaExceptionMessageConstant.MIME_TYPE_SHALL_BE_SPECIFIED_USING_THE_SUBTYPE_KEY_OF_THE_FILE_SPECIFICATION_STREAM_DICTIONARY
                         );
                 }
                 if (embeddedFile.ContainsKey(PdfName.Params)) {
                     PdfObject @params = embeddedFile.Get(PdfName.Params);
                     if (!@params.IsDictionary()) {
-                        throw new PdfAConformanceException(PdfAConformanceException.EMBEDDED_FILE_SHALL_CONTAIN_PARAMS_KEY_WITH_DICTIONARY_AS_VALUE
+                        throw new PdfAConformanceException(PdfaExceptionMessageConstant.EMBEDDED_FILE_SHALL_CONTAIN_PARAMS_KEY_WITH_DICTIONARY_AS_VALUE
                             );
                     }
                     if (((PdfDictionary)@params).GetAsString(PdfName.ModDate) == null) {
-                        throw new PdfAConformanceException(PdfAConformanceException.EMBEDDED_FILE_SHALL_CONTAIN_PARAMS_KEY_WITH_VALID_MODDATE_KEY
+                        throw new PdfAConformanceException(PdfaExceptionMessageConstant.EMBEDDED_FILE_SHALL_CONTAIN_PARAMS_KEY_WITH_VALID_MODDATE_KEY
                             );
                     }
                 }

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,7 +30,6 @@ using iText.Test;
 using iText.Test.Attributes;
 
 namespace iText.Kernel.Pdf {
-    /// <author>Michael Demey</author>
     [NUnit.Framework.Category("IntegrationTest")]
     public class PdfDocumentIdTest : ExtendedITextTest {
         public static readonly String sourceFolder = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
@@ -314,9 +313,9 @@ namespace iText.Kernel.Pdf {
         //        String newOriginalId;
         //        String appendModeNewOriginalId;
         //        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        //        PdfWriter initialWriter = new PdfWriter(baos, new WriterProperties().setInitialDocumentId(originalId));
-        //        PdfWriter newWriter = new PdfWriter(baos, new WriterProperties().setInitialDocumentId(newOriginalId));
-        //        PdfWriter appendModeWriter = new PdfWriter(baos, new WriterProperties().setInitialDocumentId(appendModeNewOriginalId));
+        //        PdfWriter initialWriter = CompareTool.createTestPdfWriter(baos, new WriterProperties().setInitialDocumentId(originalId));
+        //        PdfWriter newWriter = CompareTool.createTestPdfWriter(baos, new WriterProperties().setInitialDocumentId(newOriginalId));
+        //        PdfWriter appendModeWriter = CompareTool.createTestPdfWriter(baos, new WriterProperties().setInitialDocumentId(appendModeNewOriginalId));
         //
         //
         //    }
@@ -325,7 +324,7 @@ namespace iText.Kernel.Pdf {
         //    public void encryptionAes128Test() {
         //        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         //        PdfString originalId = new PdfString("Original ID 56789");
-        //        PdfWriter initialWriter = new PdfWriter(baos, new WriterProperties().setInitialDocumentId(originalId));
+        //        PdfWriter initialWriter = CompareTool.createTestPdfWriter(baos, new WriterProperties().setInitialDocumentId(originalId));
         //
         //        Assert.assertNotEquals();
         //        Assert.assertEquals();

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -42,7 +42,7 @@ namespace iText.Pdfa {
             PdfPage page = doc.AddNewPage();
             page.GetPdfObject().Put(PdfName.PresSteps, new PdfDictionary());
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => doc.Close());
-            NUnit.Framework.Assert.AreEqual(PdfAConformanceException.THE_PAGE_DICTIONARY_SHALL_NOT_CONTAIN_PRESSTEPS_ENTRY
+            NUnit.Framework.Assert.AreEqual(PdfaExceptionMessageConstant.THE_PAGE_DICTIONARY_SHALL_NOT_CONTAIN_PRESSTEPS_ENTRY
                 , e.Message);
         }
     }

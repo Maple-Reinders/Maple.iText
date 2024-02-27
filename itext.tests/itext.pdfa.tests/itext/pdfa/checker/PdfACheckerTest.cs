@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -45,6 +45,13 @@ namespace iText.Pdfa.Checker {
         public virtual void Before() {
             pdfAChecker = new PdfACheckerTest.EmptyPdfAChecker();
             pdfAChecker.SetFullCheckMode(true);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CheckPdfWithHugeAmountOfOutlinesTest() {
+            using (PdfDocument pdf = new PdfDocument(new PdfReader(SOURCE_FOLDER + "outlineStackOverflowTest01.pdf"))) {
+                NUnit.Framework.Assert.DoesNotThrow(() => pdfAChecker.CheckDocument(pdf.GetCatalog()));
+            }
         }
 
         [NUnit.Framework.Test]
@@ -93,8 +100,8 @@ namespace iText.Pdfa.Checker {
                 ) {
             }
 
-            public override void CheckColorSpace(PdfColorSpace colorSpace, PdfDictionary currentColorSpaces, bool checkAlternate
-                , bool? fill) {
+            public override void CheckColorSpace(PdfColorSpace colorSpace, PdfObject @object, PdfDictionary currentColorSpaces
+                , bool checkAlternate, bool? fill) {
             }
 
             public override void CheckRenderingIntent(PdfName intent) {
@@ -194,6 +201,9 @@ namespace iText.Pdfa.Checker {
             }
 
             protected internal override void CheckTrailer(PdfDictionary trailer) {
+            }
+
+            protected internal override void CheckCatalog(PdfCatalog catalog) {
             }
 
             protected internal override void CheckPageTransparency(PdfDictionary pageDict, PdfDictionary pageResources

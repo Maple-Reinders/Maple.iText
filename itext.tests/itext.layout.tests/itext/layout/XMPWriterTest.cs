@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -118,7 +118,7 @@ namespace iText.Layout {
             pdfDocument.GetCatalog().SetLang(new PdfString("en-US"));
             pdfDocument.GetCatalog().SetViewerPreferences(new PdfViewerPreferences().SetDisplayDocTitle(true));
             PdfDocumentInfo info = pdfDocument.GetDocumentInfo();
-            info.SetTitle("iText7 PDF/UA test");
+            info.SetTitle("iText PDF/UA test");
             PdfFont font = PdfFontFactory.CreateFont(FONT, PdfEncodings.WINANSI, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED
                 );
             Paragraph p = new Paragraph();

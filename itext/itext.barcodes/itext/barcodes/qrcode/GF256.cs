@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -35,7 +35,6 @@ namespace iText.Barcodes.Qrcode {
     /// for convenience and speed (but at the cost of memory).
     /// Only the bottom 8 bits are really used.
     /// </remarks>
-    /// <author>Sean Owen</author>
     internal sealed class GF256 {
         // x^8 + x^4 + x^3 + x^2 + 1
         public static readonly iText.Barcodes.Qrcode.GF256 QR_CODE_FIELD = new iText.Barcodes.Qrcode.GF256(0x011D);

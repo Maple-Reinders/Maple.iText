@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,10 +21,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System.Collections.Generic;
+using iText.Test;
 
 namespace iText.IO.Util {
     [NUnit.Framework.Category("UnitTest")]
-    public class EnumUtilTest {
+    public class EnumUtilTest : ExtendedITextTest {
         [NUnit.Framework.Test]
         public virtual void TestEnumUtilSameAmount() {
             NUnit.Framework.Assert.AreEqual(3, EnumUtil.GetAllValuesOfEnum<TestEnum1>().Count);

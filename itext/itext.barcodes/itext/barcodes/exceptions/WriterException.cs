@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,7 +28,6 @@ namespace iText.Barcodes.Exceptions {
     /// A base class which covers the range of exceptions which may occur when encoding a barcode using
     /// the Writer framework.
     /// </summary>
-    /// <author>dswitkin@google.com (Daniel Switkin)</author>
     public sealed class WriterException : ITextException {
         /// <summary>Creates a WriterException.</summary>
         public WriterException()

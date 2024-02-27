@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2023 Apryse Group NV
+    Copyright (c) 1998-2024 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -60,7 +60,7 @@ namespace iText.Bouncycastle.Cms {
         /// <summary><inheritDoc/></summary>
         public virtual ICollection<IRecipientInformation> GetRecipients() {
             List<IRecipientInformation> recipientInformation = new List<IRecipientInformation>();
-            ICollection recipients = recipientInformationStore.GetRecipients();
+            ICollection recipients = (ICollection) recipientInformationStore.GetRecipients();
             foreach (RecipientInformation recipient in recipients) {
                 recipientInformation.Add(new RecipientInformationBC(recipient));
             }

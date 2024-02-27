@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2023 Apryse Group NV
+    Copyright (c) 1998-2024 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -86,6 +86,16 @@ namespace iText.Commons.Utils {
         }
 
         /// <summary>
+        /// Adds provided number of milliseconds to the DateTime.
+        /// </summary>
+        /// <param name="date">DateTime to increase</param>
+        /// <param name="millis">number of milliseconds to add</param>
+        /// <returns>updated DateTime</returns>
+        public static DateTime AddMillisToDate(DateTime date, long millis) {
+            return date.AddMilliseconds(millis);
+        }
+
+        /// <summary>
         /// Parses passing date with default {@code yyyy-MM-dd} pattern.
         /// </summary>
         /// <param name="date">date is date to be parse</param>
@@ -135,6 +145,15 @@ namespace iText.Commons.Utils {
         public static long GetCurrentTimeZoneOffset(DateTime date) {
             TimeZone tz = TimeZone.CurrentTimeZone;
             return (long) tz.GetUtcOffset(date).TotalMilliseconds;
+        }
+
+        /// <summary>
+        /// Converts date to string of "yyyy.MM.dd HH:mm:ss z" format.
+        /// </summary>
+        /// <param name="date">date to convert.</param>
+        /// <returns>string date value.</returns>
+        public static String DateToString(DateTime signDate) {
+            return signDate.ToLocalTime().ToString("yyyy.MM.dd HH:mm:ss zzz");
         }
 
         private static DateTime GetInitial() {

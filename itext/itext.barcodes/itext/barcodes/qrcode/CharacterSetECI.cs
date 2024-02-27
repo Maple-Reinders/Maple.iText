@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,7 +28,6 @@ namespace iText.Barcodes.Qrcode {
     /// Encapsulates a Character Set ECI, according to "Extended Channel Interpretations" 5.3.1.1
     /// of ISO 18004.
     /// </summary>
-    /// <author>Sean Owen</author>
     internal sealed class CharacterSetECI {
         private static IDictionary<String, iText.Barcodes.Qrcode.CharacterSetECI> NAME_TO_ECI;
 

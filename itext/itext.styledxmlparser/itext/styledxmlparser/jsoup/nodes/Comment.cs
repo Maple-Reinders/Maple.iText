@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -26,7 +26,6 @@ using iText.StyledXmlParser.Jsoup.Parser;
 
 namespace iText.StyledXmlParser.Jsoup.Nodes {
     /// <summary>A comment node.</summary>
-    /// <author>Jonathan Hedley, jonathan@hedley.net</author>
     public class Comment : LeafNode {
         /// <summary>Create a new comment node.</summary>
         /// <param name="data">The contents of the comment</param>

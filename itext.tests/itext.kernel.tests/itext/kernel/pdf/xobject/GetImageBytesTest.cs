@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -155,6 +155,47 @@ namespace iText.Kernel.Pdf.Xobject {
             // TODO: DEVSIX-3538 (update test after fix)
             // Android-Conversion-Ignore-Test (TODO DEVSIX-6445 fix different DeflaterOutputStream behavior)
             TestFile("spotColorImagesSmall.pdf", "Im1", "png");
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void TestRGBSeparationCSWithJPXDecoderAndFunctionType0() {
+            TestFile("RGBJpxF0.pdf", "Im1", "jp2");
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void TestRGBSeparationCSWithDCTDecoderAndFunctionType0() {
+            TestFile("RGBDctF0.pdf", "Im1", "jpg");
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void TestRGBSeparationCSWithFlateDecoderAndFunctionType0() {
+            // Android-Conversion-Ignore-Test (TODO DEVSIX-6445 fix different DeflaterOutputStream behavior)
+            TestFile("RGBFlateF0.pdf", "Im1", "png");
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void TestCMYKSeparationCSWithJPXDecoderAndFunctionType2() {
+            TestFile("CMYKJpxF2.pdf", "Im1", "jp2");
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void TestRGBSeparationCSWithJPXDecoderAndFunctionType2() {
+            TestFile("RGBJpxF2.pdf", "Im1", "jp2");
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void TestCMYKSeparationCSWithDCTDecoderAndFunctionType2() {
+            TestFile("CMYKDctF2.pdf", "Im1", "jpg");
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void TestRGBSeparationCSWithDCTDecoderAndFunctionType2() {
+            TestFile("RGBDctF2.pdf", "Im1", "jpg");
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void TestRGBSeparationCSWithFlateDecoderAndFunctionType2() {
+            TestFile("RGBFlateF2.pdf", "Im1", "png");
         }
 
         [NUnit.Framework.Test]

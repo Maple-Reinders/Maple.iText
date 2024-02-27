@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2023 Apryse Group NV
+    Copyright (c) 1998-2024 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -63,6 +63,20 @@ namespace iText.Pdfa {
         public static void RetainAll<T>(this ISet<T> set, ICollection<T> c) {
             set.IntersectWith(c);
         }
+
+
+        public static bool IsEmpty<T>(this ICollection<T> collection) {
+            return collection.Count == 0;
+        }
+
+        public static String JSubstring(this String str, int beginIndex, int endIndex) {
+            return str.Substring(beginIndex, endIndex - beginIndex);
+        }
+
+        public static String JSubstring(this StringBuilder sb, int beginIndex, int endIndex) {
+            return sb.ToString(beginIndex, endIndex - beginIndex);
+        }
+
 
         public static Assembly GetAssembly(this Type type) {
 #if !NETSTANDARD2_0

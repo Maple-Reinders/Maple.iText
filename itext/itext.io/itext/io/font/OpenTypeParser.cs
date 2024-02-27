@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -316,11 +316,13 @@ namespace iText.IO.Font {
             fontNames.SetFontName(GetPsFontName());
             fontNames.SetFullName(fontNames.GetNames(4));
             String[][] otfFamilyName = fontNames.GetNames(16);
+            String[][] familyName = fontNames.GetNames(1);
+            fontNames.SetFamilyName2(familyName);
             if (otfFamilyName != null) {
                 fontNames.SetFamilyName(otfFamilyName);
             }
             else {
-                fontNames.SetFamilyName(fontNames.GetNames(1));
+                fontNames.SetFamilyName(familyName);
             }
             String[][] subfamily = fontNames.GetNames(2);
             if (subfamily != null) {

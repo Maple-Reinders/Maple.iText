@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -112,6 +112,13 @@ namespace iText.Kernel.Pdf {
 
         public virtual iText.Kernel.Pdf.PdfDocumentInfo AddCreationDate() {
             return Put(PdfName.CreationDate, new PdfDate().GetPdfObject());
+        }
+
+        /// <summary>Remove creation date from the document info dictionary.</summary>
+        /// <returns>this instance.</returns>
+        public virtual iText.Kernel.Pdf.PdfDocumentInfo RemoveCreationDate() {
+            infoDictionary.Remove(PdfName.CreationDate);
+            return this;
         }
 
         public virtual iText.Kernel.Pdf.PdfDocumentInfo AddModDate() {

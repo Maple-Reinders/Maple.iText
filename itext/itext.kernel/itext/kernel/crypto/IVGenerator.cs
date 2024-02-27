@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,7 +27,6 @@ namespace iText.Kernel.Crypto {
     /// <summary>An initialization vector generator for a CBC block encryption.</summary>
     /// <remarks>An initialization vector generator for a CBC block encryption. It's a random generator based on ARCFOUR.
     ///     </remarks>
-    /// <author>Paulo Soares</author>
     public sealed class IVGenerator {
         private static readonly ARCFOUREncryption arcfour;
 

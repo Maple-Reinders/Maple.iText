@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,7 +25,6 @@ using iText.Commons.Utils;
 
 namespace iText.Barcodes.Qrcode {
     /// <summary>See ISO 18004:2006 Annex D.</summary>
-    /// <author>Sean Owen</author>
     internal sealed class Version {
         /// <summary>See ISO 18004:2006 Annex D.</summary>
         /// <remarks>

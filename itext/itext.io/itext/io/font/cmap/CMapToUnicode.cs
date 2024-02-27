@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,7 +29,6 @@ using iText.IO.Util;
 
 namespace iText.IO.Font.Cmap {
     /// <summary>This class represents a CMap file.</summary>
-    /// <author>Ben Litchfield (ben@benlitchfield.com)</author>
     public class CMapToUnicode : AbstractCMap {
         public static iText.IO.Font.Cmap.CMapToUnicode EmptyCMapToUnicodeMap = new iText.IO.Font.Cmap.CMapToUnicode
             (true);

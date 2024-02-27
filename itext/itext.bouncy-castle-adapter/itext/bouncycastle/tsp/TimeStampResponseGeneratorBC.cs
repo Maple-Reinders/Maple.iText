@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2023 Apryse Group NV
+    Copyright (c) 1998-2024 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,7 @@
  */
 using System;
 using System.Collections;
+using System.Linq;
 using iText.Bouncycastle.Math;
 using iText.Commons.Bouncycastle.Math;
 using Org.BouncyCastle.Tsp;
@@ -57,7 +58,7 @@ namespace iText.Bouncycastle.Tsp {
         /// <param name="algorithms">set of algorithm strings</param>
         public TimeStampResponseGeneratorBC(ITimeStampTokenGenerator tokenGenerator, IList algorithms)
             : this(new TimeStampResponseGenerator(((TimeStampTokenGeneratorBC)tokenGenerator).GetTimeStampTokenGenerator
-                (), algorithms)) {
+                (), algorithms.Cast<String>().ToList())) {
         }
 
         /// <summary>Gets actual org.bouncycastle object being wrapped.</summary>

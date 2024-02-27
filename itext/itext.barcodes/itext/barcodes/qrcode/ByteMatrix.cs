@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -31,7 +31,6 @@ namespace iText.Barcodes.Qrcode {
     /// JAVAPORT: The original code was a 2D array of ints, but since it only ever gets assigned
     /// -1, 0, and 1, I'm going to use less memory and go with bytes.
     /// </remarks>
-    /// <author>dswitkin@google.com (Daniel Switkin)</author>
     public sealed class ByteMatrix {
         private readonly byte[][] bytes;
 

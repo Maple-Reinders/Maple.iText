@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2023 Apryse Group NV
+Copyright (c) 1998-2024 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -336,7 +336,7 @@ namespace iText.Kernel.Font {
         /// </returns>
         public static PdfFont CreateFont(String fontProgram, String encoding, PdfFontFactory.EmbeddingStrategy embeddingStrategy
             , bool cached) {
-            FontProgram fp = FontProgramFactory.CreateFont(fontProgram, cached);
+            FontProgram fp = FontProgramFactory.CreateFont(fontProgram, encoding, cached);
             return CreateFont(fp, encoding, embeddingStrategy);
         }
 
