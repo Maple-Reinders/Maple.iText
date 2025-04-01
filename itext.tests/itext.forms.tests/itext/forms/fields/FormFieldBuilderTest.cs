@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -44,8 +44,16 @@ namespace iText.Forms.Fields {
         public virtual void GetSetConformanceLevelTest() {
             FormFieldBuilderTest.TestBuilder builder = new FormFieldBuilderTest.TestBuilder(DUMMY_DOCUMENT, DUMMY_NAME
                 );
-            builder.SetConformanceLevel(PdfAConformanceLevel.PDF_A_1A);
-            NUnit.Framework.Assert.AreSame(PdfAConformanceLevel.PDF_A_1A, builder.GetConformanceLevel());
+            builder.SetConformance(PdfConformance.PDF_A_1A);
+            NUnit.Framework.Assert.AreSame(PdfAConformance.PDF_A_1A, builder.GetConformance().GetAConformance());
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void GetSetConformanceLevelPdfUATest() {
+            FormFieldBuilderTest.TestBuilder builder = new FormFieldBuilderTest.TestBuilder(DUMMY_DOCUMENT, DUMMY_NAME
+                );
+            builder.SetConformance(PdfConformance.PDF_UA_1);
+            NUnit.Framework.Assert.AreSame(PdfUAConformance.PDF_UA_1, builder.GetConformance().GetUAConformance());
         }
 
         private class TestBuilder : FormFieldBuilder<FormFieldBuilderTest.TestBuilder> {

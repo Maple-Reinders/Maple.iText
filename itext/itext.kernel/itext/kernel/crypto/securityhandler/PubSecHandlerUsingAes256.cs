@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -52,17 +52,24 @@ namespace iText.Kernel.Crypto.Securityhandler {
 
         protected internal override void SetPubSecSpecificHandlerDicEntries(PdfDictionary encryptionDictionary, bool
              encryptMetadata, bool embeddedFilesOnly) {
+            int version = 5;
+            PdfName filter = PdfName.AESV3;
+            SetEncryptionDictEntries(encryptionDictionary, encryptMetadata, embeddedFilesOnly, version, filter);
+        }
+
+//\cond DO_NOT_DOCUMENT
+        internal virtual void SetEncryptionDictEntries(PdfDictionary encryptionDictionary, bool encryptMetadata, bool
+             embeddedFilesOnly, int version, PdfName cryptFilter) {
             encryptionDictionary.Put(PdfName.Filter, PdfName.Adobe_PubSec);
             encryptionDictionary.Put(PdfName.SubFilter, PdfName.Adbe_pkcs7_s5);
-            encryptionDictionary.Put(PdfName.R, new PdfNumber(5));
-            encryptionDictionary.Put(PdfName.V, new PdfNumber(5));
+            encryptionDictionary.Put(PdfName.V, new PdfNumber(version));
             PdfArray recipients = CreateRecipientsArray();
             PdfDictionary stdcf = new PdfDictionary();
             stdcf.Put(PdfName.Recipients, recipients);
             if (!encryptMetadata) {
                 stdcf.Put(PdfName.EncryptMetadata, PdfBoolean.FALSE);
             }
-            stdcf.Put(PdfName.CFM, PdfName.AESV3);
+            stdcf.Put(PdfName.CFM, cryptFilter);
             stdcf.Put(PdfName.Length, new PdfNumber(256));
             PdfDictionary cf = new PdfDictionary();
             cf.Put(PdfName.DefaultCryptFilter, stdcf);
@@ -77,5 +84,11 @@ namespace iText.Kernel.Crypto.Securityhandler {
                 encryptionDictionary.Put(PdfName.StmF, PdfName.DefaultCryptFilter);
             }
         }
+//\endcond
+
+        /// <summary><inheritDoc/></summary>
+        protected internal override void InitMd5MessageDigest() {
+        }
+        //Do nothing to not initialize md5 message digest, since it's not used by AES256 handler
     }
 }

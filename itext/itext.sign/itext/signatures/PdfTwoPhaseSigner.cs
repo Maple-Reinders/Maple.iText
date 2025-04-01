@@ -1,45 +1,78 @@
 /*
-    This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
-    Authors: Apryse Software.
+This file is part of the iText (R) project.
+Copyright (c) 1998-2025 Apryse Group NV
+Authors: Apryse Software.
 
-    This program is offered under a commercial and under the AGPL license.
-    For commercial licensing, contact us at https://itextpdf.com/sales.  For AGPL licensing, see below.
+This program is offered under a commercial and under the AGPL license.
+For commercial licensing, contact us at https://itextpdf.com/sales.  For AGPL licensing, see below.
 
-    AGPL licensing:
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+AGPL licensing:
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-﻿using System;
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+using System;
 using System.Collections.Generic;
 using System.IO;
-using iText.Commons.Bouncycastle.Cert;
-using iText.Commons.Bouncycastle.Crypto;
+using iText.Commons.Digest;
+using iText.Kernel.Crypto;
 using iText.Kernel.Exceptions;
+using iText.Kernel.Mac;
 using iText.Kernel.Pdf;
 using iText.Signatures.Cms;
 using iText.Signatures.Exceptions;
 
 namespace iText.Signatures {
+    /// <summary>
+    /// Class that prepares document and adds the signature to it while performing signing operation in two steps
+    /// (see
+    /// <see cref="PadesTwoPhaseSigningHelper"/>
+    /// for more info).
+    /// </summary>
+    /// <remarks>
+    /// Class that prepares document and adds the signature to it while performing signing operation in two steps
+    /// (see
+    /// <see cref="PadesTwoPhaseSigningHelper"/>
+    /// for more info).
+    /// <para />
+    /// Firstly, this class allows to prepare the document for signing and calculate the document digest to sign.
+    /// Secondly, it adds an existing signature to a PDF where space was already reserved.
+    /// </remarks>
     public class PdfTwoPhaseSigner {
         private readonly PdfReader reader;
 
         private readonly Stream outputStream;
 
+        private IExternalDigest externalDigest;
+
         private StampingProperties stampingProperties = new StampingProperties().UseAppendMode();
 
         private bool closed;
 
+        /// <summary>
+        /// Creates new
+        /// <see cref="PdfTwoPhaseSigner"/>
+        /// instance.
+        /// </summary>
+        /// <param name="reader">
+        /// 
+        /// <see cref="iText.Kernel.Pdf.PdfReader"/>
+        /// instance to read the original PDF file
+        /// </param>
+        /// <param name="outputStream">
+        /// 
+        /// <see cref="System.IO.Stream"/>
+        /// output stream to write the resulting PDF file into
+        /// </param>
         public PdfTwoPhaseSigner(PdfReader reader, Stream outputStream) {
             this.reader = reader;
             this.outputStream = outputStream;
@@ -62,8 +95,13 @@ namespace iText.Signatures {
         /// <returns>the message digest of the prepared document.</returns>
         public virtual byte[] PrepareDocumentForSignature(SignerProperties signerProperties, String digestAlgorithm
             , PdfName filter, PdfName subFilter, int estimatedSize, bool includeDate) {
-            IDigest digest;
-            digest = SignUtils.GetMessageDigest(digestAlgorithm);
+            IMessageDigest digest;
+            if (externalDigest != null) {
+                digest = externalDigest.GetMessageDigest(digestAlgorithm);
+            }
+            else {
+                digest = SignUtils.GetMessageDigest(digestAlgorithm);
+            }
             return PrepareDocumentForSignature(signerProperties, digest, filter, subFilter, estimatedSize, includeDate
                 );
         }
@@ -73,9 +111,26 @@ namespace iText.Signatures {
         /// <param name="fieldName">the field to sign. It must be the last field</param>
         /// <param name="outs">the output PDF</param>
         /// <param name="cmsContainer">the finalized CMS container</param>
+        [System.ObsoleteAttribute(@"AddSignatureToPreparedDocument(iText.Kernel.Pdf.PdfReader, System.String, System.IO.Stream, iText.Signatures.Cms.CMSContainer) should be used instead."
+            )]
         public static void AddSignatureToPreparedDocument(PdfDocument document, String fieldName, Stream outs, CMSContainer
              cmsContainer) {
             PdfSigner.SignatureApplier applier = new PdfSigner.SignatureApplier(document, fieldName, outs);
+            applier.Apply((a) => cmsContainer.Serialize());
+        }
+
+        /// <summary>Adds an existing signature to a PDF where space was already reserved.</summary>
+        /// <param name="reader">
+        /// 
+        /// <see cref="iText.Kernel.Pdf.PdfReader"/>
+        /// that reads the PDF file
+        /// </param>
+        /// <param name="fieldName">the field to sign. It must be the last field</param>
+        /// <param name="outs">the output PDF</param>
+        /// <param name="cmsContainer">the finalized CMS container</param>
+        public static void AddSignatureToPreparedDocument(PdfReader reader, String fieldName, Stream outs, CMSContainer
+             cmsContainer) {
+            PdfSigner.SignatureApplier applier = new PdfSigner.SignatureApplier(reader, fieldName, outs);
             applier.Apply((a) => cmsContainer.Serialize());
         }
 
@@ -84,10 +139,38 @@ namespace iText.Signatures {
         /// <param name="fieldName">the field to sign. It must be the last field</param>
         /// <param name="outs">the output PDF</param>
         /// <param name="signedContent">the bytes for the signed data</param>
+        [System.ObsoleteAttribute(@"AddSignatureToPreparedDocument(iText.Kernel.Pdf.PdfReader, System.String, System.IO.Stream, byte[]) should be used instead."
+            )]
         public static void AddSignatureToPreparedDocument(PdfDocument document, String fieldName, Stream outs, byte
             [] signedContent) {
             PdfSigner.SignatureApplier applier = new PdfSigner.SignatureApplier(document, fieldName, outs);
             applier.Apply((a) => signedContent);
+        }
+
+        /// <summary>Adds an existing signature to a PDF where space was already reserved.</summary>
+        /// <param name="reader">
+        /// 
+        /// <see cref="iText.Kernel.Pdf.PdfReader"/>
+        /// that reads the PDF file
+        /// </param>
+        /// <param name="fieldName">the field to sign. It must be the last field</param>
+        /// <param name="outs">the output PDF</param>
+        /// <param name="signedContent">the bytes for the signed data</param>
+        public static void AddSignatureToPreparedDocument(PdfReader reader, String fieldName, Stream outs, byte[] 
+            signedContent) {
+            PdfSigner.SignatureApplier applier = new PdfSigner.SignatureApplier(reader, fieldName, outs);
+            applier.Apply((a) => signedContent);
+        }
+
+        /// <summary>Use the external digest to inject specific digest implementations</summary>
+        /// <param name="externalDigest">the IExternalDigest instance to use to generate Digests</param>
+        /// <returns>
+        /// same instance of
+        /// <see cref="PdfTwoPhaseSigner"/>
+        /// </returns>
+        public virtual iText.Signatures.PdfTwoPhaseSigner SetExternalDigest(IExternalDigest externalDigest) {
+            this.externalDigest = externalDigest;
+            return this;
         }
 
         /// <summary>Set stamping properties to be used during main signing operation.</summary>
@@ -111,38 +194,24 @@ namespace iText.Signatures {
             return this;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual PdfSigner CreatePdfSigner(SignerProperties signerProperties) {
-            PdfSigner signer = new PdfSigner(reader, outputStream, null, stampingProperties);
-            signer.SetFieldLockDict(signerProperties.GetFieldLockDict());
-            signer.SetFieldName(signerProperties.GetFieldName());
-            // We need to update field name because signer could change it
-            signerProperties.SetFieldName(signer.GetFieldName());
-            signer.SetCertificationLevel(signerProperties.GetCertificationLevel());
-            signer.SetPageRect(signerProperties.GetPageRect());
-            signer.SetPageNumber(signerProperties.GetPageNumber());
-            signer.SetSignDate(signerProperties.GetSignDate());
-            signer.SetSignatureCreator(signerProperties.GetSignatureCreator());
-            signer.SetContact(signerProperties.GetContact());
-            signer.SetReason(signerProperties.GetReason());
-            signer.SetLocation(signerProperties.GetLocation());
-            signer.SetSignatureAppearance(signerProperties.GetSignatureAppearance());
-            return signer;
+            return new PdfSigner(reader, outputStream, null, stampingProperties, signerProperties);
         }
+//\endcond
 
-        private byte[] PrepareDocumentForSignature(SignerProperties signerProperties, IDigest messageDigest, PdfName
-             filter, PdfName subFilter, int estimatedSize, bool includeDate) {
+        private byte[] PrepareDocumentForSignature(SignerProperties signerProperties, IMessageDigest messageDigest
+            , PdfName filter, PdfName subFilter, int estimatedSize, bool includeDate) {
             if (closed) {
                 throw new PdfException(SignExceptionMessageConstant.THIS_INSTANCE_OF_PDF_SIGNER_ALREADY_CLOSED);
             }
             PdfSigner pdfSigner = CreatePdfSigner(signerProperties);
-            
             PdfDocument document = pdfSigner.GetDocument();
             if (document.GetPdfVersion().CompareTo(PdfVersion.PDF_2_0) < 0) {
                 document.GetCatalog().AddDeveloperExtension(PdfDeveloperExtension.ESIC_1_7_EXTENSIONLEVEL2);
             }
             document.GetCatalog().AddDeveloperExtension(PdfDeveloperExtension.ISO_32002);
             document.GetCatalog().AddDeveloperExtension(PdfDeveloperExtension.ISO_32001);
-        
             PdfSignature cryptoDictionary = pdfSigner.CreateSignatureDictionary(includeDate);
             cryptoDictionary.Put(PdfName.Filter, filter);
             cryptoDictionary.Put(PdfName.SubFilter, subFilter);
@@ -153,6 +222,13 @@ namespace iText.Signatures {
             Stream data = pdfSigner.GetRangeStream();
             byte[] digest = DigestAlgorithms.Digest(data, messageDigest);
             byte[] paddedSig = new byte[estimatedSize];
+            if (document.GetDiContainer().GetInstance<IMacContainerLocator>().IsMacContainerLocated()) {
+                byte[] encodedSig = pdfSigner.EmbedMacTokenIntoSignatureContainer(paddedSig);
+                if (estimatedSize < encodedSig.Length) {
+                    throw new System.IO.IOException(SignExceptionMessageConstant.NOT_ENOUGH_SPACE);
+                }
+                Array.Copy(encodedSig, 0, paddedSig, 0, encodedSig.Length);
+            }
             PdfDictionary dic2 = new PdfDictionary();
             dic2.Put(PdfName.Contents, new PdfString(paddedSig).SetHexWriting(true));
             pdfSigner.Close(dic2);

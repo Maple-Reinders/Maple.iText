@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -35,5 +35,13 @@ namespace iText.Commons.Bouncycastle.Asn1.X509 {
         /// </summary>
         /// <returns>CRLReason.keyCompromise value.</returns>
         int GetKeyCompromise();
+
+        /// <summary>
+        /// Gets
+        /// <c>removeFromCRL</c>
+        /// constant for the wrapped CRLReason.
+        /// </summary>
+        /// <returns>CRLReason.removeFromCRL value.</returns>
+        int GetRemoveFromCRL();
     }
 }

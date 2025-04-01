@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,10 +33,10 @@ namespace iText.Layout {
     [NUnit.Framework.Category("IntegrationTest")]
     public class FixedHeightTest : ExtendedITextTest {
         private static readonly String sourceFolder = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
-            .CurrentContext.TestDirectory) + "/resources/itext/layout/FloatAndAlignmentTest/";
+            .CurrentContext.TestDirectory) + "/resources/itext/layout/FixedHeightTest/";
 
         private static readonly String destinationFolder = NUnit.Framework.TestContext.CurrentContext.TestDirectory
-             + "/test/itext/layout/FloatAndAlignmentTest/";
+             + "/test/itext/layout/FixedHeightTest/";
 
         private const String textByron = "When a man hath no freedom to fight for at home,\n" + "    Let him combat for that of his neighbours;\n"
              + "Let him think of the glories of Greece and of Rome,\n" + "    And get knocked on the head for his labours.\n"

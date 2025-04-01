@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using iText.Kernel.Geom;
 
 namespace iText.Layout.Renderer {
+//\cond DO_NOT_DOCUMENT
     internal class FlexItemInfo {
         private AbstractRenderer renderer;
 
@@ -41,4 +42,5 @@ namespace iText.Layout.Renderer {
             return rectangle;
         }
     }
+//\endcond
 }

@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -37,11 +37,13 @@ using iText.Commons.Bouncycastle.Cert.Ocsp;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Bouncycastle.Math;
 using iText.Commons.Bouncycastle.Tsp;
+using iText.Commons.Digest;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf;
 using iText.Signatures.Exceptions;
 
 namespace iText.Signatures {
+    //\cond DO_NOT_DOCUMENT 
     internal sealed class SignUtils {
         private static readonly IBouncyCastleFactory FACTORY = BouncyCastleFactoryCreator.GetFactory();
 
@@ -83,8 +85,12 @@ namespace iText.Signatures {
             return extensionValue.IsNull() ? null : extensionValue.GetDerEncoded();
         }
 
-        internal static IDigest GetMessageDigest(String hashAlgorithm) {
-            return FACTORY.CreateIDigest(hashAlgorithm);
+        internal static IMessageDigest GetMessageDigest(String hashAlgorithm) {
+            return new BouncyCastleDigest().GetMessageDigest(hashAlgorithm);
+        }
+        
+        internal static IMessageDigest GetMessageDigest(String hashAlgorithm, IExternalDigest externalDigest) {
+            return externalDigest.GetMessageDigest(hashAlgorithm);
         }
 
         internal static Stream GetHttpResponse(Uri urlt) {
@@ -205,37 +211,6 @@ namespace iText.Signatures {
             response.encoding = httpWebResponse.Headers[HttpResponseHeader.ContentEncoding];
             return response;
         }
-        
-        /// <summary>
-        /// This behavior is different in Java and .NET, because in Java we use this two-step check:
-        /// first via #hasUnsupportedCriticalExtension method, and then additionally allowing standard critical extensions;
-        /// in .NET there's only second step. However, removing first step in Java can be a breaking change for some users
-        /// and moreover we don't have any means of providing customization for unsupported extensions check as of right now.
-        ///
-        /// During major release I'd suggest changing java unsupported extensions check logic to the same as in .NET,
-        /// but only if it is possible to customize this logic.
-        /// </summary>
-        /// <param name="cert"></param>
-        /// <returns></returns>
-        /// TODO DEVSIX-2634
-        [Obsolete]
-        internal static bool HasUnsupportedCriticalExtension(IX509Certificate cert) {
-            if ( cert == null ) {
-                throw new ArgumentException("X509Certificate can't be null.");
-            }
-
-            ISet<string> criticalExtensionsSet = cert.GetCriticalExtensionOids();
-            if (criticalExtensionsSet != null) {
-                foreach (String oid in criticalExtensionsSet) {
-                    if (OID.X509Extensions.SUPPORTED_CRITICAL_EXTENSIONS.Contains(oid)) {
-                        continue;
-                        
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
 
         internal static DateTime GetTimeStampDate(ITstInfo timeStampTokenInfo) {
             return timeStampTokenInfo.GetGenTime();
@@ -261,12 +236,9 @@ namespace iText.Signatures {
             return rootStore;
         }
 
-        internal static void SetRSASSAPSSParamsWithMGF1(ISigner signature, String digestAlgoName, int saltLen, int trailerField)
-        {
-         //     var mgf1Spec = new MgfParameters() MGF1ParameterSpec(digestAlgoName);
-         //    PSSParameterSpec spec = new Pss  PSSParameterSpec(digestAlgoName, "MGF1", mgf1Spec, saltLen, trailerField);
-         // signature.  setParameter(spec);
-         }
+        internal static void SetRSASSAPSSParamsWithMGF1(ISigner signature, String digestAlgoName, int saltLen, int trailerField) {
+            signature.InitRsaPssSigner(digestAlgoName, saltLen, trailerField);
+        }
         
         internal static void UpdateVerifier(ISigner sig, byte[] digest) {
             sig.UpdateVerifier(digest);
@@ -281,4 +253,5 @@ namespace iText.Signatures {
             return FACTORY.CreateX509Certificate(data);
         }
     }
+   //\endcond 
 }

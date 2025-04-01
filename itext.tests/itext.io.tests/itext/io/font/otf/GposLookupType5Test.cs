@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -34,19 +34,20 @@ namespace iText.IO.Font.Otf {
 
         [NUnit.Framework.Test]
         public virtual void VerifyMarkToBaseAttachment() {
-            TrueTypeFont fontProgram = (TrueTypeFont)FontProgramFactory.CreateFont(RESOURCE_FOLDER + "KhmerOS.ttf");
+            TrueTypeFont fontProgram = (TrueTypeFont)FontProgramFactory.CreateFont(RESOURCE_FOLDER + "NotoSansKhmer-Regular.ttf"
+                );
             GlyphPositioningTableReader gposTableReader = fontProgram.GetGposTable();
-            GposLookupType5 lookup = (GposLookupType5)gposTableReader.GetLookupTable(0);
+            GposLookupType5 lookup = (GposLookupType5)gposTableReader.GetLookupTable(25);
             IList<Glyph> glyphs = JavaUtil.ArraysAsList(new Glyph(fontProgram.GetGlyphByCode(445)), new Glyph(fontProgram
                 .GetGlyphByCode(394)));
             GlyphLine gl = new GlyphLine(glyphs);
-            gl.idx = 1;
+            gl.SetIdx(1);
             lookup.TransformOne(gl);
             NUnit.Framework.Assert.AreEqual(2, gl.Size());
             NUnit.Framework.Assert.AreEqual(445, gl.Get(0).GetCode());
             NUnit.Framework.Assert.AreEqual(394, gl.Get(1).GetCode());
-            NUnit.Framework.Assert.AreEqual(-1, gl.Get(1).GetAnchorDelta());
-            NUnit.Framework.Assert.AreEqual(756, gl.Get(1).GetXPlacement());
+            NUnit.Framework.Assert.AreEqual(0, gl.Get(1).GetAnchorDelta());
+            NUnit.Framework.Assert.AreEqual(0, gl.Get(1).GetXPlacement());
         }
 
         [NUnit.Framework.Test]
@@ -60,7 +61,7 @@ namespace iText.IO.Font.Otf {
                 (75)));
             GlyphPositioningTableReader gposTableReader = fontProgram.GetGposTable();
             GposLookupType5 lookup = (GposLookupType5)gposTableReader.GetLookupTable(3);
-            glyphLine.idx = 1;
+            glyphLine.SetIdx(1);
             lookup.TransformOne(glyphLine);
             NUnit.Framework.Assert.AreEqual(2, glyphLine.Size());
             NUnit.Framework.Assert.AreEqual(513, glyphLine.Get(0).GetCode());
@@ -77,13 +78,24 @@ namespace iText.IO.Font.Otf {
                 (75)));
             GlyphPositioningTableReader gposTableReader = fontProgram.GetGposTable();
             GposLookupType5 lookup = (GposLookupType5)gposTableReader.GetLookupTable(3);
-            glyphLine.idx = 1;
+            glyphLine.SetIdx(1);
             lookup.TransformOne(glyphLine);
             NUnit.Framework.Assert.AreEqual(2, glyphLine.Size());
             NUnit.Framework.Assert.AreEqual(1490, glyphLine.Get(0).GetCode());
             NUnit.Framework.Assert.AreEqual(75, glyphLine.Get(1).GetCode());
             NUnit.Framework.Assert.AreEqual(0, glyphLine.Get(1).GetAnchorDelta());
             NUnit.Framework.Assert.AreEqual(0, glyphLine.Get(1).GetXPlacement());
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void IdxBiggerThanLineEndTest() {
+            TrueTypeFont fontProgram = (TrueTypeFont)FontProgramFactory.CreateFont(RESOURCE_FOLDER + "NotoNaskhArabic-Regular.ttf"
+                );
+            GlyphLine glyphLine = new GlyphLine(JavaCollectionsUtil.SingletonList(fontProgram.GetGlyph(203)));
+            GlyphPositioningTableReader gposTableReader = fontProgram.GetGposTable();
+            GposLookupType5 lookup = (GposLookupType5)gposTableReader.GetLookupTable(3);
+            glyphLine.SetIdx(10);
+            NUnit.Framework.Assert.IsFalse(lookup.TransformOne(glyphLine));
         }
     }
 }

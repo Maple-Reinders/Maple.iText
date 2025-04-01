@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 
 namespace iText.IO.Font.Woff2 {
+//\cond DO_NOT_DOCUMENT
     /// <summary>Helper class to deal with unsigned primitives in java</summary>
     internal class JavaUnsignedUtil {
         public static int AsU16(short number) {
@@ -46,4 +47,5 @@ namespace iText.IO.Font.Woff2 {
                 )));
         }
     }
+//\endcond
 }

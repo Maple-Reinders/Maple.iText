@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,6 +30,7 @@ using iText.Layout.Layout;
 using iText.Layout.Renderer;
 
 namespace iText.Forms.Form.Renderer {
+//\cond DO_NOT_DOCUMENT
     /// <summary>Custom implementation for rendering form field values.</summary>
     /// <remarks>
     /// Custom implementation for rendering form field values. It makes sure that text value
@@ -85,4 +86,5 @@ namespace iText.Forms.Form.Renderer {
             this.callTrimFirst = callTrimFirst;
         }
     }
+//\endcond
 }

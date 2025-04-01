@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,8 +23,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using iText.Commons.Utils;
-using iText.Kernel.Events;
 using iText.Kernel.Exceptions;
+using iText.Kernel.Pdf.Event;
 using iText.Kernel.Pdf.Layer;
 
 namespace iText.Kernel.Pdf {
@@ -549,13 +549,19 @@ namespace iText.Kernel.Pdf {
         }
 
         private class DeepFlushingContext {
+//\cond DO_NOT_DOCUMENT
             // null stands for every key to be in black list
             internal ICollection<PdfName> blackList;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             // null stands for every key to be taking unconditional context
             internal IDictionary<PdfName, PageFlushingHelper.DeepFlushingContext> innerContexts;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal PageFlushingHelper.DeepFlushingContext unconditionalInnerContext;
+//\endcond
 
             public DeepFlushingContext(ICollection<PdfName> blackList, IDictionary<PdfName, PageFlushingHelper.DeepFlushingContext
                 > innerContexts) {

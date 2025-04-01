@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,9 +23,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using iText.Commons.Utils;
+using iText.Forms;
 using iText.Forms.Fields.Properties;
 using iText.Forms.Form.Renderer;
 using iText.IO.Image;
+using iText.Kernel.Pdf.Tagutils;
 using iText.Layout.Element;
 using iText.Layout.Properties;
 using iText.Layout.Renderer;
@@ -60,12 +62,24 @@ namespace iText.Forms.Form.Element {
         /// <see cref="SignatureFieldAppearance"/>
         /// instance.
         /// </summary>
-        /// <param name="id">the id.</param>
+        /// <param name="id">
+        /// signature field name if you use this
+        /// <see cref="SignatureFieldAppearance"/>
+        /// in pure layout for the new
+        /// interactive signature field creation. ID will be ignored if this
+        /// <see cref="SignatureFieldAppearance"/>
+        /// is used for signing or for existing signature field
+        /// </param>
         public SignatureFieldAppearance(String id)
             : base(
-                        // We should support signing of existing fields with dots in name.
+                        // ID is required for the new interactive signature field creation. We can't provide parameterless constructor
+                        
+                        // since the user might misuse it for unintended purpose, and we have to generate a unique field name
+                        
+                        // that doesn't exist in the document acroform, which we don't have access to at this level.
                         id != null && id.Contains(".") ? "" : id) {
             if (id.Contains(".")) {
+                // We should support signing of existing fields with dots in name.
                 idWithDots = id;
             }
             // Draw the borders inside the element by default
@@ -248,6 +262,14 @@ namespace iText.Forms.Form.Element {
         /// </returns>
         public override String GetId() {
             return idWithDots == null ? base.GetId() : idWithDots;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public override AccessibilityProperties GetAccessibilityProperties() {
+            if (tagProperties == null) {
+                tagProperties = new FormDefaultAccessibilityProperties(FormDefaultAccessibilityProperties.FORM_FIELD_TEXT);
+            }
+            return tagProperties;
         }
 
         /// <summary><inheritDoc/></summary>

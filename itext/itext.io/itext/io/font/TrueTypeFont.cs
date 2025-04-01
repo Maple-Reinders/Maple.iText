@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -75,13 +75,17 @@ namespace iText.IO.Font {
             : this(new OpenTypeParser(ttf)) {
         }
 
+//\cond DO_NOT_DOCUMENT
         internal TrueTypeFont(String ttcPath, int ttcIndex)
             : this(new OpenTypeParser(ttcPath, ttcIndex)) {
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal TrueTypeFont(byte[] ttc, int ttcIndex)
             : this(new OpenTypeParser(ttc, ttcIndex)) {
         }
+//\endcond
 
         public override bool HasKernPairs() {
             return kerning.Size() > 0;

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -71,7 +71,7 @@ namespace iText.Kernel.Pdf.Annot {
         public virtual void ScreenEmbeddedWavFromStreamTest() {
             String filename = destinationFolder + "screenEmbeddedWavFromStreamTest.pdf";
             String cmp = sourceFolder + "cmp_" + "screenEmbeddedWavFromStreamTest.pdf";
-            using (FileStream @is = new FileStream(sourceFolder + "sample.wav", FileMode.Open, FileAccess.Read)) {
+            using (Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sample.wav")) {
                 using (PdfDocument pdfDoc = new PdfDocument(CompareTool.CreateTestPdfWriter(filename))) {
                     PdfFileSpec spec = PdfFileSpec.CreateEmbeddedFileSpec(pdfDoc, @is, null, "sample.wav", null, null);
                     AddPageWithScreenAnnotation(pdfDoc, spec);

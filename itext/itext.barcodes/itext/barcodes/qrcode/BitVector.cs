@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using System;
 using System.Text;
 
 namespace iText.Barcodes.Qrcode {
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// JAVAPORT: This should be combined with BitArray in the future, although that class is not yet
     /// dynamically resizeable.
@@ -195,4 +196,5 @@ namespace iText.Barcodes.Qrcode {
             sizeInBits += 8;
         }
     }
+//\endcond
 }

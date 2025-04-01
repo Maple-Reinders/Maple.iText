@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -40,11 +40,17 @@ namespace iText.Kernel.Pdf.Canvas.Wmf {
 
         public const int PS_INSIDEFRAME = 6;
 
+//\cond DO_NOT_DOCUMENT
         internal int style = PS_SOLID;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal int penWidth = 1;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal Color color = ColorConstants.BLACK;
+//\endcond
 
         /// <summary>Creates a MetaPen object.</summary>
         public MetaPen()

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -56,6 +56,8 @@ namespace iText.Signatures.Testutils {
 
         private const String OID_OCSP_NONCE_EXTENSION = "1.3.6.1.5.5.7.48.1.2";
 
+        private const String ID_ATTR_PDF_MAC_DATA = "1.0.32004.1.2";
+
         private static readonly IAsn1Dump DUMP = BOUNCY_CASTLE_FACTORY.CreateASN1Dump();
 
         private static readonly ICollection<String> IGNORED_OIDS;
@@ -66,6 +68,7 @@ namespace iText.Signatures.Testutils {
             tempSet.Add(OID_TST_INFO);
             tempSet.Add(OID_SIGNING_TIME);
             tempSet.Add(OID_OCSP_NONCE_EXTENSION);
+            tempSet.Add(ID_ATTR_PDF_MAC_DATA);
             IGNORED_OIDS = JavaCollectionsUtil.UnmodifiableSet(tempSet);
         }
 

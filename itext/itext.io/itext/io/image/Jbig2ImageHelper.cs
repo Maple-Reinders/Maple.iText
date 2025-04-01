@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,6 +27,7 @@ using iText.IO.Exceptions;
 using iText.IO.Source;
 
 namespace iText.IO.Image {
+//\cond DO_NOT_DOCUMENT
     internal class Jbig2ImageHelper {
         private byte[] globals;
 
@@ -63,8 +64,8 @@ namespace iText.IO.Image {
                 sr.Read();
                 Jbig2SegmentReader.Jbig2Page p = sr.GetPage(image.GetPage());
                 raf.Close();
-                image.SetHeight(p.pageBitmapHeight);
-                image.SetWidth(p.pageBitmapWidth);
+                image.SetHeight(p.GetPageBitmapHeight());
+                image.SetWidth(p.GetPageBitmapWidth());
                 image.SetBpc(1);
                 image.SetColorEncodingComponentsNumber(1);
                 byte[] globals = sr.GetGlobal(true);
@@ -83,4 +84,5 @@ namespace iText.IO.Image {
             }
         }
     }
+//\endcond
 }

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -66,6 +66,7 @@ namespace iText.StyledXmlParser.Jsoup.Select {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Parse the query</summary>
         /// <returns>Evaluator</returns>
         internal virtual Evaluator Parse() {
@@ -100,6 +101,7 @@ namespace iText.StyledXmlParser.Jsoup.Select {
             }
             return new CombiningEvaluator.And(evals);
         }
+//\endcond
 
         private void Combinator(char combinator) {
             tq.ConsumeWhitespace();

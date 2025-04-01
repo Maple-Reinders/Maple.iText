@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,7 +22,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using iText.Commons;
 using iText.Kernel.Exceptions;
+using iText.Kernel.Logs;
 
 namespace iText.Kernel.Pdf {
     /// <summary>
@@ -43,6 +46,9 @@ namespace iText.Kernel.Pdf {
     /// </remarks>
     /// <seealso cref="ReaderProperties.SetMemoryLimitsAwareHandler(MemoryLimitsAwareHandler)"/>
     public class MemoryLimitsAwareHandler {
+        private static readonly ILogger LOGGER = ITextLogManager.GetLogger(typeof(iText.Kernel.Pdf.MemoryLimitsAwareHandler
+            ));
+
         private const int SINGLE_SCALE_COEFFICIENT = 100;
 
         private const int SUM_SCALE_COEFFICIENT = 500;
@@ -69,7 +75,9 @@ namespace iText.Kernel.Pdf {
 
         private long memoryUsedForCurrentPdfStreamDecompression = 0;
 
+//\cond DO_NOT_DOCUMENT
         internal bool considerCurrentPdfStream = false;
+//\endcond
 
         /// <summary>
         /// Creates a
@@ -111,6 +119,29 @@ namespace iText.Kernel.Pdf {
             this.maxSizeOfDecompressedPdfStreamsSum = maxSizeOfDecompressedPdfStreamsSum;
             this.maxNumberOfElementsInXrefStructure = maxNumberOfElementsInXrefStructure;
             this.maxXObjectsSizePerPage = maxXObjectsSizePerPage;
+        }
+
+        /// <summary>
+        /// Creates a new instance of
+        /// <see cref="MemoryLimitsAwareHandler"/>
+        /// by copying settings from this instance
+        /// of
+        /// <see cref="MemoryLimitsAwareHandler"/>.
+        /// </summary>
+        /// <returns>
+        /// a new instance of
+        /// <see cref="MemoryLimitsAwareHandler"/>.
+        /// </returns>
+        public virtual iText.Kernel.Pdf.MemoryLimitsAwareHandler CreateNewInstance() {
+            iText.Kernel.Pdf.MemoryLimitsAwareHandler to = new iText.Kernel.Pdf.MemoryLimitsAwareHandler();
+            to.maxSizeOfSingleDecompressedPdfStream = this.maxSizeOfSingleDecompressedPdfStream;
+            to.maxSizeOfDecompressedPdfStreamsSum = this.maxSizeOfDecompressedPdfStreamsSum;
+            to.maxNumberOfElementsInXrefStructure = this.maxNumberOfElementsInXrefStructure;
+            to.maxXObjectsSizePerPage = this.maxXObjectsSizePerPage;
+            if (this.GetType() != typeof(iText.Kernel.Pdf.MemoryLimitsAwareHandler)) {
+                LOGGER.LogWarning(KernelLogMessageConstant.MEMORYLIMITAWAREHANDLER_OVERRIDE_CREATENEWINSTANCE_METHOD);
+            }
+            return to;
         }
 
         /// <summary>Gets the maximum allowed size which can be occupied by a single decompressed pdf stream.</summary>
@@ -248,6 +279,7 @@ namespace iText.Kernel.Pdf {
             return documentSizeInMb * MIN_LIMIT_FOR_NUMBER_OF_ELEMENTS_IN_XREF_STRUCTURE;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Considers the number of bytes which are occupied by the decompressed pdf stream.</summary>
         /// <remarks>
         /// Considers the number of bytes which are occupied by the decompressed pdf stream.
@@ -271,7 +303,9 @@ namespace iText.Kernel.Pdf {
             }
             return this;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Begins handling of current pdf stream decompression.</summary>
         /// <returns>
         /// this
@@ -283,7 +317,9 @@ namespace iText.Kernel.Pdf {
             considerCurrentPdfStream = true;
             return this;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Ends handling of current pdf stream decompression.</summary>
         /// <remarks>
         /// Ends handling of current pdf stream decompression.
@@ -305,10 +341,13 @@ namespace iText.Kernel.Pdf {
             considerCurrentPdfStream = false;
             return this;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual long GetAllMemoryUsedForDecompression() {
             return allMemoryUsedForDecompression;
         }
+//\endcond
 
         private static long CalculateDefaultParameter(long documentSize, int scale, long min) {
             long result = documentSize * scale;

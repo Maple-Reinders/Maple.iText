@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,7 +24,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using iText.Commons.Utils;
+using iText.IO.Font;
 using iText.IO.Font.Constants;
+using iText.IO.Font.Otf;
 using iText.IO.Image;
 using iText.IO.Source;
 using iText.IO.Util;
@@ -51,14 +53,17 @@ namespace iText.Kernel.Pdf.Canvas {
         private static readonly String SOURCE_FOLDER = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
             .CurrentContext.TestDirectory) + "/resources/itext/kernel/pdf/canvas/PdfCanvasTest/";
 
+        private static readonly String FONTS_FOLDER = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
+            .CurrentContext.TestDirectory) + "/resources/itext/kernel/pdf/fonts/";
+
         private const String AUTHOR = "iText Software";
 
         private const String CREATOR = "iText";
 
         private const String TITLE = "Empty iText Document";
 
-        private sealed class _ContentProvider_75 : PdfCanvasTest.ContentProvider {
-            public _ContentProvider_75() {
+        private sealed class _ContentProvider_87 : PdfCanvasTest.ContentProvider {
+            public _ContentProvider_87() {
             }
 
             public void DrawOnCanvas(PdfCanvas canvas, int pageNumber) {
@@ -68,7 +73,7 @@ namespace iText.Kernel.Pdf.Canvas {
             }
         }
 
-        private static readonly PdfCanvasTest.ContentProvider DEFAULT_CONTENT_PROVIDER = new _ContentProvider_75();
+        private static readonly PdfCanvasTest.ContentProvider DEFAULT_CONTENT_PROVIDER = new _ContentProvider_87();
 
         [NUnit.Framework.OneTimeSetUp]
         public static void BeforeClass() {
@@ -242,12 +247,12 @@ namespace iText.Kernel.Pdf.Canvas {
             int pageCount = 1000;
             String filename = DESTINATION_FOLDER + "1000PagesDocumentWithText.pdf";
             PdfWriter writer = CompareTool.CreateTestPdfWriter(filename);
-            CreateStandardDocument(writer, pageCount, new _ContentProvider_376());
+            CreateStandardDocument(writer, pageCount, new _ContentProvider_388());
             AssertStandardDocument(filename, pageCount);
         }
 
-        private sealed class _ContentProvider_376 : PdfCanvasTest.ContentProvider {
-            public _ContentProvider_376() {
+        private sealed class _ContentProvider_388 : PdfCanvasTest.ContentProvider {
+            public _ContentProvider_388() {
             }
 
             public void DrawOnCanvas(PdfCanvas canvas, int pageNumber) {
@@ -746,7 +751,7 @@ namespace iText.Kernel.Pdf.Canvas {
             PdfDocument document = new PdfDocument(CompareTool.CreateTestPdfWriter(DESTINATION_FOLDER + "gifImageTest02.pdf"
                 ));
             PdfPage page = document.AddNewPage();
-            Stream @is = new FileStream(SOURCE_FOLDER + "2-frames.gif", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "2-frames.gif");
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int reads = @is.Read();
             while (reads != -1) {
@@ -766,7 +771,7 @@ namespace iText.Kernel.Pdf.Canvas {
             PdfDocument document = new PdfDocument(CompareTool.CreateTestPdfWriter(DESTINATION_FOLDER + "gifImageTest03.pdf"
                 ));
             PdfPage page = document.AddNewPage();
-            Stream @is = new FileStream(SOURCE_FOLDER + "2-frames.gif", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "2-frames.gif");
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int reads = @is.Read();
             while (reads != -1) {
@@ -786,7 +791,7 @@ namespace iText.Kernel.Pdf.Canvas {
             PdfDocument document = new PdfDocument(CompareTool.CreateTestPdfWriter(DESTINATION_FOLDER + "gifImageTest04.pdf"
                 ));
             PdfPage page = document.AddNewPage();
-            Stream @is = new FileStream(SOURCE_FOLDER + "2-frames.gif", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "2-frames.gif");
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int reads = @is.Read();
             while (reads != -1) {
@@ -807,7 +812,7 @@ namespace iText.Kernel.Pdf.Canvas {
             PdfDocument document = new PdfDocument(CompareTool.CreateTestPdfWriter(DESTINATION_FOLDER + "gifImageTest05.pdf"
                 ));
             PdfPage page = document.AddNewPage();
-            Stream @is = new FileStream(SOURCE_FOLDER + "animated_fox_dog.gif", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "animated_fox_dog.gif");
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int reads = @is.Read();
             while (reads != -1) {
@@ -855,6 +860,58 @@ namespace iText.Kernel.Pdf.Canvas {
             document.Close();
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(destFile, cmpFile, DESTINATION_FOLDER, "diff_"
                 ));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CanvasStreamFlushedNoException() {
+            PdfDocument doc = new PdfDocument(new PdfWriter(new ByteArrayOutputStream()));
+            PdfStream stream = new _PdfStream_1123();
+            stream.Put(PdfName.Filter, new PdfName("FlateDecode"));
+            NUnit.Framework.Assert.DoesNotThrow(() => {
+                new PdfCanvas(stream, new PdfResources(), doc);
+            }
+            );
+        }
+
+        private sealed class _PdfStream_1123 : PdfStream {
+            public _PdfStream_1123() {
+                this.isFlushed = false;
+            }
+
+            private bool isFlushed;
+
+            public override bool IsFlushed() {
+                System.Console.Out.WriteLine("isFlushed: " + this.isFlushed);
+                if (this.isFlushed) {
+                    return true;
+                }
+                this.isFlushed = true;
+                return false;
+            }
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CanvasInitializationStampingExistingStreamMemoryLimitAware() {
+            String srcFile = SOURCE_FOLDER + "pageWithContent.pdf";
+            ReaderProperties properties = new ReaderProperties();
+            MemoryLimitsAwareHandler handler = new _MemoryLimitsAwareHandler_1146();
+            handler.SetMaxSizeOfSingleDecompressedPdfStream(1);
+            properties.SetMemoryLimitsAwareHandler(handler);
+            PdfDocument document = new PdfDocument(new PdfReader(srcFile, properties));
+            PdfPage page = document.GetPage(1);
+            NUnit.Framework.Assert.Catch(typeof(MemoryLimitsAwareException), () => {
+                new PdfCanvas(page.GetLastContentStream(), page.GetResources(), page.GetDocument());
+            }
+            );
+        }
+
+        private sealed class _MemoryLimitsAwareHandler_1146 : MemoryLimitsAwareHandler {
+            public _MemoryLimitsAwareHandler_1146() {
+            }
+
+            public override bool IsMemoryLimitsAwarenessRequiredOnDecompression(PdfArray filters) {
+                return true;
+            }
         }
 
         [NUnit.Framework.Test]
@@ -1160,6 +1217,105 @@ namespace iText.Kernel.Pdf.Canvas {
                 ));
         }
 
+        [NUnit.Framework.Test]
+        public virtual void IgnorePageRotationForContentTest() {
+            String outPdf = DESTINATION_FOLDER + "ignorePageRotationForContent.pdf";
+            String cmpPdf = SOURCE_FOLDER + "cmp_ignorePageRotationForContent.pdf";
+            using (PdfDocument pdfDoc = new PdfDocument(CompareTool.CreateTestPdfWriter(outPdf))) {
+                pdfDoc.GetDocumentInfo().SetAuthor(AUTHOR).SetCreator(CREATOR).SetTitle(TITLE);
+                PdfPage page = pdfDoc.AddNewPage().SetRotation(270);
+                // When "true": in case the page has a rotation, then new content will be automatically rotated in the
+                // opposite direction. On the rotated page this would look as if new content ignores page rotation.
+                page.SetIgnorePageRotationForContent(true);
+                PdfCanvas canvas = new PdfCanvas(page, false);
+                canvas.SaveState().BeginText().MoveText(180, 350).SetFontAndSize(PdfFontFactory.CreateFont(StandardFonts.HELVETICA
+                    ), 30).ShowText("Page rotation is set to 270 degrees,").EndText().RestoreState();
+                PdfCanvas canvas2 = new PdfCanvas(page, false);
+                canvas2.SaveState().BeginText().MoveText(180, 250).SetFontAndSize(PdfFontFactory.CreateFont(StandardFonts.
+                    HELVETICA), 30).ShowText("but new content ignores page rotation").EndText().RestoreState();
+                page.Flush();
+            }
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, DESTINATION_FOLDER, "diff_"
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void GetResourcesTest() {
+            String outPdf = DESTINATION_FOLDER + "getResourcesDoc.pdf";
+            PdfDocument pdfDoc = new PdfDocument(CompareTool.CreateTestPdfWriter(outPdf));
+            PdfPage page1 = pdfDoc.AddNewPage();
+            PdfCanvas canvas = new PdfCanvas(page1);
+            canvas.SaveState().BeginText().MoveText(150, 400).SetFontAndSize(PdfFontFactory.CreateFont(), 8).ShowText(
+                "test text").EndText().RestoreState();
+            PdfResources resources = canvas.GetResources();
+            pdfDoc.Close();
+            NUnit.Framework.Assert.AreEqual(1, resources.GetResourceNames().Count);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void AttachContentStreamTest() {
+            String outPdf = DESTINATION_FOLDER + "attachContentStreamDoc.pdf";
+            PdfDocument pdfDoc = new PdfDocument(CompareTool.CreateTestPdfWriter(outPdf));
+            PdfPage page1 = pdfDoc.AddNewPage();
+            PdfCanvas canvas = new PdfCanvas(page1);
+            canvas.AttachContentStream(new PdfStream("test".GetBytes(System.Text.Encoding.UTF8)));
+            String contentFromStream = iText.Commons.Utils.JavaUtil.GetStringForBytes(canvas.GetContentStream().GetBytes
+                (), System.Text.Encoding.UTF8);
+            pdfDoc.Close();
+            NUnit.Framework.Assert.AreEqual("test", contentFromStream);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void GraphicStateFontNullTest() {
+            String outPdf = DESTINATION_FOLDER + "showTextDoc.pdf";
+            using (PdfDocument pdfDoc = new PdfDocument(CompareTool.CreateTestPdfWriter(outPdf))) {
+                PdfPage page1 = pdfDoc.AddNewPage();
+                PdfCanvas canvas = new PdfCanvas(page1);
+                GlyphLine glyphLine = new GlyphLine();
+                canvas.GetGraphicsState().SetFont(null);
+                ActualTextIterator actualTextIterator = new ActualTextIterator(glyphLine);
+                NUnit.Framework.Assert.Catch(typeof(PdfException), () => canvas.ShowText(glyphLine, actualTextIterator));
+            }
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void GlyphlineActualTextTest() {
+            String outFileName = DESTINATION_FOLDER + "glyphlineActualText.pdf";
+            using (PdfDocument pdfDocument = new PdfDocument(CompareTool.CreateTestPdfWriter(outFileName))) {
+                PdfFont font = PdfFontFactory.CreateFont(FONTS_FOLDER + "NotoSansCJKjp-Bold.otf", PdfEncodings.IDENTITY_H);
+                IList<Glyph> glyphs = JavaCollectionsUtil.SingletonList(font.GetGlyph((int)'\u65E0'));
+                GlyphLine glyphLine = new GlyphLine(glyphs);
+                glyphLine.SetActualText(0, 1, "TEST");
+                PdfCanvas canvas = new PdfCanvas(pdfDocument.AddNewPage());
+                canvas.SaveState().BeginText().SetFontAndSize(font, 7).ShowText(glyphLine).EndText().RestoreState();
+                String contentstream = iText.Commons.Utils.JavaUtil.GetStringForBytes(canvas.GetContentStream().GetBytes()
+                    , System.Text.Encoding.UTF8);
+                canvas.Release();
+                NUnit.Framework.Assert.IsTrue(contentstream.Contains("/ActualText"));
+            }
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void LineDashTest() {
+            String outPdf = DESTINATION_FOLDER + "lineDash.pdf";
+            String cmpPdf = SOURCE_FOLDER + "cmp_lineDash.pdf";
+            using (PdfDocument pdfDocument = new PdfDocument(CompareTool.CreateTestPdfWriter(outPdf))) {
+                PdfCanvas canvas = new PdfCanvas(pdfDocument.AddNewPage());
+                canvas.SaveState().SetTextRenderingMode(PdfCanvasConstants.TextRenderingMode.FILL_STROKE).SetStrokeColor(ColorConstants
+                    .BLUE).SetLineWidth(2).SetFontAndSize(PdfFontFactory.CreateFont(StandardFonts.HELVETICA), 30);
+                canvas.SetLineDash(3);
+                canvas.BeginText().MoveText(180, 250).ShowText("phase 3").EndText();
+                canvas.SetLineDash(new float[] { 0, 0, 0 }, 2);
+                canvas.BeginText().MoveText(180, 350).ShowText("dashArray [0, 0, 0]").EndText();
+                canvas.SetLineDash(new float[] { 5, -5 }, 1);
+                canvas.BeginText().MoveText(180, 450).ShowText("dashArray [5, -5]").EndText();
+                canvas.SetLineDash(5, -10);
+                canvas.BeginText().MoveText(180, 550).ShowText("phase -10").EndText().RestoreState();
+            }
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, DESTINATION_FOLDER, "diff_"
+                ));
+        }
+
         private void CreateStandardDocument(PdfWriter writer, int pageCount, PdfCanvasTest.ContentProvider contentProvider
             ) {
             PdfDocument pdfDoc = new PdfDocument(writer);
@@ -1177,7 +1333,7 @@ namespace iText.Kernel.Pdf.Canvas {
         private void AssertStandardDocument(String filename, int pageCount) {
             PdfReader reader = CompareTool.CreateOutputReader(filename);
             PdfDocument pdfDocument = new PdfDocument(reader);
-            NUnit.Framework.Assert.AreEqual(false, reader.HasRebuiltXref(), "Rebuilt");
+            NUnit.Framework.Assert.IsFalse(reader.HasRebuiltXref(), "Rebuilt");
             PdfDictionary info = pdfDocument.GetTrailer().GetAsDictionary(PdfName.Info);
             NUnit.Framework.Assert.AreEqual(AUTHOR, info.Get(PdfName.Author).ToString(), "Author");
             NUnit.Framework.Assert.AreEqual(CREATOR, info.Get(PdfName.Creator).ToString(), "Creator");

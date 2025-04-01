@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -42,6 +42,7 @@ namespace iText.Svg.Renderers.Path.Impl {
         String[] MakeCoordinatesAbsolute(String[] relativeCoordinates, double[] initialPoint);
     }
 
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// Implementation of
     /// <see cref="IOperatorConverter"/>
@@ -69,7 +70,9 @@ namespace iText.Svg.Renderers.Path.Impl {
             return result;
         }
     }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// Default implementation of
     /// <see cref="IOperatorConverter"/>
@@ -86,4 +89,5 @@ namespace iText.Svg.Renderers.Path.Impl {
             return SvgCoordinateUtils.MakeRelativeOperatorCoordinatesAbsolute(relativeCoordinates, initialPoint);
         }
     }
+//\endcond
 }

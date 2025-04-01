@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -76,5 +76,17 @@ namespace iText.Commons.Bouncycastle.Asn1 {
         /// </summary>
         /// <param name="element">AlgorithmIdentifier wrapper.</param>
         void AddOptional(IAlgorithmIdentifier element);
+
+        /// <summary>
+        /// Calls actual
+        /// <c>size</c>
+        /// method for the wrapped ASN1EncodableVector object.
+        /// </summary>
+        /// <returns>
+        /// 
+        /// <c>int</c>
+        /// representing current vector size
+        /// </returns>
+        int Size();
     }
 }

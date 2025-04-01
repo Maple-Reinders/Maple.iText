@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,9 +25,12 @@ using System;
 namespace iText.StyledXmlParser.Css {
     /// <summary>Abstract superclass for all CSS at-rules (rules in CSS that start with an @ sign).</summary>
     public abstract class CssAtRule : CssStatement {
+//\cond DO_NOT_DOCUMENT
         /// <summary>The rule name.</summary>
         internal String ruleName;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Creates a new
         /// <see cref="CssAtRule"/>
@@ -37,6 +40,7 @@ namespace iText.StyledXmlParser.Css {
         internal CssAtRule(String ruleName) {
             this.ruleName = ruleName;
         }
+//\endcond
 
         /// <summary>Gets the rule name.</summary>
         /// <returns>the rule name</returns>

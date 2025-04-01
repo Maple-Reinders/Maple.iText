@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,14 +25,18 @@ using iText.Test.Pdfa;
 using iText.Test.Utils;
 
 namespace iText.Test {
-    // Android-Conversion-Skip-Line (TODO DEVSIX-7377 introduce pdf\a validation on Android)
+    // Android-Conversion-Skip-File (TODO DEVSIX-7377 introduce pdf\a validation on Android)
     [NUnit.Framework.Category("UnitTest")]
     public class VeraPdfLoggerValidationTest : ExtendedITextTest {
+//\cond DO_NOT_DOCUMENT
         internal static readonly String SOURCE_FOLDER = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
             .CurrentContext.TestDirectory) + "/resources/itext/pdftest/cmp/VeraPdfLoggerValidationTest/";
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static readonly String DESTINATION_FOLDER = NUnit.Framework.TestContext.CurrentContext.TestDirectory
              + "/test/itext/pdftest/VeraPdfLoggerValidationTest/";
+//\endcond
 
         [NUnit.Framework.OneTimeSetUp]
         public static void BeforeClass() {
@@ -40,21 +44,69 @@ namespace iText.Test {
         }
 
         [NUnit.Framework.Test]
-        public virtual void CheckValidatorLogsTest() {
-            String fileNameWithWarnings = "cmp_pdfA2b_checkValidatorLogsTest_with_warnings.pdf";
-            String fileNameWithoutWarnings = "cmp_pdfA2b_checkValidatorLogsTest.pdf";
+        public virtual void CheckValidatorLogsNoOutputTest() {
+            String source = "pdfA2b_checkValidatorLogsTest.pdf";
+            String target = "checkValidatorLogsNoOutputTest.pdf";
+            FileUtil.Copy(SOURCE_FOLDER + source, DESTINATION_FOLDER + target);
+            NUnit.Framework.Assert.IsNull(new VeraPdfValidator().Validate(DESTINATION_FOLDER + target));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CheckValidatorLogsWithWarningTest() {
+            String source = "pdfA2b_checkValidatorLogsTest_with_warnings.pdf";
+            String target = "checkValidatorLogsWitWarningTest.pdf";
+            FileUtil.Copy(SOURCE_FOLDER + source, DESTINATION_FOLDER + target);
+            String expectedWarningsForFileWithWarnings = "The following warnings and errors were logged during validation:\n"
+                 + "WARNING: Invalid embedded cff font. Charset range exceeds number of glyphs\n" + "WARNING: Missing OutputConditionIdentifier in an output intent dictionary\n"
+                 + "WARNING: The Top DICT does not begin with ROS operator";
+            IgnoreRunningWhenNative((isNative) => {
+                NUnit.Framework.Assert.AreEqual(expectedWarningsForFileWithWarnings, new VeraPdfValidator().Validate(DESTINATION_FOLDER
+                     + target));
+            }
+            );
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CheckValidatorLogsCleanupTest() {
+            String fileNameWithWarnings = "pdfA2b_checkValidatorLogsTest_with_warnings.pdf";
+            String fileNameWithoutWarnings = "pdfA2b_checkValidatorLogsTest.pdf";
             FileUtil.Copy(SOURCE_FOLDER + fileNameWithWarnings, DESTINATION_FOLDER + fileNameWithWarnings);
             FileUtil.Copy(SOURCE_FOLDER + fileNameWithoutWarnings, DESTINATION_FOLDER + fileNameWithoutWarnings);
             String expectedWarningsForFileWithWarnings = "The following warnings and errors were logged during validation:\n"
                  + "WARNING: Invalid embedded cff font. Charset range exceeds number of glyphs\n" + "WARNING: Missing OutputConditionIdentifier in an output intent dictionary\n"
                  + "WARNING: The Top DICT does not begin with ROS operator";
-            NUnit.Framework.Assert.AreEqual(expectedWarningsForFileWithWarnings, new VeraPdfValidator().Validate(DESTINATION_FOLDER
-                 + fileNameWithWarnings));
-            // Android-Conversion-Skip-Line (TODO DEVSIX-7377 introduce pdf\a validation on Android)
-            //We check that the logs are empty after the first check
-            NUnit.Framework.Assert.IsNull(new VeraPdfValidator().Validate(DESTINATION_FOLDER + fileNameWithoutWarnings
-                ));
+            IgnoreRunningWhenNative((isNative) => {
+                NUnit.Framework.Assert.AreEqual(expectedWarningsForFileWithWarnings, new VeraPdfValidator().Validate(DESTINATION_FOLDER
+                     + fileNameWithWarnings));
+                //We check that the logs are empty after the first check
+                NUnit.Framework.Assert.IsNull(new VeraPdfValidator().Validate(DESTINATION_FOLDER + fileNameWithoutWarnings
+                    ));
+            }
+            );
         }
-        // Android-Conversion-Skip-Line (TODO DEVSIX-7377 introduce pdf\a validation on Android)
+
+        [NUnit.Framework.Test]
+        public virtual void CheckValidatorLogsForFileContainingErrorsTest() {
+            String source = "pdfA2b_checkValidatorLogsTest_with_errors.pdf";
+            String target = "checkValidatorLogsForFileContainingErrorsTest.pdf";
+            FileUtil.Copy(SOURCE_FOLDER + source, DESTINATION_FOLDER + target);
+            String expectedResponseForErrors = "VeraPDF verification failed. See verification results: file:";
+            IgnoreRunningWhenNative((isNative) => {
+                String result = new VeraPdfValidator().Validate(DESTINATION_FOLDER + target);
+                NUnit.Framework.Assert.IsTrue(result.StartsWith(expectedResponseForErrors));
+            }
+            );
+        }
+
+        private static readonly bool isNative = Environment.GetEnvironmentVariable("org.graalvm.nativeimage.imagecode"
+            ) != null;
+
+        public static void IgnoreRunningWhenNative(Action<Object> test) {
+            // VeraPdf doesn't work in native mode so skip VeraPdf validation
+            if (isNative) {
+                return;
+            }
+            test(isNative);
+        }
     }
 }

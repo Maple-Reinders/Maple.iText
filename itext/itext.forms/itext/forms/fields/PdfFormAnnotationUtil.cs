@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -81,7 +81,6 @@ namespace iText.Forms.Fields {
             bool tagged = document.IsTagged();
             if (tagged) {
                 tagPointer = document.GetTagStructureContext().GetAutoTaggingPointer();
-                //TODO DEVSIX-4117 PrintField attributes
                 if (!StandardRoles.FORM.Equals(tagPointer.GetRole())) {
                     tagPointer.AddTag(StandardRoles.FORM);
                 }
@@ -103,6 +102,7 @@ namespace iText.Forms.Fields {
                     kidDict.Remove(PdfName.Parent);
                     field.GetPdfObject().MergeDifferent(kidDict);
                     field.RemoveChildren();
+                    kidDict.GetIndirectReference().SetFree();
                     field.SetChildField(PdfFormAnnotation.MakeFormAnnotation(field.GetPdfObject(), field.GetDocument()));
                     ReplaceAnnotationOnPage(kidDict, field.GetPdfObject());
                 }

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -45,7 +45,9 @@ namespace iText.Layout.Renderer {
 
         protected internal IList<IRenderer> waitingDrawingElements = new List<IRenderer>();
 
+//\cond DO_NOT_DOCUMENT
         internal IList<Rectangle> floatRendererAreas;
+//\endcond
 
         private IRenderer keepWithNextHangingRenderer;
 
@@ -327,6 +329,7 @@ namespace iText.Layout.Renderer {
             FlushWaitingDrawingElements(true);
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void FlushWaitingDrawingElements(bool force) {
             ICollection<IRenderer> flushedElements = new HashSet<IRenderer>();
             for (int i = 0; i < waitingDrawingElements.Count; ++i) {
@@ -345,7 +348,9 @@ namespace iText.Layout.Renderer {
             }
             waitingDrawingElements.RemoveAll(flushedElements);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal void LinkRenderToDocument(IRenderer renderer, PdfDocument pdfDocument) {
             if (renderer == null) {
                 return;
@@ -362,6 +367,7 @@ namespace iText.Layout.Renderer {
                 }
             }
         }
+//\endcond
 
         private void ProcessRenderer(IRenderer renderer, IList<IRenderer> resultRenderers) {
             AlignChildHorizontally(renderer, currentArea.GetBBox());

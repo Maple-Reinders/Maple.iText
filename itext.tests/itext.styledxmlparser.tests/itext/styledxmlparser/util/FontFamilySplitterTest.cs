@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,6 +30,7 @@ namespace iText.StyledXmlParser.Util {
     public class FontFamilySplitterTest : ExtendedITextTest {
         [NUnit.Framework.Test]
         public virtual void FontFamilySplitter() {
+            //TODO DEVSIX-1130: Adapt after fix
             String fontFamilies = "'Puritan'\n" + "Puritan\n" + "'Pur itan'\n" + "Pur itan\n" + "'Pur it an'\n" + "Pur it an\n"
                  + "   \"Puritan\"\n" + "Puritan\n" + "  \"Pur itan\"\n" + "Pur itan\n" + "\"Pur it an\"\n" + "Pur it an\n"
                  + "FreeSans\n" + "FreeSans\n" + "'Puritan', FreeSans\n" + "Puritan; FreeSans\n" + "'Pur itan' , FreeSans\n"

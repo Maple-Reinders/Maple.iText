@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -34,8 +34,8 @@ namespace iText.Forms.Fields {
         /// <summary>Name of the form field.</summary>
         private readonly String formFieldName;
 
-        /// <summary>Conformance level of the form field.</summary>
-        private PdfAConformanceLevel conformanceLevel = null;
+        /// <summary>Conformance of the form field.</summary>
+        private PdfConformance conformance = null;
 
         /// <summary>
         /// Creates builder for
@@ -47,6 +47,9 @@ namespace iText.Forms.Fields {
         protected internal FormFieldBuilder(PdfDocument document, String formFieldName) {
             this.document = document;
             this.formFieldName = formFieldName;
+            if (document != null) {
+                this.conformance = document.GetConformance();
+            }
         }
 
         /// <summary>Gets document to be used for form field creation.</summary>
@@ -65,25 +68,25 @@ namespace iText.Forms.Fields {
             return formFieldName;
         }
 
-        /// <summary>Gets conformance level for form field creation.</summary>
+        /// <summary>Gets conformance for form field creation.</summary>
         /// <returns>
         /// instance of
-        /// <see cref="iText.Kernel.Pdf.PdfAConformanceLevel"/>
+        /// <see cref="iText.Kernel.Pdf.PdfConformance"/>
         /// to be used for form field creation
         /// </returns>
-        public virtual PdfAConformanceLevel GetConformanceLevel() {
-            return conformanceLevel;
+        public virtual PdfConformance GetConformance() {
+            return conformance;
         }
 
-        /// <summary>Sets conformance level for form field creation.</summary>
-        /// <param name="conformanceLevel">
-        /// instance of
-        /// <see cref="iText.Kernel.Pdf.PdfAConformanceLevel"/>
-        /// to be used for form field creation
+        /// <summary>Sets conformance for form field creation.</summary>
+        /// <param name="conformance">
+        /// Instance of
+        /// <see cref="iText.Kernel.Pdf.PdfConformance"/>
+        /// to be used for form field creation.
         /// </param>
         /// <returns>this builder</returns>
-        public virtual T SetConformanceLevel(PdfAConformanceLevel conformanceLevel) {
-            this.conformanceLevel = conformanceLevel;
+        public virtual T SetConformance(PdfConformance conformance) {
+            this.conformance = conformance;
             return GetThis();
         }
 

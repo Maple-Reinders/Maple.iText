@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -65,6 +65,7 @@ namespace iText.Kernel.Font {
 
         private readonly CMapToUnicode embeddedToUnicode;
 
+//\cond DO_NOT_DOCUMENT
         internal PdfType0Font(TrueTypeFont ttf, String cmap)
             : base() {
             if (!PdfEncodings.IDENTITY_H.Equals(cmap) && !PdfEncodings.IDENTITY_V.Equals(cmap)) {
@@ -92,7 +93,9 @@ namespace iText.Kernel.Font {
                 }
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         // Note. Make this constructor protected. Only PdfFontFactory (kernel level) will
         // be able to create Type0 font based on predefined font.
         // Or not? Possible it will be convenient construct PdfType0Font based on custom CidFont.
@@ -111,7 +114,9 @@ namespace iText.Kernel.Font {
             cidFontType = CID_FONT_TYPE_0;
             embeddedToUnicode = null;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal PdfType0Font(PdfDictionary fontDictionary)
             : base(fontDictionary) {
             newFont = false;
@@ -196,6 +201,7 @@ namespace iText.Kernel.Font {
             usedGlyphs = new SortedSet<int>();
             subset = false;
         }
+//\endcond
 
         /// <summary>Get Unicode mapping name from ordering.</summary>
         /// <param name="ordering">the text ordering to base to unicode mapping on</param>
@@ -243,7 +249,7 @@ namespace iText.Kernel.Font {
             // TODO DEVSIX-7568 handle unicode value with cmap and use only glyphByCode
             Glyph glyph = GetFontProgram().GetGlyph(unicode);
             if (glyph == null && (glyph = notdefGlyphs.Get(unicode)) == null) {
-                // Handle special layout characters like sfthyphen (00AD).
+                // Handle special layout characters like softhyphen (00AD).
                 // This glyphs will be skipped while converting to bytes
                 Glyph notdef = GetFontProgram().GetGlyphByCode(0);
                 if (notdef != null) {
@@ -357,13 +363,13 @@ namespace iText.Kernel.Font {
             CMapCharsetEncoder encoder = StandardCMapCharsets.GetEncoder(cmapEncoding.GetCmapName());
             if (encoder == null) {
                 int totalByteCount = 0;
-                for (int i = glyphLine.start; i < glyphLine.end; i++) {
+                for (int i = glyphLine.GetStart(); i < glyphLine.GetEnd(); i++) {
                     totalByteCount += cmapEncoding.GetCmapBytesLength(glyphLine.Get(i).GetCode());
                 }
                 // perform actual conversion
                 byte[] bytes = new byte[totalByteCount];
                 int offset = 0;
-                for (int i = glyphLine.start; i < glyphLine.end; i++) {
+                for (int i = glyphLine.GetStart(); i < glyphLine.GetEnd(); i++) {
                     usedGlyphs.Add(glyphLine.Get(i).GetCode());
                     offset = cmapEncoding.FillCmapBytes(glyphLine.Get(i).GetCode(), bytes, offset);
                 }
@@ -371,7 +377,7 @@ namespace iText.Kernel.Font {
             }
             else {
                 MemoryStream baos = new MemoryStream();
-                for (int i = glyphLine.start; i < glyphLine.end; i++) {
+                for (int i = glyphLine.GetStart(); i < glyphLine.GetEnd(); i++) {
                     Glyph g = glyphLine.Get(i);
                     usedGlyphs.Add(g.GetCode());
                     byte[] encodedBit = encoder.EncodeUnicodeCodePoint(g.GetUnicode());
@@ -677,7 +683,7 @@ namespace iText.Kernel.Font {
         public override float GetContentWidth(PdfString content) {
             float width = 0;
             GlyphLine glyphLine = DecodeIntoGlyphLine(content);
-            for (int i = glyphLine.start; i < glyphLine.end; i++) {
+            for (int i = glyphLine.GetStart(); i < glyphLine.GetEnd(); i++) {
                 width += glyphLine.Get(i).GetWidth();
             }
             return width;
@@ -914,7 +920,8 @@ namespace iText.Kernel.Font {
 
         private PdfObject GenerateWidthsArray() {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            OutputStream<ByteArrayOutputStream> stream = new OutputStream<ByteArrayOutputStream>(bytes);
+            HighPrecisionOutputStream<ByteArrayOutputStream> stream = new HighPrecisionOutputStream<ByteArrayOutputStream
+                >(bytes);
             stream.WriteByte('[');
             int lastNumber = -10;
             bool firstTime = true;
@@ -947,8 +954,8 @@ namespace iText.Kernel.Font {
         /// <summary>Creates a ToUnicode CMap to allow copy and paste from Acrobat.</summary>
         /// <returns>the stream representing this CMap or <c>null</c></returns>
         public virtual PdfStream GetToUnicode() {
-            OutputStream<ByteArrayOutputStream> stream = new OutputStream<ByteArrayOutputStream>(new ByteArrayOutputStream
-                ());
+            HighPrecisionOutputStream<ByteArrayOutputStream> stream = new HighPrecisionOutputStream<ByteArrayOutputStream
+                >(new ByteArrayOutputStream());
             stream.WriteString("/CIDInit /ProcSet findresource begin\n" + "12 dict begin\n" + "begincmap\n" + "/CIDSystemInfo\n"
                  + "<< /Registry (Adobe)\n" + "/Ordering (UCS)\n" + "/Supplement 0\n" + ">> def\n" + "/CMapName /Adobe-Identity-UCS def\n"
                  + "/CMapType 2 def\n" + "1 begincodespacerange\n" + "<0000><FFFF>\n" + "endcodespacerange\n");
@@ -973,7 +980,8 @@ namespace iText.Kernel.Font {
             return new PdfStream(((ByteArrayOutputStream)stream.GetOutputStream()).ToArray());
         }
 
-        private int WriteBfrange(OutputStream<ByteArrayOutputStream> stream, IList<Glyph> range) {
+        private static int WriteBfrange(HighPrecisionOutputStream<ByteArrayOutputStream> stream, IList<Glyph> range
+            ) {
             if (range.IsEmpty()) {
                 return 0;
             }

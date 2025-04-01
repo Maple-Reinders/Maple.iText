@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -65,7 +65,7 @@ namespace iText.Kernel.Pdf {
         //indicate nearest first Indirect reference object which includes current reading the object, using for PdfString decrypt
         private PdfIndirectReference currentIndirectReference;
 
-        private XMPMeta xmpMeta;
+        private PdfReader.XrefProcessor xrefProcessor = new PdfReader.XrefProcessor();
 
         protected internal PdfTokenizer tokens;
 
@@ -83,8 +83,6 @@ namespace iText.Kernel.Pdf {
 
         protected internal PdfDocument pdfDocument;
 
-        protected internal PdfAConformanceLevel pdfAConformanceLevel;
-
         protected internal ReaderProperties properties;
 
         protected internal bool encrypted = false;
@@ -96,6 +94,10 @@ namespace iText.Kernel.Pdf {
         protected internal bool fixedXref = false;
 
         protected internal bool xrefStm = false;
+
+        private XMPMeta xmpMeta;
+
+        private PdfConformance pdfConformance;
 
         /// <summary>Constructs a new PdfReader.</summary>
         /// <param name="byteSource">source of bytes for the reader</param>
@@ -158,10 +160,19 @@ namespace iText.Kernel.Pdf {
             : this(filename, new ReaderProperties()) {
         }
 
+        /// <summary>Reads and parses a PDF document.</summary>
+        /// <param name="file">the file of the document</param>
+        /// <param name="properties">properties of the created reader</param>
+        public PdfReader(FileInfo file, ReaderProperties properties)
+            : this(file.FullName, properties) {
+        }
+
+//\cond DO_NOT_DOCUMENT
         internal PdfReader(IRandomAccessSource byteSource, ReaderProperties properties, bool closeStream) {
             this.properties = properties;
             this.tokens = GetOffsetTokeniser(byteSource, closeStream);
         }
+//\endcond
 
         /// <summary>
         /// Close
@@ -370,6 +381,9 @@ namespace iText.Kernel.Pdf {
         /// </param>
         /// <returns>byte[] array.</returns>
         public virtual byte[] ReadStreamBytesRaw(PdfStream stream) {
+            if (stream == null) {
+                throw new PdfException(KernelExceptionMessageConstant.UNABLE_TO_READ_STREAM_BYTES);
+            }
             PdfName type = stream.GetAsName(PdfName.Type);
             if (!PdfName.XRef.Equals(type) && !PdfName.ObjStm.Equals(type)) {
                 CheckPdfStreamLength(stream);
@@ -429,6 +443,7 @@ namespace iText.Kernel.Pdf {
                 catch (Exception) {
                 }
             }
+            // ignored
             return bytes;
         }
 
@@ -600,8 +615,8 @@ namespace iText.Kernel.Pdf {
         /// <see cref="WriterProperties.SetStandardEncryption(byte[], byte[], int, int)"/>.
         /// See ISO 32000-1, Table 22 for more details.
         /// </remarks>
-        /// <returns>the encryption permissions, an unsigned 32-bit quantity.</returns>
-        public virtual long GetPermissions() {
+        /// <returns>the encryption permissions.</returns>
+        public virtual int GetPermissions() {
             /* !pdfDocument.getXref().isReadingCompleted() can be used for encryption properties as well,
             * because decrypt object is initialized in private readDecryptObj method which is called in our code
             * in the next line after the setting isReadingCompleted line. This means that there's no way for users
@@ -610,9 +625,9 @@ namespace iText.Kernel.Pdf {
             if (pdfDocument == null || !pdfDocument.GetXref().IsReadingCompleted()) {
                 throw new PdfException(KernelExceptionMessageConstant.DOCUMENT_HAS_NOT_BEEN_READ_YET);
             }
-            long perm = 0;
+            int perm = 0;
             if (encrypted && decrypt.GetPermissions() != null) {
-                perm = (long)decrypt.GetPermissions();
+                perm = decrypt.GetPermissions().Value;
             }
             return perm;
         }
@@ -636,37 +651,29 @@ namespace iText.Kernel.Pdf {
             }
         }
 
-        /// <summary>Gets the declared PDF/A conformance level of the source document that is being read.</summary>
+        /// <summary>Gets the declared PDF conformance of the source document that is being read.</summary>
         /// <remarks>
-        /// Gets the declared PDF/A conformance level of the source document that is being read.
+        /// Gets the declared PDF conformance of the source document that is being read.
         /// Note that this information is provided via XMP metadata and is not verified by iText.
-        /// <see cref="pdfAConformanceLevel"/>
-        /// is lazy initialized.
+        /// Conformance is lazy initialized.
         /// It will be initialized during the first call of this method.
         /// </remarks>
-        /// <returns>
-        /// conformance level of the source document, or
-        /// <see langword="null"/>
-        /// if no PDF/A
-        /// conformance level information is specified.
-        /// </returns>
-        public virtual PdfAConformanceLevel GetPdfAConformanceLevel() {
-            if (pdfAConformanceLevel == null) {
+        /// <returns>conformance of the source document</returns>
+        public virtual PdfConformance GetPdfConformance() {
+            if (pdfConformance == null) {
                 if (pdfDocument == null || !pdfDocument.GetXref().IsReadingCompleted()) {
                     throw new PdfException(KernelExceptionMessageConstant.DOCUMENT_HAS_NOT_BEEN_READ_YET);
                 }
                 try {
                     if (xmpMeta == null && pdfDocument.GetXmpMetadata() != null) {
-                        xmpMeta = XMPMetaFactory.ParseFromBuffer(pdfDocument.GetXmpMetadata());
+                        xmpMeta = pdfDocument.GetXmpMetadata();
                     }
-                    if (xmpMeta != null) {
-                        pdfAConformanceLevel = PdfAConformanceLevel.GetConformanceLevel(xmpMeta);
-                    }
+                    pdfConformance = PdfConformance.GetConformance(xmpMeta);
                 }
                 catch (XMPException) {
                 }
             }
-            return pdfAConformanceLevel;
+            return pdfConformance;
         }
 
         /// <summary>Computes user password if standard encryption handler is used with Standard40, Standard128 or AES128 encryption algorithm.
@@ -763,6 +770,22 @@ namespace iText.Kernel.Pdf {
             return encrypted;
         }
 
+        /// <summary>
+        /// Gets a copy of
+        /// <see cref="ReaderProperties"/>
+        /// used to create this instance of
+        /// <see cref="PdfReader"/>.
+        /// </summary>
+        /// <returns>
+        /// a copy of
+        /// <see cref="ReaderProperties"/>
+        /// used to create this instance of
+        /// <see cref="PdfReader"/>
+        /// </returns>
+        public virtual ReaderProperties GetPropertiesCopy() {
+            return new ReaderProperties(properties);
+        }
+
         /// <summary>Parses the entire PDF</summary>
         protected internal virtual void ReadPdf() {
             String version = tokens.CheckPdfHeader();
@@ -789,8 +812,7 @@ namespace iText.Kernel.Pdf {
             }
             catch (Exception ex) {
                 if (PdfReader.StrictnessLevel.CONSERVATIVE.IsStricter(this.GetStrictnessLevel())) {
-                    ILogger logger = ITextLogManager.GetLogger(typeof(iText.Kernel.Pdf.PdfReader));
-                    logger.LogError(ex, iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT);
+                    LogXrefException(ex);
                     RebuildXref();
                 }
                 else {
@@ -802,6 +824,9 @@ namespace iText.Kernel.Pdf {
         }
 
         protected internal virtual void ReadObjectStream(PdfStream objectStream) {
+            if (objectStream == null) {
+                throw new PdfException(KernelExceptionMessageConstant.UNABLE_TO_READ_OBJECT_STREAM);
+            }
             int objectStreamNumber = objectStream.GetIndirectReference().GetObjNumber();
             int first = objectStream.GetAsNumber(PdfName.First).IntValue();
             int n = objectStream.GetAsNumber(PdfName.N).IntValue();
@@ -899,8 +924,8 @@ namespace iText.Kernel.Pdf {
                         return CreatePdfNullInstance(readAsDirect);
                     }
                     else {
-                        throw new PdfException(KernelExceptionMessageConstant.INVALID_INDIRECT_REFERENCE, MessageFormatUtil.Format
-                            ("{0} {1} R", reference.GetObjNumber(), reference.GetGenNumber()));
+                        throw new PdfException(MessageFormatUtil.Format(KernelExceptionMessageConstant.INVALID_INDIRECT_REFERENCE, 
+                            reference.GetObjNumber(), reference.GetGenNumber()), reference);
                     }
                 }
             }
@@ -1215,6 +1240,7 @@ namespace iText.Kernel.Pdf {
                     }
                 }
             }
+            ProcessXref(xref);
             PdfDictionary trailer = (PdfDictionary)ReadObject(false);
             PdfObject xrs = trailer.Get(PdfName.XRefStm);
             if (xrs != null && xrs.GetObjectType() == PdfObject.NUMBER) {
@@ -1355,6 +1381,7 @@ namespace iText.Kernel.Pdf {
                         ++start;
                     }
                 }
+                ProcessXref(xref);
                 ptr = prev;
                 if (alreadyVisitedXrefStreams.Contains(ptr)) {
                     throw new XrefCycledReferencesException(KernelExceptionMessageConstant.XREF_STREAM_HAS_CYCLED_REFERENCES);
@@ -1455,6 +1482,9 @@ namespace iText.Kernel.Pdf {
                 PdfDictionary dic = (PdfDictionary)ReadObject(false);
                 return dic.Get(PdfName.Root, false) != null;
             }
+            catch (MemoryLimitsAwareException e) {
+                throw;
+            }
             catch (Exception) {
                 return false;
             }
@@ -1493,9 +1523,17 @@ namespace iText.Kernel.Pdf {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual bool IsMemorySavingMode() {
             return memorySavingMode;
         }
+//\endcond
+
+//\cond DO_NOT_DOCUMENT
+        internal virtual void SetXrefProcessor(PdfReader.XrefProcessor xrefProcessor) {
+            this.xrefProcessor = xrefProcessor;
+        }
+//\endcond
 
         private void ProcessArrayReadError() {
             String error = MessageFormatUtil.Format(KernelExceptionMessageConstant.UNEXPECTED_TOKEN, iText.Commons.Utils.JavaUtil.GetStringForBytes
@@ -1535,6 +1573,7 @@ namespace iText.Kernel.Pdf {
                         , filter));
                 }
             }
+            decrypt.ConfigureEncryptionParametersFromReader(pdfDocument, trailer);
         }
 
         private PdfObject ReadObject(PdfIndirectReference reference, bool fixXref) {
@@ -1549,6 +1588,10 @@ namespace iText.Kernel.Pdf {
                 if (reference.GetObjStreamNumber() > 0) {
                     PdfStream objectStream = (PdfStream)pdfDocument.GetXref().Get(reference.GetObjStreamNumber()).GetRefersTo(
                         false);
+                    if (objectStream == null) {
+                        throw new PdfException(MessageFormatUtil.Format(KernelExceptionMessageConstant.INVALID_OBJECT_STREAM_NUMBER
+                            , reference.GetObjNumber(), reference.GetObjStreamNumber(), reference.GetIndex()));
+                    }
                     ReadObjectStream(objectStream);
                     return reference.refersTo;
                 }
@@ -1692,6 +1735,33 @@ namespace iText.Kernel.Pdf {
             return tok;
         }
 
+        private void ProcessXref(PdfXrefTable xrefTable) {
+            long currentPosition = tokens.GetPosition();
+            try {
+                xrefProcessor.ProcessXref(xrefTable, tokens);
+            }
+            finally {
+                tokens.Seek(currentPosition);
+            }
+        }
+
+        private static void LogXrefException(Exception ex) {
+            ILogger logger = ITextLogManager.GetLogger(typeof(iText.Kernel.Pdf.PdfReader));
+            if (ex.InnerException != null) {
+                logger.LogError(MessageFormatUtil.Format(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE
+                    , ex.InnerException.Message));
+            }
+            else {
+                if (ex.Message != null) {
+                    logger.LogError(MessageFormatUtil.Format(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE
+                        , ex.Message));
+                }
+                else {
+                    logger.LogError(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT);
+                }
+            }
+        }
+
         protected internal class ReusableRandomAccessSource : IRandomAccessSource {
             private ByteBuffer buffer;
 
@@ -1749,9 +1819,11 @@ namespace iText.Kernel.Pdf {
 
             private readonly int levelValue;
 
+//\cond DO_NOT_DOCUMENT
             internal StrictnessLevel(int levelValue) {
                 this.levelValue = levelValue;
             }
+//\endcond
 
             /// <summary>
             /// Checks whether the current instance represents more strict reading level than
@@ -1777,6 +1849,28 @@ namespace iText.Kernel.Pdf {
                 return compareWith == null || this.levelValue > compareWith.levelValue;
             }
         }
+
+//\cond DO_NOT_DOCUMENT
+        /// <summary>Class containing a callback which is called on every xref table reading.</summary>
+        internal class XrefProcessor {
+//\cond DO_NOT_DOCUMENT
+            /// <summary>Process xref table.</summary>
+            /// <param name="xrefTable">
+            /// 
+            /// <see cref="PdfXrefTable"/>
+            /// to be processed
+            /// </param>
+            /// <param name="tokenizer">
+            /// 
+            /// <see cref="iText.IO.Source.PdfTokenizer"/>
+            /// to be processed
+            /// </param>
+            internal virtual void ProcessXref(PdfXrefTable xrefTable, PdfTokenizer tokenizer) {
+            }
+//\endcond
+            // Do nothing.
+        }
+//\endcond
 
         void System.IDisposable.Dispose() {
             Close();

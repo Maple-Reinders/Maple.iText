@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -56,9 +56,6 @@ namespace iText.Forms.Form {
         /// <summary>The Constant FORM_FIELD_LABEL.</summary>
         public const int FORM_FIELD_LABEL = PROPERTY_START + 10;
 
-        /// <summary>The Constant FORM_ACCESSIBILITY_LANGUAGE.</summary>
-        public const int FORM_ACCESSIBILITY_LANGUAGE = PROPERTY_START + 11;
-
         /// <summary>The Constant FORM_FIELD_RADIO_GROUP_NAME.</summary>
         public const int FORM_FIELD_RADIO_GROUP_NAME = PROPERTY_START + 12;
 
@@ -70,6 +67,21 @@ namespace iText.Forms.Form {
 
         /// <summary>The Constant FORM_CONFORMANCE_LEVEL.</summary>
         public const int FORM_CONFORMANCE_LEVEL = PROPERTY_START + 15;
+
+        /// <summary>The Constant LIST_BOX_TOP_INDEX representing the index of the first visible option in a scrollable list.
+        ///     </summary>
+        public const int LIST_BOX_TOP_INDEX = PROPERTY_START + 16;
+
+        /// <summary>
+        /// The Constant TEXT_FIELD_COMB_FLAG representing
+        /// <c>Comb</c>
+        /// flag for the text field.
+        /// </summary>
+        public const int TEXT_FIELD_COMB_FLAG = PROPERTY_START + 17;
+
+        /// <summary>The Constant TEXT_FIELD_MAX_LEN representing the maximum length of the field's text, in characters.
+        ///     </summary>
+        public const int TEXT_FIELD_MAX_LEN = PROPERTY_START + 18;
 
         private FormProperty() {
         }

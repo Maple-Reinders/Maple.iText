@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,7 +30,7 @@ using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf.Filters;
 
 namespace iText.Kernel.Pdf {
-    public class PdfOutputStream : OutputStream<iText.Kernel.Pdf.PdfOutputStream> {
+    public class PdfOutputStream : HighPrecisionOutputStream<iText.Kernel.Pdf.PdfOutputStream> {
         private static readonly byte[] stream = ByteUtils.GetIsoBytes("stream\n");
 
         private static readonly byte[] endstream = ByteUtils.GetIsoBytes("\nendstream");
@@ -119,6 +119,7 @@ namespace iText.Kernel.Pdf {
             return this;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Writes corresponding amount of bytes from a given long</summary>
         /// <param name="bytes">a source of bytes, must be &gt;= 0</param>
         /// <param name="size">expected amount of bytes</param>
@@ -128,7 +129,9 @@ namespace iText.Kernel.Pdf {
                 Write((byte)(bytes >> 8 * size & 0xff));
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Writes corresponding amount of bytes from a given int</summary>
         /// <param name="bytes">a source of bytes, must be &gt;= 0</param>
         /// <param name="size">expected amount of bytes</param>
@@ -136,6 +139,7 @@ namespace iText.Kernel.Pdf {
             //safe convert to long, despite sign.
             Write(bytes & 0xFFFFFFFFL, size);
         }
+//\endcond
 
         private void Write(PdfArray pdfArray) {
             WriteByte('[');

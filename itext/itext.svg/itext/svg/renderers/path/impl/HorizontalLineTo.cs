@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,12 +22,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using iText.Kernel.Geom;
-using iText.Svg.Utils;
 
 namespace iText.Svg.Renderers.Path.Impl {
     /// <summary>Implements lineTo(H) attribute of SVG's path element</summary>
     public class HorizontalLineTo : LineTo {
+//\cond DO_NOT_DOCUMENT
         internal const int ARGUMENT_SIZE = 1;
+//\endcond
 
         /// <summary>Creates an absolute Horizontal LineTo.</summary>
         public HorizontalLineTo()
@@ -45,7 +46,8 @@ namespace iText.Svg.Renderers.Path.Impl {
             String[] normalizedCoords = new String[LineTo.ARGUMENT_SIZE];
             // An H or h command is equivalent to an L or l command with 0 specified for the y coordinate.
             normalizedCoords[0] = inputCoordinates[0];
-            normalizedCoords[1] = IsRelative() ? "0" : SvgCssUtils.ConvertDoubleToString(startPoint.GetY());
+            normalizedCoords[1] = IsRelative() ? "0" : Convert.ToString(startPoint.GetY(), System.Globalization.CultureInfo.InvariantCulture
+                );
             base.SetCoordinates(normalizedCoords, startPoint);
         }
     }

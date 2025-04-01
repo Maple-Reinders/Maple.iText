@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using iText.Commons.Bouncycastle.Cert;
 
 namespace iText.Signatures {
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// Empty
     /// <see cref="IIssuingCertificateRetriever"/>
@@ -65,6 +66,10 @@ namespace iText.Signatures {
             return new IX509Certificate[0];
         }
 
+        public virtual IX509Certificate[][] GetCrlIssuerCertificatesByName(IX509Crl crl) {
+            return new IX509Certificate[0][];
+        }
+
         /// <summary><inheritDoc/></summary>
         /// <param name="certificates">
         /// 
@@ -74,4 +79,5 @@ namespace iText.Signatures {
         }
         // Do nothing.
     }
+//\endcond
 }

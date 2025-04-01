@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,11 +21,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
-using System.IO;
 using iText.Bouncycastleconnector;
 using iText.Commons.Bouncycastle;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
+using iText.Commons.Utils;
+using iText.Kernel.Crypto;
 using iText.Kernel.Logs;
 using iText.Kernel.Pdf;
 using iText.Signatures;
@@ -73,12 +74,14 @@ namespace iText.Signatures.Sign {
             String fieldName = "Signature1";
             byte[] ownerPass = "World".GetBytes();
             PdfReader reader = new PdfReader(srcFile, new ReaderProperties().SetPassword(ownerPass));
-            PdfSigner signer = new PdfSigner(reader, new FileStream(outPdf, FileMode.Create), new StampingProperties()
-                .UseAppendMode());
-            signer.SetFieldName(fieldName);
+            PdfSigner signer = new PdfSigner(reader, FileUtil.GetFileOutputStream(outPdf), new StampingProperties().UseAppendMode
+                ());
+            SignerProperties signerProperties = new SignerProperties().SetFieldName(fieldName);
+            signer.SetSignerProperties(signerProperties);
             // Creating the signature
             IExternalSignature pks = new PrivateKeySignature(pk, DigestAlgorithms.SHA256);
-            signer.SignDetached(pks, chain, null, null, null, 0, PdfSigner.CryptoStandard.CADES);
+            signer.SignDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, PdfSigner.CryptoStandard.CADES
+                );
             //Password to open out and cmp files are the same
             ReaderProperties properties = new ReaderProperties().SetPassword(ownerPass);
             NUnit.Framework.Assert.IsNull(SignaturesCompareTool.CompareSignatures(outPdf, cmpPdf, properties, properties
@@ -93,11 +96,12 @@ namespace iText.Signatures.Sign {
                 String cmpPdf = SOURCE_FOLDER + "cmp_signCertificateSecurityPdf.pdf";
                 String outPdf = DESTINATION_FOLDER + "signCertificateSecurityPdf.pdf";
                 PdfReader reader = new PdfReader(srcFile, new ReaderProperties().SetPublicKeySecurityParams(chain[0], pk));
-                PdfSigner signer = new PdfSigner(reader, new FileStream(outPdf, FileMode.Create), new StampingProperties()
-                    .UseAppendMode());
+                PdfSigner signer = new PdfSigner(reader, FileUtil.GetFileOutputStream(outPdf), new StampingProperties().UseAppendMode
+                    ());
                 // Creating the signature
                 IExternalSignature pks = new PrivateKeySignature(pk, DigestAlgorithms.SHA256);
-                signer.SignDetached(pks, chain, null, null, null, 0, PdfSigner.CryptoStandard.CADES);
+                signer.SignDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, PdfSigner.CryptoStandard.CADES
+                    );
                 ReaderProperties properties = new ReaderProperties().SetPublicKeySecurityParams(chain[0], pk);
                 //Public key to open out and cmp files are the same
                 NUnit.Framework.Assert.IsNull(SignaturesCompareTool.CompareSignatures(outPdf, cmpPdf, properties, properties

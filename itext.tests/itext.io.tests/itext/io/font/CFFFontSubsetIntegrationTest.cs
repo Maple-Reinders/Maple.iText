@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -104,7 +104,7 @@ namespace iText.IO.Font {
             CFFFont result = new CFFFont(cffSubsetBytes);
             int expectedCharsetLength = 255;
             // skip over the format ID (1 byte) and the first SID (2 bytes)
-            result.Seek(result.fonts[0].charsetOffset + 3);
+            result.Seek(result.fonts[0].GetCharsetOffset() + 3);
             NUnit.Framework.Assert.AreEqual(expectedCharsetLength - 2, result.GetCard16());
         }
 

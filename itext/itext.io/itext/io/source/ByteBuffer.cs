@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -151,6 +151,7 @@ namespace iText.IO.Source {
             return true;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Fill
         /// <c>ByteBuffer</c>
@@ -177,7 +178,9 @@ namespace iText.IO.Source {
             count++;
             return this;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Fill
         /// <c>ByteBuffer</c>
@@ -204,5 +207,6 @@ namespace iText.IO.Source {
             count += b.Length;
             return this;
         }
+//\endcond
     }
 }

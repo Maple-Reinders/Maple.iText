@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -42,7 +42,7 @@ namespace iText.Commons.Actions.Contexts {
         }
 
         /// <summary>Unregisters certain namespaces.</summary>
-        /// <param name="namespaces">the namespaces to be unregisted</param>
+        /// <param name="namespaces">the namespaces to be unregistered</param>
         protected internal virtual void UnregisterContext(ICollection<String> namespaces) {
             ContextManager.GetInstance().UnregisterContext(namespaces);
         }

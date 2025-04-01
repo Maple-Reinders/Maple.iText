@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -60,6 +60,16 @@ namespace iText.Layout.Exceptions {
         public const String INVALID_COLUMN_PROPERTIES = "Invalid column-count/column-width/column-gap properties, they're absent or have negative value";
 
         public const String INVALID_FONT_PROPERTY_VALUE = "Invalid FONT property value type.";
+
+        public const String TAGGING_HINTKEY_SHOULD_HAVE_ACCES = "TaggingHintKey should have accessibility properties";
+
+        public const String GRID_AUTO_REPEAT_CAN_BE_USED_ONLY_ONCE = "Automatic repetitions in the grid template are allowed only once per template.";
+
+        public const String GRID_AUTO_REPEAT_CANNOT_BE_COMBINED_WITH_INDEFINITE_SIZES = "Automatic repetitions in the grid template cannot be combined with intrinsic or flexible sizes.";
+
+        public const String FLEXIBLE_ARENT_ALLOWED_AS_MINIMUM_IN_MINMAX = "Flexible values aren't allowed as minimum in minmax grid function.";
+
+        public const String TEXT_CONTENT_CANNOT_BE_NULL = "Text content cannot be null.";
 
         private LayoutExceptionMessageConstant() {
         }

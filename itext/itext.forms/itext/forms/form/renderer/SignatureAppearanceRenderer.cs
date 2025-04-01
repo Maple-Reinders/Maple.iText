@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,6 +28,7 @@ using iText.Commons.Utils;
 using iText.Forms;
 using iText.Forms.Fields;
 using iText.Forms.Form.Element;
+using iText.Forms.Util;
 using iText.Kernel.Colors;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
@@ -49,7 +50,7 @@ namespace iText.Forms.Form.Renderer {
 
         private const float EPS = 1e-5f;
 
-        private readonly SignatureAppearanceRenderer.RenderingMode renderingMode;
+        private readonly SignatureAppearanceRenderer.DisplayOption displayOption;
 
         private bool isFontSizeApproximated = false;
 
@@ -61,7 +62,7 @@ namespace iText.Forms.Form.Renderer {
         /// <param name="modelElement">the model element</param>
         public SignatureAppearanceRenderer(SignatureFieldAppearance modelElement)
             : base(modelElement) {
-            renderingMode = RetrieveRenderingMode();
+            displayOption = RetrieveRenderingMode();
         }
 
         /// <summary><inheritDoc/></summary>
@@ -106,15 +107,16 @@ namespace iText.Forms.Form.Renderer {
             Rectangle bBox = GetOccupiedArea().GetBBox().Clone();
             ApplyPaddings(bBox, false);
             ApplyBorderBox(bBox, false);
+            ApplyMargins(bBox, false);
             if (bBox.GetY() < 0) {
                 bBox.SetHeight(bBox.GetY() + bBox.GetHeight());
                 bBox.SetY(0);
             }
             Rectangle descriptionRect = null;
             Rectangle signatureRect = null;
-            switch (renderingMode) {
-                case SignatureAppearanceRenderer.RenderingMode.NAME_AND_DESCRIPTION:
-                case SignatureAppearanceRenderer.RenderingMode.GRAPHIC_AND_DESCRIPTION: {
+            switch (displayOption) {
+                case SignatureAppearanceRenderer.DisplayOption.NAME_AND_DESCRIPTION:
+                case SignatureAppearanceRenderer.DisplayOption.GRAPHIC_AND_DESCRIPTION: {
                     // Split the signature field into two and add the name of the signer or an image to the one side,
                     // the description to the other side.
                     UnitValue[] paddings = GetPaddings();
@@ -138,13 +140,13 @@ namespace iText.Forms.Form.Renderer {
                     break;
                 }
 
-                case SignatureAppearanceRenderer.RenderingMode.GRAPHIC: {
+                case SignatureAppearanceRenderer.DisplayOption.GRAPHIC: {
                     // The signature field will consist of an image only; no description will be shown.
                     signatureRect = bBox;
                     break;
                 }
 
-                case SignatureAppearanceRenderer.RenderingMode.DESCRIPTION: {
+                case SignatureAppearanceRenderer.DisplayOption.DESCRIPTION: {
                     // Default one, it just shows whatever description was defined for the signature.
                     float additionalHeight = CalculateAdditionalHeight();
                     if (RetrieveHeight() == null) {
@@ -165,7 +167,7 @@ namespace iText.Forms.Form.Renderer {
                     return;
                 }
             }
-            AdjustChildrenLayout(renderingMode, signatureRect, descriptionRect, layoutContext.GetArea().GetPageNumber(
+            AdjustChildrenLayout(displayOption, signatureRect, descriptionRect, layoutContext.GetArea().GetPageNumber(
                 ));
         }
 
@@ -201,7 +203,7 @@ namespace iText.Forms.Form.Renderer {
             PdfDocument doc = drawContext.GetDocument();
             Rectangle area = GetOccupiedArea().GetBBox().Clone();
             ApplyMargins(area, false);
-            DeleteMargins();
+            IDictionary<int, Object> properties = FormFieldRendererUtil.RemoveProperties(this.modelElement);
             PdfPage page = doc.GetPage(occupiedArea.GetPageNumber());
             Background background = this.GetProperty<Background>(Property.BACKGROUND);
             // Background is light gray by default, but can be set to null by user.
@@ -214,25 +216,26 @@ namespace iText.Forms.Form.Renderer {
             // in forms logic root renderer is CanvasRenderer, and these properties will have default values. So
             // we get them from renderer and set these properties to model element, which will be passed to forms logic.
             modelElement.SetProperty(Property.FONT_PROVIDER, this.GetProperty<FontProvider>(Property.FONT_PROVIDER));
-            modelElement.SetProperty(Property.RENDERING_MODE, this.GetProperty<SignatureAppearanceRenderer.RenderingMode?
-                >(Property.RENDERING_MODE));
-            PdfSignatureFormField sigField = new SignatureFormFieldBuilder(doc, name).SetWidgetRectangle(area).SetConformanceLevel
-                (GetConformanceLevel(doc)).SetFont(font).CreateSignature();
+            modelElement.SetProperty(Property.RENDERING_MODE, this.GetProperty<RenderingMode?>(Property.RENDERING_MODE
+                ));
+            PdfSignatureFormField sigField = new SignatureFormFieldBuilder(doc, name).SetWidgetRectangle(area).SetConformance
+                (GetConformance(doc)).SetFont(font).CreateSignature();
             sigField.DisableFieldRegeneration();
             sigField.SetFontSize(fontSizeValue);
             sigField.GetFirstFormAnnotation().SetBackgroundColor(backgroundColor);
             ApplyDefaultFieldProperties(sigField);
+            ApplyAccessibilityProperties(sigField, doc);
             sigField.GetFirstFormAnnotation().SetFormFieldElement((SignatureFieldAppearance)modelElement);
             sigField.EnableFieldRegeneration();
             PdfAcroForm forms = PdfFormCreator.GetAcroForm(doc, true);
             forms.AddField(sigField, page);
-            WriteAcroFormFieldLangAttribute(doc);
+            FormFieldRendererUtil.ReapplyProperties(modelElement, properties);
         }
 
-        private void AdjustChildrenLayout(SignatureAppearanceRenderer.RenderingMode renderingMode, Rectangle signatureRect
+        private void AdjustChildrenLayout(SignatureAppearanceRenderer.DisplayOption displayOption, Rectangle signatureRect
             , Rectangle descriptionRect, int pageNum) {
-            switch (renderingMode) {
-                case SignatureAppearanceRenderer.RenderingMode.NAME_AND_DESCRIPTION: {
+            switch (displayOption) {
+                case SignatureAppearanceRenderer.DisplayOption.NAME_AND_DESCRIPTION: {
                     ParagraphRenderer name = (ParagraphRenderer)flatRenderer.GetChildRenderers()[0];
                     RelayoutParagraph(name, signatureRect, pageNum);
                     ParagraphRenderer description = (ParagraphRenderer)flatRenderer.GetChildRenderers()[1];
@@ -240,14 +243,14 @@ namespace iText.Forms.Form.Renderer {
                     break;
                 }
 
-                case SignatureAppearanceRenderer.RenderingMode.GRAPHIC_AND_DESCRIPTION: {
+                case SignatureAppearanceRenderer.DisplayOption.GRAPHIC_AND_DESCRIPTION: {
                     RelayoutImage(signatureRect, pageNum);
                     ParagraphRenderer description = (ParagraphRenderer)flatRenderer.GetChildRenderers()[1];
                     RelayoutParagraph(description, descriptionRect, pageNum);
                     break;
                 }
 
-                case SignatureAppearanceRenderer.RenderingMode.GRAPHIC: {
+                case SignatureAppearanceRenderer.DisplayOption.GRAPHIC: {
                     RelayoutImage(signatureRect, pageNum);
                     break;
                 }
@@ -335,8 +338,8 @@ namespace iText.Forms.Form.Renderer {
             if (this.HasOwnProperty(Property.FONT_SIZE) || modelElement.HasOwnProperty(Property.FONT_SIZE)) {
                 return;
             }
-            if (SignatureAppearanceRenderer.RenderingMode.GRAPHIC == renderingMode || SignatureAppearanceRenderer.RenderingMode
-                .GRAPHIC_AND_DESCRIPTION == renderingMode || SignatureAppearanceRenderer.RenderingMode.CUSTOM == renderingMode
+            if (SignatureAppearanceRenderer.DisplayOption.GRAPHIC == displayOption || SignatureAppearanceRenderer.DisplayOption
+                .GRAPHIC_AND_DESCRIPTION == displayOption || SignatureAppearanceRenderer.DisplayOption.CUSTOM == displayOption
                 ) {
                 // We can expect CLIP_ELEMENT log messages since the initial image size may be larger than the field height.
                 // But image size will be adjusted during its relayout in #adjustFieldLayout.
@@ -349,38 +352,38 @@ namespace iText.Forms.Form.Renderer {
             }
         }
 
-        private SignatureAppearanceRenderer.RenderingMode RetrieveRenderingMode() {
+        private SignatureAppearanceRenderer.DisplayOption RetrieveRenderingMode() {
             IList<IElement> contentElements = ((SignatureFieldAppearance)modelElement).GetContentElements();
             if (contentElements.Count == 2 && contentElements[1] is Paragraph) {
                 if (contentElements[0] is Paragraph) {
-                    return SignatureAppearanceRenderer.RenderingMode.NAME_AND_DESCRIPTION;
+                    return SignatureAppearanceRenderer.DisplayOption.NAME_AND_DESCRIPTION;
                 }
                 if (contentElements[0] is Image) {
-                    return SignatureAppearanceRenderer.RenderingMode.GRAPHIC_AND_DESCRIPTION;
+                    return SignatureAppearanceRenderer.DisplayOption.GRAPHIC_AND_DESCRIPTION;
                 }
             }
             if (contentElements.Count == 1) {
                 if (contentElements[0] is Paragraph) {
-                    return SignatureAppearanceRenderer.RenderingMode.DESCRIPTION;
+                    return SignatureAppearanceRenderer.DisplayOption.DESCRIPTION;
                 }
                 if (contentElements[0] is Image) {
-                    return SignatureAppearanceRenderer.RenderingMode.GRAPHIC;
+                    return SignatureAppearanceRenderer.DisplayOption.GRAPHIC;
                 }
             }
-            return SignatureAppearanceRenderer.RenderingMode.CUSTOM;
+            return SignatureAppearanceRenderer.DisplayOption.CUSTOM;
         }
 
-        /// <summary>Signature rendering modes.</summary>
-        private enum RenderingMode {
-            /// <summary>The rendering mode is just the description.</summary>
+        /// <summary>Signature display options.</summary>
+        private enum DisplayOption {
+            /// <summary>The display option is just the description.</summary>
             DESCRIPTION,
-            /// <summary>The rendering mode is the name of the signer and the description.</summary>
+            /// <summary>The display option is the name of the signer and the description.</summary>
             NAME_AND_DESCRIPTION,
-            /// <summary>The rendering mode is an image and the description.</summary>
+            /// <summary>The display option is an image and the description.</summary>
             GRAPHIC_AND_DESCRIPTION,
-            /// <summary>The rendering mode is just an image.</summary>
+            /// <summary>The display option is just an image.</summary>
             GRAPHIC,
-            /// <summary>The rendering mode is div.</summary>
+            /// <summary>The display option is div.</summary>
             CUSTOM
         }
     }

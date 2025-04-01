@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -87,7 +87,7 @@ namespace iText.Kernel.Pdf {
             pdfDoc1.Close();
             PdfReader reader = CompareTool.CreateOutputReader(destinationFolder + "copying1_2.pdf");
             PdfDocument pdfDocument = new PdfDocument(reader);
-            NUnit.Framework.Assert.AreEqual(false, reader.HasRebuiltXref(), "Rebuilt");
+            NUnit.Framework.Assert.IsFalse(reader.HasRebuiltXref(), "Rebuilt");
             PdfDictionary trailer = pdfDocument.GetTrailer();
             PdfDictionary info = trailer.GetAsDictionary(PdfName.Info);
             PdfName b = info.GetAsName(new PdfName("a"));
@@ -118,7 +118,7 @@ namespace iText.Kernel.Pdf {
             pdfDoc1.Close();
             PdfReader reader = CompareTool.CreateOutputReader(destinationFolder + "copying2_2.pdf");
             PdfDocument pdfDocument = new PdfDocument(reader);
-            NUnit.Framework.Assert.AreEqual(false, reader.HasRebuiltXref(), "Rebuilt");
+            NUnit.Framework.Assert.IsFalse(reader.HasRebuiltXref(), "Rebuilt");
             for (int i = 0; i < 5; i++) {
                 byte[] bytes = pdfDocument.GetPage(i + 1).GetContentBytes();
                 NUnit.Framework.Assert.AreEqual("%page " + (i * 2 + 1).ToString() + "\n", iText.Commons.Utils.JavaUtil.GetStringForBytes
@@ -142,7 +142,7 @@ namespace iText.Kernel.Pdf {
             pdfDoc.Close();
             PdfReader reader = CompareTool.CreateOutputReader(destinationFolder + "copying3_1.pdf");
             pdfDoc = new PdfDocument(reader);
-            NUnit.Framework.Assert.AreEqual(false, reader.HasRebuiltXref(), "Rebuilt");
+            NUnit.Framework.Assert.IsFalse(reader.HasRebuiltXref(), "Rebuilt");
             PdfDictionary dic0 = pdfDoc.GetPage(1).GetPdfObject().GetAsDictionary(new PdfName("HelloWorld"));
             NUnit.Framework.Assert.AreEqual(4, dic0.GetIndirectReference().GetObjNumber());
             NUnit.Framework.Assert.AreEqual(0, dic0.GetIndirectReference().GetGenNumber());
@@ -319,6 +319,34 @@ namespace iText.Kernel.Pdf {
                 );
             linkAnotPdf.Close();
             targetPdf.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outFileName, cmpFileName, destinationFolder
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void ObjRefAsStreamCopyTest() {
+            String pdf = sourceFolder + "objRefAsStream.pdf";
+            String outPdf = destinationFolder + "objRefAsStreamCopy.pdf";
+            String cmpPdf = sourceFolder + "cmp_objRefAsStreamCopy.pdf";
+            PdfDocument pdfFile = new PdfDocument(new PdfReader(pdf));
+            PdfDocument copiedFile = new PdfDocument(CompareTool.CreateTestPdfWriter(outPdf));
+            copiedFile.SetTagged();
+            pdfFile.CopyPagesTo(1, 1, copiedFile);
+            pdfFile.Close();
+            copiedFile.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, destinationFolder, "diff"
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CopyDocWithFullDDictionary() {
+            String outFileName = destinationFolder + "copyDocWithDDictionary.pdf";
+            String cmpFileName = sourceFolder + "cmp_copyDocWithDDictionary.pdf";
+            PdfDocument inPdf = new PdfDocument(new PdfReader(sourceFolder + "DocWithDDictionary.pdf"));
+            PdfDocument outPdf = new PdfDocument(new PdfWriter(outFileName));
+            inPdf.CopyPagesTo(1, 1, outPdf);
+            inPdf.Close();
+            outPdf.Close();
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outFileName, cmpFileName, destinationFolder
                 ));
         }

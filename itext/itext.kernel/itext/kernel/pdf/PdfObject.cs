@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using Microsoft.Extensions.Logging;
 using iText.Commons;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Utils;
+using iText.Kernel.Validation.Context;
 
 namespace iText.Kernel.Pdf {
     public abstract class PdfObject {
@@ -70,11 +71,11 @@ namespace iText.Kernel.Pdf {
         /// </remarks>
         protected internal const short ORIGINAL_OBJECT_STREAM = 1 << 4;
 
-        /// <summary>For internal usage only.</summary>
+        /// <summary>Marks objects that shall be written to the output document.</summary>
         /// <remarks>
-        /// For internal usage only. Marks objects that shall be written to the output document.
-        /// Option is needed to build the correct PDF objects tree when closing the document.
-        /// As a result it avoids writing unused (removed) objects.
+        /// Marks objects that shall be written to the output document. Shouldn't be used on purpose
+        /// since this flag is handled internally: option is needed to build the correct PDF objects
+        /// tree when closing the document. As a result it avoids writing unused (removed) objects.
         /// </remarks>
         protected internal const short MUST_BE_FLUSHED = 1 << 5;
 
@@ -152,7 +153,7 @@ namespace iText.Kernel.Pdf {
                         logger.LogInformation(iText.IO.Logs.IoLogMessageConstant.PDF_OBJECT_FLUSHING_NOT_PERFORMED);
                         return;
                     }
-                    document.CheckIsoConformance(this, IsoKey.PDF_OBJECT);
+                    document.CheckIsoConformance(new PdfObjectValidationContext(this));
                     document.FlushObject(this, canBeInObjStm && GetObjectType() != STREAM && GetObjectType() != INDIRECT_REFERENCE
                          && GetIndirectReference().GetGenNumber() == 0);
                 }
@@ -170,6 +171,39 @@ namespace iText.Kernel.Pdf {
         /// <returns>indirect reference.</returns>
         public virtual PdfIndirectReference GetIndirectReference() {
             return indirectReference;
+        }
+
+        /// <summary>Checks recursively whether the object contains indirect reference at any level.</summary>
+        /// <returns>
+        /// 
+        /// <see langword="true"/>
+        /// if indirect reference was found,
+        /// <see langword="false"/>
+        /// otherwise
+        /// </returns>
+        public virtual bool ContainsIndirectReference() {
+            if (IsIndirect()) {
+                return true;
+            }
+            if (IsDictionary()) {
+                PdfDictionary dict = (PdfDictionary)this;
+                foreach (PdfObject value in dict.Values()) {
+                    if (value.ContainsIndirectReference()) {
+                        return true;
+                    }
+                }
+            }
+            else {
+                if (IsArray()) {
+                    PdfArray arr = (PdfArray)this;
+                    foreach (PdfObject value in arr) {
+                        if (value.ContainsIndirectReference()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         /// <summary>Checks if object is indirect.</summary>
@@ -590,6 +624,7 @@ namespace iText.Kernel.Pdf {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         internal static bool EqualContent(PdfObject obj1, PdfObject obj2) {
             PdfObject direct1 = obj1 != null && obj1.IsIndirectReference() ? ((PdfIndirectReference)obj1).GetRefersTo(
                 true) : obj1;
@@ -597,7 +632,9 @@ namespace iText.Kernel.Pdf {
                 true) : obj2;
             return direct1 != null && direct1.Equals(direct2);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Processes two cases of object copying:
         /// <list type="number">
@@ -637,7 +674,9 @@ namespace iText.Kernel.Pdf {
         internal virtual PdfObject ProcessCopying(PdfDocument documentTo, bool allowDuplicating) {
             return ProcessCopying(documentTo, allowDuplicating, NullCopyFilter.GetInstance());
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Processes two cases of object copying:
         /// <list type="number">
@@ -698,5 +737,6 @@ namespace iText.Kernel.Pdf {
                 return obj.Clone();
             }
         }
+//\endcond
     }
 }

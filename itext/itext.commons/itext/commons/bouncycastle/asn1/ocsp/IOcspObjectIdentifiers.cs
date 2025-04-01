@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -51,5 +51,13 @@ namespace iText.Commons.Bouncycastle.Asn1.Ocsp {
         /// </summary>
         /// <returns>OCSPObjectIdentifiers.id_pkix_ocsp_nocheck wrapper.</returns>
         IDerObjectIdentifier GetIdPkixOcspNoCheck();
+
+        /// <summary>
+        /// Gets
+        /// <c>id_pkix_ocsp_archive_cutoff</c>
+        /// constant for the wrapped OCSPObjectIdentifiers.
+        /// </summary>
+        /// <returns>OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff wrapper.</returns>
+        IDerObjectIdentifier GetIdPkixOcspArchiveCutoff();
     }
 }

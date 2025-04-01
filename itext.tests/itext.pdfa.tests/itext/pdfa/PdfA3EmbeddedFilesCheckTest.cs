@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -51,10 +51,10 @@ namespace iText.Pdfa {
             String outPdf = destinationFolder + "pdfA3b_fileSpecCheckTest01.pdf";
             String cmpPdf = cmpFolder + "cmp_pdfA3b_fileSpecCheckTest01.pdf";
             PdfWriter writer = new PdfWriter(outPdf);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_3B, outputIntent);
             PdfPage page = pdfDocument.AddNewPage();
             PdfFont font = PdfFontFactory.CreateFont(sourceFolder + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
@@ -76,10 +76,10 @@ namespace iText.Pdfa {
             String outPdf = destinationFolder + "pdfA3b_fileSpecCheckTest02.pdf";
             String cmpPdf = cmpFolder + "cmp_pdfA3b_fileSpecCheckTest02.pdf";
             PdfWriter writer = new PdfWriter(outPdf);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_3B, outputIntent);
             PdfPage page = pdfDocument.AddNewPage();
             PdfFont font = PdfFontFactory.CreateFont(sourceFolder + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
@@ -101,10 +101,10 @@ namespace iText.Pdfa {
             String outPdf = destinationFolder + "pdfA3b_fileSpecCheckTest03.pdf";
             String cmpPdf = cmpFolder + "cmp_pdfA3b_fileSpecCheckTest03.pdf";
             PdfWriter writer = new PdfWriter(outPdf);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_3B, outputIntent);
             PdfPage page = pdfDocument.AddNewPage();
             PdfFont font = PdfFontFactory.CreateFont(sourceFolder + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
@@ -123,10 +123,10 @@ namespace iText.Pdfa {
             String outPdf = destinationFolder + "pdfA3b_fileSpecCheckTest04.pdf";
             String cmpPdf = cmpFolder + "cmp_pdfA3b_fileSpecCheckTest04.pdf";
             PdfWriter writer = new PdfWriter(outPdf);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_3B, outputIntent);
             PdfPage page = pdfDocument.AddNewPage();
             PdfFont font = PdfFontFactory.CreateFont(sourceFolder + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);

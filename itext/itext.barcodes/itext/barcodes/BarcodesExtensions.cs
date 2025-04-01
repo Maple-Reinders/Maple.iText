@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -26,6 +26,7 @@ using System.Reflection;
 using iText.Commons.Utils;
 
 namespace iText.Barcodes {
+    //\cond DO_NOT_DOCUMENT
     internal static class BarcodesExtensions {
         public static byte[] GetBytes(this String str, String encoding) {
             return EncodingUtil.GetEncoding(encoding).GetBytes(str);
@@ -69,4 +70,5 @@ namespace iText.Barcodes {
 #endif
         }
     }
+    //\endcond
 }

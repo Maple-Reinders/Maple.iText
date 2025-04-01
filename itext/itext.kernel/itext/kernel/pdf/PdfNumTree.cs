@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -75,9 +75,9 @@ namespace iText.Kernel.Pdf {
             if (numbers.Length <= NODE_SIZE) {
                 PdfDictionary dic = new PdfDictionary();
                 PdfArray ar = new PdfArray();
-                for (int k = 0; k < numbers.Length; ++k) {
-                    ar.Add(new PdfNumber((int)numbers[k]));
-                    ar.Add(items.Get(numbers[k]));
+                foreach (int? number in numbers) {
+                    ar.Add(new PdfNumber((int)number));
+                    ar.Add(items.Get(number));
                 }
                 dic.Put(PdfName.Nums, ar);
                 return dic;

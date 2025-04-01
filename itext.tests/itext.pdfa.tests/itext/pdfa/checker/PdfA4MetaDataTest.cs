@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,11 +33,10 @@ using iText.Pdfa.Exceptions;
 using iText.Test;
 
 namespace iText.Pdfa.Checker {
-    // Android-Conversion-Skip-Line (TODO DEVSIX-7377 introduce pdf\a validation on Android)
     [NUnit.Framework.Category("IntegrationTest")]
     public class PdfA4MetaDataTest : ExtendedITextTest {
         private static readonly String DESTINATION_FOLDER = NUnit.Framework.TestContext.CurrentContext.TestDirectory
-             + "/test/itext/pdfa/PdfA4ActionCheckTest/";
+             + "/test/itext/pdfa/PdfA4MetaDataTest/";
 
         private static readonly String SOURCE_FOLDER = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
             .CurrentContext.TestDirectory) + "/resources/itext/pdfa/";
@@ -50,12 +49,12 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void PdfA4DocumentShallContainMetaDataKey() {
             PdfDictionary dictionary = new PdfDictionary();
-            PdfA4Checker checker = new PdfA4Checker(PdfAConformanceLevel.PDF_A_4);
+            PdfA4Checker checker = new PdfA4Checker(PdfAConformance.PDF_A_4);
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(PdfAConformanceLevel.PDF_A_4).CheckMetaData(dictionary);
+                new PdfA4Checker(PdfAConformance.PDF_A_4).CheckMetaData(dictionary);
             }
             );
-            NUnit.Framework.Assert.AreEqual(e.Message, PdfAConformanceException.A_CATALOG_DICTIONARY_SHALL_CONTAIN_METADATA_ENTRY
+            NUnit.Framework.Assert.AreEqual(e.Message, PdfaExceptionMessageConstant.A_CATALOG_DICTIONARY_SHALL_CONTAIN_METADATA_ENTRY
                 );
         }
 
@@ -63,7 +62,7 @@ namespace iText.Pdfa.Checker {
         public virtual void PdfA4DocumentMetaDataDocumentShallNotContainBytes() {
             String startHeader = "<?xpacket begin=\"\" id=\"W5M0MpCehiHzreSzNTczkc9d\" bytes=\"1234567890\"?>\n";
             byte[] bytes = startHeader.GetBytes();
-            PdfA4Checker checker = new PdfA4Checker(PdfAConformanceLevel.PDF_A_4);
+            PdfA4Checker checker = new PdfA4Checker(PdfAConformance.PDF_A_4);
             PdfDictionary catalog = new PdfDictionary();
             catalog.Put(PdfName.Metadata, new PdfStream(bytes));
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
@@ -78,7 +77,7 @@ namespace iText.Pdfa.Checker {
         public virtual void PdfA4DocumentMetaDataDocumentShallNotContainEncoding() {
             String startHeader = "<?xpacket begin=\"\" id=\"W5M0MpCehiHzreSzNTczkc9d\" encoding=\"UTF-8\"?>\n";
             byte[] bytes = startHeader.GetBytes();
-            PdfA4Checker checker = new PdfA4Checker(PdfAConformanceLevel.PDF_A_4);
+            PdfA4Checker checker = new PdfA4Checker(PdfAConformance.PDF_A_4);
             PdfDictionary catalog = new PdfDictionary();
             catalog.Put(PdfName.Metadata, new PdfStream(bytes));
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
@@ -94,7 +93,7 @@ namespace iText.Pdfa.Checker {
             String startHeader = "<?xpacket begin=\"\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n";
             startHeader += "<?xpacket begin=\"\" id=\"W5M0MpCehiHzreSzNTczkc9d\" encoding=\"UTF-8\"?>\n";
             byte[] bytes = startHeader.GetBytes();
-            PdfA4Checker checker = new PdfA4Checker(PdfAConformanceLevel.PDF_A_4);
+            PdfA4Checker checker = new PdfA4Checker(PdfAConformance.PDF_A_4);
             PdfDictionary catalog = new PdfDictionary();
             catalog.Put(PdfName.Metadata, new PdfStream(bytes));
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
@@ -109,7 +108,7 @@ namespace iText.Pdfa.Checker {
         public virtual void PdfA4DocumentMetaDataDocumentShallNotThrowInAnyPacket() {
             byte[] bytes = File.ReadAllBytes(System.IO.Path.Combine(SOURCE_FOLDER + "xmp/xmpWithMultipleXmpHeaders.xmp"
                 ));
-            PdfA4Checker checker = new PdfA4Checker(PdfAConformanceLevel.PDF_A_4);
+            PdfA4Checker checker = new PdfA4Checker(PdfAConformance.PDF_A_4);
             PdfDictionary catalog = new PdfDictionary();
             catalog.Put(PdfName.Metadata, new PdfStream(bytes));
             NUnit.Framework.Assert.DoesNotThrow(() => {
@@ -124,7 +123,7 @@ namespace iText.Pdfa.Checker {
                 ));
             String xmpContent = iText.Commons.Utils.JavaUtil.GetStringForBytes(bytes, System.Text.Encoding.ASCII).Replace
                 ("pdfaid:rev", "rev");
-            PdfA4Checker checker = new PdfA4Checker(PdfAConformanceLevel.PDF_A_4);
+            PdfA4Checker checker = new PdfA4Checker(PdfAConformance.PDF_A_4);
             PdfDictionary catalog = new PdfDictionary();
             catalog.Put(PdfName.Metadata, new PdfStream(xmpContent.GetBytes(System.Text.Encoding.UTF8)));
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfException), () => {
@@ -139,7 +138,7 @@ namespace iText.Pdfa.Checker {
                 ));
             String xmpContent = iText.Commons.Utils.JavaUtil.GetStringForBytes(bytes, System.Text.Encoding.ASCII).Replace
                 ("http://www.aiim.org/pdfa/ns/id/", "no_link");
-            PdfA4Checker checker = new PdfA4Checker(PdfAConformanceLevel.PDF_A_4);
+            PdfA4Checker checker = new PdfA4Checker(PdfAConformance.PDF_A_4);
             PdfDictionary catalog = new PdfDictionary();
             catalog.Put(PdfName.Metadata, new PdfStream(xmpContent.GetBytes(System.Text.Encoding.UTF8)));
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
@@ -154,7 +153,7 @@ namespace iText.Pdfa.Checker {
         public virtual void PdfA4DocumentMetaDataDocumentShallThrowInSecondPacket() {
             byte[] bytes = File.ReadAllBytes(System.IO.Path.Combine(SOURCE_FOLDER + "xmp/xmpWithMultipleXmpHeadersWithEnconding.xmp"
                 ));
-            PdfA4Checker checker = new PdfA4Checker(PdfAConformanceLevel.PDF_A_4);
+            PdfA4Checker checker = new PdfA4Checker(PdfAConformance.PDF_A_4);
             PdfDictionary catalog = new PdfDictionary();
             catalog.Put(PdfName.Metadata, new PdfStream(bytes));
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
@@ -168,8 +167,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestAbsentPartPropertyPDFA4() {
             String outPdf = DESTINATION_FOLDER + "testAbsentPartPropertyPDFA4.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
             }
             );
             PdfADocument pdfADocument = new PdfADocument(new PdfReader(outPdf), new PdfWriter(new MemoryStream()));
@@ -178,7 +177,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
             NUnit.Framework.Assert.AreEqual(MessageFormatUtil.Format(PdfaExceptionMessageConstant.XMP_METADATA_HEADER_SHALL_CONTAIN_VERSION_IDENTIFIER_PART
@@ -188,8 +187,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestInvalidPartPropertyPDFA4() {
             String outPdf = DESTINATION_FOLDER + "testInvalidPartPropertyPDFA4.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
             }
             );
             PdfADocument pdfADocument = new PdfADocument(new PdfReader(outPdf), new PdfWriter(new MemoryStream()));
@@ -203,7 +202,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             Exception e_1 = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
             NUnit.Framework.Assert.AreEqual(MessageFormatUtil.Format(PdfaExceptionMessageConstant.XMP_METADATA_HEADER_SHALL_CONTAIN_VERSION_IDENTIFIER_PART
@@ -213,8 +212,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestNullPartPropertyPDFA4() {
             String outPdf = DESTINATION_FOLDER + "testNullPartPropertyPDFA4.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
             }
             );
             PdfADocument pdfADocument = new PdfADocument(new PdfReader(outPdf), new PdfWriter(new MemoryStream()));
@@ -228,7 +227,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             Exception e_1 = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
             NUnit.Framework.Assert.AreEqual(MessageFormatUtil.Format(PdfaExceptionMessageConstant.XMP_METADATA_HEADER_SHALL_CONTAIN_VERSION_IDENTIFIER_PART
@@ -238,8 +237,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestAbsentRevisionPropertyPDFA4() {
             String outPdf = DESTINATION_FOLDER + "testNullRevisionPropertyPDFA4.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
             }
             );
             PdfADocument pdfADocument = new PdfADocument(new PdfReader(outPdf), new PdfWriter(new MemoryStream()));
@@ -248,7 +247,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
             NUnit.Framework.Assert.AreEqual(PdfaExceptionMessageConstant.XMP_METADATA_HEADER_SHALL_CONTAIN_VERSION_IDENTIFIER_REV
@@ -258,8 +257,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestInvalidValueNotNumberRevisionPropertyPDFA4() {
             String outPdf = DESTINATION_FOLDER + "testInvalidValueNotNumberRevisionPropertyPDFA4.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
             }
             );
             PdfADocument pdfADocument = new PdfADocument(new PdfReader(outPdf), new PdfWriter(new MemoryStream()));
@@ -273,7 +272,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             Exception e_1 = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
             NUnit.Framework.Assert.AreEqual(PdfaExceptionMessageConstant.XMP_METADATA_HEADER_SHALL_CONTAIN_VERSION_IDENTIFIER_REV
@@ -283,8 +282,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestInvalidValueNotLength4RevisionPropertyPDFA4() {
             String outPdf = DESTINATION_FOLDER + "testInvalidValueNotLength4RevisionPropertyPDFA4.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
             }
             );
             PdfADocument pdfADocument = new PdfADocument(new PdfReader(outPdf), new PdfWriter(new MemoryStream()));
@@ -298,7 +297,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             Exception e_1 = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
             NUnit.Framework.Assert.AreEqual(PdfaExceptionMessageConstant.XMP_METADATA_HEADER_SHALL_CONTAIN_VERSION_IDENTIFIER_REV
@@ -308,8 +307,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestInvalidValueLength4ButContainsLettersRevisionPropertyPDFA4() {
             String outPdf = DESTINATION_FOLDER + "testInvalidValueLength4ButContainsLettersRevisionPropertyPDFA4.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
             }
             );
             PdfADocument pdfADocument = new PdfADocument(new PdfReader(outPdf), new PdfWriter(new MemoryStream()));
@@ -323,7 +322,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             Exception e_1 = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
             NUnit.Framework.Assert.AreEqual(PdfaExceptionMessageConstant.XMP_METADATA_HEADER_SHALL_CONTAIN_VERSION_IDENTIFIER_REV
@@ -333,8 +332,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestValidPropertiesPDFA4() {
             String outPdf = DESTINATION_FOLDER + "testValidPropertiesPDFA4.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
             }
             );
             PdfADocument pdfADocument = new PdfADocument(new PdfReader(outPdf), new PdfWriter(new MemoryStream()));
@@ -342,7 +341,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             NUnit.Framework.Assert.DoesNotThrow(() => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
         }
@@ -350,8 +349,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestValidPropertiesPDFA4F() {
             String outPdf = DESTINATION_FOLDER + "testValidPropertiesPDFA4F.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4F;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4F;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
                 PdfFileSpec fs = PdfFileSpec.CreateEmbeddedFileSpec(doc, "file".GetBytes(), "description", "file.txt", null
                     , null, null);
                 doc.AddFileAttachment("file.txt", fs);
@@ -362,7 +361,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             NUnit.Framework.Assert.DoesNotThrow(() => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
         }
@@ -370,8 +369,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestValidPropertiesPDFA4E() {
             String outPdf = DESTINATION_FOLDER + "testValidPropertiesPDFA4E.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4E;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4E;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
             }
             );
             PdfADocument pdfADocument = new PdfADocument(new PdfReader(outPdf), new PdfWriter(new MemoryStream()));
@@ -379,7 +378,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             NUnit.Framework.Assert.DoesNotThrow(() => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
         }
@@ -387,8 +386,8 @@ namespace iText.Pdfa.Checker {
         [NUnit.Framework.Test]
         public virtual void TestAbsentConformancePropertyPDFA4F() {
             String outPdf = DESTINATION_FOLDER + "testAbsentConformancePropertyPDFA4F.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4F;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4F;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
                 PdfFileSpec fs = PdfFileSpec.CreateEmbeddedFileSpec(doc, "file".GetBytes(), "description", "file.txt", null
                     , null, null);
                 doc.AddFileAttachment("file.txt", fs);
@@ -399,14 +398,14 @@ namespace iText.Pdfa.Checker {
                 xmpMeta.DeleteProperty(XMPConst.NS_PDFA_ID, XMPConst.CONFORMANCE);
             }
             ));
-            NUnit.Framework.Assert.DoesNotThrow(() => new PdfA4Checker(conformanceLevel).CheckMetaData(catalog));
+            NUnit.Framework.Assert.DoesNotThrow(() => new PdfA4Checker(conformance).CheckMetaData(catalog));
         }
 
         [NUnit.Framework.Test]
         public virtual void TestInvalidConformancePropertyPDFA4F() {
             String outPdf = DESTINATION_FOLDER + "testInvalidConformancePropertyPDFA4F.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4F;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4F;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
                 PdfFileSpec fs = PdfFileSpec.CreateEmbeddedFileSpec(doc, "file".GetBytes(), "description", "file.txt", null
                     , null, null);
                 doc.AddFileAttachment("file.txt", fs);
@@ -423,7 +422,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             Exception e_1 = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
             NUnit.Framework.Assert.AreEqual(PdfaExceptionMessageConstant.XMP_METADATA_HEADER_SHALL_CONTAIN_VERSION_IDENTIFIER_CONFORMANCE
@@ -432,26 +431,26 @@ namespace iText.Pdfa.Checker {
 
         [NUnit.Framework.Test]
         public virtual void HistoryWithXmpMetaData() {
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
             byte[] bytes = File.ReadAllBytes(System.IO.Path.Combine(SOURCE_FOLDER + "xmp/xmpWithCorrectHistory.xmp"));
             XMPMeta xmpMeta = XMPMetaFactory.Parse(new MemoryStream(bytes));
             PdfDictionary catalog = new PdfDictionary();
             MemoryStream baos = new MemoryStream();
             XMPMetaFactory.Serialize(xmpMeta, baos);
             catalog.Put(PdfName.Metadata, new PdfStream(baos.ToArray()));
-            NUnit.Framework.Assert.DoesNotThrow(() => new PdfA4Checker(conformanceLevel).CheckMetaData(catalog));
+            NUnit.Framework.Assert.DoesNotThrow(() => new PdfA4Checker(conformance).CheckMetaData(catalog));
         }
 
         [NUnit.Framework.Test]
         public virtual void HistoryWithInvalidWhenXmpMetaData() {
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
             byte[] bytes = File.ReadAllBytes(System.IO.Path.Combine(SOURCE_FOLDER + "xmp/xmpWithInvalidWhen.xmp"));
             XMPMeta xmpMeta = XMPMetaFactory.Parse(new MemoryStream(bytes));
             PdfDictionary catalog = new PdfDictionary();
             MemoryStream baos = new MemoryStream();
             XMPMetaFactory.Serialize(xmpMeta, baos);
             catalog.Put(PdfName.Metadata, new PdfStream(baos.ToArray()));
-            Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => new PdfA4Checker(conformanceLevel
+            Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => new PdfA4Checker(conformance
                 ).CheckMetaData(catalog));
             NUnit.Framework.Assert.AreEqual(MessageFormatUtil.Format(PdfaExceptionMessageConstant.XMP_METADATA_HISTORY_ENTRY_SHALL_CONTAIN_KEY
                 , "stEvt:when"), e.Message);
@@ -459,14 +458,14 @@ namespace iText.Pdfa.Checker {
 
         [NUnit.Framework.Test]
         public virtual void HistoryWithInvalidActionXmpMetaData() {
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
             byte[] bytes = File.ReadAllBytes(System.IO.Path.Combine(SOURCE_FOLDER + "xmp/xmpWithInvalidAction.xmp"));
             XMPMeta xmpMeta = XMPMetaFactory.Parse(new MemoryStream(bytes));
             PdfDictionary catalog = new PdfDictionary();
             MemoryStream baos = new MemoryStream();
             XMPMetaFactory.Serialize(xmpMeta, baos);
             catalog.Put(PdfName.Metadata, new PdfStream(baos.ToArray()));
-            Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => new PdfA4Checker(conformanceLevel
+            Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => new PdfA4Checker(conformance
                 ).CheckMetaData(catalog));
             NUnit.Framework.Assert.AreEqual(MessageFormatUtil.Format(PdfaExceptionMessageConstant.XMP_METADATA_HISTORY_ENTRY_SHALL_CONTAIN_KEY
                 , "stEvt:action"), e.Message);
@@ -474,22 +473,22 @@ namespace iText.Pdfa.Checker {
 
         [NUnit.Framework.Test]
         public virtual void HistoryWithEmptyEntryXmpMetaData() {
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4;
+            PdfAConformance conformance = PdfAConformance.PDF_A_4;
             byte[] bytes = File.ReadAllBytes(System.IO.Path.Combine(SOURCE_FOLDER + "xmp/xmpWithEmpty.xmp"));
             XMPMeta xmpMeta = XMPMetaFactory.Parse(new MemoryStream(bytes));
             PdfDictionary catalog = new PdfDictionary();
             MemoryStream baos = new MemoryStream();
             XMPMetaFactory.Serialize(xmpMeta, baos);
             catalog.Put(PdfName.Metadata, new PdfStream(baos.ToArray()));
-            new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+            new PdfA4Checker(conformance).CheckMetaData(catalog);
             NUnit.Framework.Assert.IsTrue(true);
         }
 
         [NUnit.Framework.Test]
         public virtual void TestNullConformancePropertyPDFA4F() {
             String outPdf = DESTINATION_FOLDER + "testNullConformancePropertyPDFA4F.pdf";
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_4F;
-            GeneratePdfADocument(conformanceLevel, outPdf, (doc) => {
+            PdfAConformance conformance = PdfAConformance.PDF_A_4F;
+            GeneratePdfADocument(conformance, outPdf, (doc) => {
                 PdfFileSpec fs = PdfFileSpec.CreateEmbeddedFileSpec(doc, "file".GetBytes(), "description", "file.txt", null
                     , null, null);
                 doc.AddFileAttachment("file.txt", fs);
@@ -506,7 +505,7 @@ namespace iText.Pdfa.Checker {
             }
             ));
             Exception e_1 = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
-                new PdfA4Checker(conformanceLevel).CheckMetaData(catalog);
+                new PdfA4Checker(conformance).CheckMetaData(catalog);
             }
             );
             NUnit.Framework.Assert.AreEqual(PdfaExceptionMessageConstant.XMP_METADATA_HEADER_SHALL_CONTAIN_VERSION_IDENTIFIER_CONFORMANCE
@@ -517,9 +516,9 @@ namespace iText.Pdfa.Checker {
         public virtual void PdfA4DocumentMetaDataIsNotUTF8Encoded() {
             String outPdf = DESTINATION_FOLDER + "metadataNotUTF8.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm"
-                , FileMode.Open, FileAccess.Read)));
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm"))
+                );
             doc.AddNewPage();
             byte[] bytes = File.ReadAllBytes(System.IO.Path.Combine(SOURCE_FOLDER + "xmp/xmpWithEmpty.xmp"));
             XMPMeta xmpMeta = XMPMetaFactory.Parse(new MemoryStream(bytes));
@@ -538,9 +537,9 @@ namespace iText.Pdfa.Checker {
             byte[] bytes = File.ReadAllBytes(System.IO.Path.Combine(SOURCE_FOLDER + "encodedXmp.xmp"));
             String outPdf = DESTINATION_FOLDER + "metadataNotUTF8.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm"
-                , FileMode.Open, FileAccess.Read)));
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm"))
+                );
             doc.AddNewPage();
             doc.GetPage(1).SetXmpMetadata(bytes);
             Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => {
@@ -550,22 +549,22 @@ namespace iText.Pdfa.Checker {
             NUnit.Framework.Assert.AreEqual(PdfaExceptionMessageConstant.INVALID_XMP_METADATA_ENCODING, e.Message);
         }
 
-        private void GeneratePdfADocument(PdfAConformanceLevel conformanceLevel, String outPdf, Action<PdfDocument
-            > consumer) {
+        private void GeneratePdfADocument(PdfAConformance conformance, String outPdf, Action<PdfDocument> consumer
+            ) {
             if (outPdf == null) {
                 NUnit.Framework.Assert.Fail();
             }
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, conformanceLevel, new PdfOutputIntent("Custom", "", "http://www.color.org"
-                , "sRGB IEC61966-2.1", new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                )));
+            PdfADocument doc = new PdfADocument(writer, conformance, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm"))
+                );
             doc.AddNewPage();
             consumer(doc);
             doc.Close();
         }
 
         private static PdfDictionary GenerateCustomXmpCatalog(PdfADocument pdfADocument, Action<XMPMeta> action) {
-            XMPMeta xmpMeta = XMPMetaFactory.Parse(new MemoryStream(pdfADocument.GetXmpMetadata()));
+            XMPMeta xmpMeta = pdfADocument.GetXmpMetadata();
             PdfDictionary catalog = pdfADocument.GetCatalog().GetPdfObject();
             MemoryStream baos = new MemoryStream();
             action(xmpMeta);

@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-
+//\cond DO_NOT_DOCUMENT
 namespace iText.Signatures {
     internal static class SignExtensions {
         public static String JSubstring(this String str, int beginIndex, int endIndex) {
@@ -44,6 +44,15 @@ namespace iText.Signatures {
             foreach (T item in newItems) {
                 t.Add(item);
             }
+        }
+        
+        public static bool ContainsAll<T>(this ICollection<T> thisC, ICollection<T> otherC) {
+            foreach (T e in otherC) {
+                if (!thisC.Contains(e)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public static T[] ToArray<T>(this ICollection<T> col, T[] toArray) {
@@ -78,6 +87,10 @@ namespace iText.Signatures {
             foreach (KeyValuePair<TKey, TValue> pair in collectionToAdd) {
                 c[pair.Key] = pair.Value;
             }
+        }
+        
+        public static void Add<T>(this IList<T> list, int index, T elem) {
+            list.Insert(index, elem);
         }
 
         public static T JRemoveAt<T>(this IList<T> list, int index) {
@@ -143,5 +156,10 @@ namespace iText.Signatures {
         public static bool Before(this DateTime date, DateTime when) {
             return date.CompareTo(when) < 0;
         }
+        
+        public static IEnumerable<T> Sorted<T>(this IEnumerable<T> source, Comparison<T> comp) {
+            return source.OrderBy(x => x, Comparer<T>.Create(comp));
+        }
     }
 }
+//\endcond

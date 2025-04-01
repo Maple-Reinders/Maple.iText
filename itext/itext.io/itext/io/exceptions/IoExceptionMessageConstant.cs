@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -207,6 +207,8 @@ namespace iText.IO.Exceptions {
         public const String PDF_HEADER_NOT_FOUND = "PDF header not found.";
 
         public const String PDF_STARTXREF_NOT_FOUND = "PDF startxref not found.";
+
+        public const String PDF_EOF_NOT_FOUND = "PDF \"%%EOF\" marker is not found.";
 
         public const String PHOTOMETRIC_IS_NOT_SUPPORTED = "Photometric {0} is not supported.";
 

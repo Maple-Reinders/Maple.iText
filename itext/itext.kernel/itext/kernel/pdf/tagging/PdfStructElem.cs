@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,6 +29,7 @@ using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Annot;
 using iText.Kernel.Pdf.Filespec;
+using iText.Kernel.Validation.Context;
 
 namespace iText.Kernel.Pdf.Tagging {
     /// <summary>A wrapper for structure element dictionaries (ISO-32000 14.7.2 "Structure Hierarchy").</summary>
@@ -106,6 +107,29 @@ namespace iText.Kernel.Pdf.Tagging {
                 SetAttributes(attributes);
             }
             return attributes;
+        }
+
+        /// <summary>Gets a list of PDF attribute objects.</summary>
+        /// <returns>list of PDF attribute objects.</returns>
+        public virtual IList<PdfStructureAttributes> GetAttributesList() {
+            IList<PdfStructureAttributes> attributesList = new List<PdfStructureAttributes>();
+            PdfObject elemAttributesObj = GetAttributes(false);
+            if (elemAttributesObj != null) {
+                if (elemAttributesObj.IsDictionary()) {
+                    attributesList.Add(new PdfStructureAttributes((PdfDictionary)elemAttributesObj));
+                }
+                else {
+                    if (elemAttributesObj.IsArray()) {
+                        PdfArray attributesArray = (PdfArray)elemAttributesObj;
+                        foreach (PdfObject attributeObj in attributesArray) {
+                            if (attributeObj.IsDictionary()) {
+                                attributesList.Add(new PdfStructureAttributes((PdfDictionary)attributeObj));
+                            }
+                        }
+                    }
+                }
+            }
+            return attributesList;
         }
 
         public virtual void SetAttributes(PdfObject attributes) {
@@ -307,6 +331,30 @@ namespace iText.Kernel.Pdf.Tagging {
                 }
             }
             return kids;
+        }
+
+        /// <summary>Checks if the kid with the given index is flushed.</summary>
+        /// <param name="index">index of the kid to check.</param>
+        /// <returns>
+        /// 
+        /// <see langword="true"/>
+        /// if the kid with the given index is flushed,
+        /// <see langword="false"/>
+        /// otherwise.
+        /// </returns>
+        public virtual bool IsKidFlushed(int index) {
+            PdfObject k = GetK();
+            if (k == null) {
+                return false;
+            }
+            if (k.IsArray()) {
+                PdfArray array = (PdfArray)k;
+                if (index >= array.Size()) {
+                    return false;
+                }
+                return array.Get(index).IsFlushed();
+            }
+            return index == 0 && k.IsFlushed();
         }
 
         public virtual PdfObject GetK() {
@@ -593,11 +641,12 @@ namespace iText.Kernel.Pdf.Tagging {
             }
             PdfDocument doc = GetDocument();
             if (doc != null) {
-                doc.CheckIsoConformance(GetPdfObject(), IsoKey.TAG_STRUCTURE_ELEMENT);
+                doc.CheckIsoConformance(new TagStructElementValidationContext(GetPdfObject()));
             }
             base.Flush();
         }
 
+//\cond DO_NOT_DOCUMENT
         internal static void AddKidObject(PdfDictionary parent, int index, PdfObject kid) {
             if (parent.IsFlushed()) {
                 throw new PdfException(KernelExceptionMessageConstant.CANNOT_ADD_KID_TO_THE_FLUSHED_ELEMENT);
@@ -637,6 +686,7 @@ namespace iText.Kernel.Pdf.Tagging {
                 kid.SetModified();
             }
         }
+//\endcond
 
         protected internal override bool IsWrappedObjectMustBeIndirect() {
             return true;

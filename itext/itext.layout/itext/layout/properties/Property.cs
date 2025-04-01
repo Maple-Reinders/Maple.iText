@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -63,9 +63,9 @@ namespace iText.Layout.Properties {
 
         public const int BASE_DIRECTION = 7;
 
-        public const int BOLD_SIMULATION = 8;
+        public const int BEFORE_TEXT_RESTORE_EXECUTOR = 157;
 
-        public const int BORDER = 9;
+        public const int BOLD_SIMULATION = 8;
 
         public const int BORDER_BOTTOM = 10;
 
@@ -76,8 +76,6 @@ namespace iText.Layout.Properties {
         public const int BORDER_COLLAPSE = 114;
 
         public const int BORDER_LEFT = 11;
-
-        public const int BORDER_RADIUS = 101;
 
         public const int BORDER_RIGHT = 12;
 
@@ -186,6 +184,28 @@ namespace iText.Layout.Properties {
         public const int FORCED_PLACEMENT = 26;
 
         public const int FULL = 25;
+
+        public const int GRID_COLUMN_END = 147;
+
+        public const int GRID_COLUMN_START = 148;
+
+        public const int GRID_COLUMN_SPAN = 9;
+
+        public const int GRID_ROW_END = 149;
+
+        public const int GRID_ROW_START = 150;
+
+        public const int GRID_ROW_SPAN = 101;
+
+        public const int GRID_TEMPLATE_COLUMNS = 145;
+
+        public const int GRID_TEMPLATE_ROWS = 146;
+
+        public const int GRID_AUTO_ROWS = 151;
+
+        public const int GRID_AUTO_COLUMNS = 152;
+
+        public const int GRID_FLOW = 154;
 
         public const int HEIGHT = 27;
 
@@ -304,11 +324,26 @@ namespace iText.Layout.Properties {
 
         public const int ROWSPAN = 60;
 
+        public const int ROW_GAP = 153;
+
         public const int SPACING_RATIO = 61;
 
         public const int SPLIT_CHARACTERS = 62;
 
         public const int STROKE_COLOR = 63;
+
+        /// <summary>
+        /// STROKE_DASH_PATTERN property specifies dash pattern for the text stroke and stores the
+        /// <see cref="System.Collections.IList{E}"/>
+        /// as float array of the form [ dashArray dashPhase ], where
+        /// <c>dashArray</c>
+        /// is a float array that specifies
+        /// the length of the alternating dashes and gaps,
+        /// <c>dashPhase</c>
+        /// is a float that specifies the distance into
+        /// the dash pattern to start the dash.
+        /// </summary>
+        public const int STROKE_DASH_PATTERN = 156;
 
         public const int STROKE_WIDTH = 64;
 
@@ -329,6 +364,8 @@ namespace iText.Layout.Properties {
         public const int TAGGING_HINT_KEY = 109;
 
         public const int TEXT_ALIGNMENT = 70;
+
+        public const int TEXT_ANCHOR = 155;
 
         /// <summary>
         /// Use values from
@@ -382,12 +419,13 @@ namespace iText.Layout.Properties {
         /// </remarks>
         private static readonly bool[] INHERITED_PROPERTIES;
 
-        private const int MAX_INHERITED_PROPERTY_ID = 144;
+        private const int MAX_INHERITED_PROPERTY_ID = 157;
 
         static Property() {
             INHERITED_PROPERTIES = new bool[MAX_INHERITED_PROPERTY_ID + 1];
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.APPEARANCE_STREAM_LAYOUT] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.BASE_DIRECTION] = true;
+            INHERITED_PROPERTIES[iText.Layout.Properties.Property.BEFORE_TEXT_RESTORE_EXECUTOR] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.BOLD_SIMULATION] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.CAPTION_SIDE] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.CHARACTER_SPACING] = true;
@@ -412,8 +450,10 @@ namespace iText.Layout.Properties {
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.SPACING_RATIO] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.SPLIT_CHARACTERS] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.STROKE_COLOR] = true;
+            INHERITED_PROPERTIES[iText.Layout.Properties.Property.STROKE_DASH_PATTERN] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.STROKE_WIDTH] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.TEXT_ALIGNMENT] = true;
+            INHERITED_PROPERTIES[iText.Layout.Properties.Property.TEXT_ANCHOR] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.TEXT_RENDERING_MODE] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.TEXT_RISE] = true;
             INHERITED_PROPERTIES[iText.Layout.Properties.Property.UNDERLINE] = true;

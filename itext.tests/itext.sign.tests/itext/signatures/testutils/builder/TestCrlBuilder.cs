@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -23,6 +23,7 @@
 using System;
 using iText.Bouncycastleconnector;
 using iText.Commons.Bouncycastle;
+using iText.Commons.Bouncycastle.Asn1;
 using iText.Commons.Bouncycastle.Asn1.X500;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
@@ -59,6 +60,11 @@ namespace iText.Signatures.Testutils.Builder {
 
         public virtual void AddCrlEntry(IX509Certificate certificate, int reason) {
             crlBuilder.AddCRLEntry(certificate.GetSerialNumber(), nextUpdate, reason);
+        }
+
+        public virtual void AddExtension(IDerObjectIdentifier objectIdentifier, bool isCritical, 
+            IAsn1Encodable extension) {
+            crlBuilder.AddExtension(objectIdentifier, isCritical, extension);
         }
 
         public virtual byte[] MakeCrl() {

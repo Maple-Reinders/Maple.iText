@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -50,6 +50,20 @@ namespace iText.Forms {
                 PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
                 NUnit.Framework.Assert.AreEqual(3, form.GetRootFormFields().Count);
             }
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void FormWithSameFieldReferencesTest() {
+            String srcFileName = SOURCE_FOLDER + "formWithSameFieldReferences.pdf";
+            String cmpFileName = SOURCE_FOLDER + "cmp_formWithSameFieldReferences.pdf";
+            String outFileName = DESTINATION_FOLDER + "formWithSameFieldReferences.pdf";
+            using (PdfDocument sourceDoc = new PdfDocument(new PdfReader(srcFileName), new PdfWriter(outFileName))) {
+                PdfAcroForm acroForm = PdfFormCreator.GetAcroForm(sourceDoc, true);
+                NUnit.Framework.Assert.AreEqual(1, acroForm.GetFields().Size());
+                NUnit.Framework.Assert.IsNull(acroForm.GetField("Field").GetKids());
+            }
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outFileName, cmpFileName, DESTINATION_FOLDER
+                , "diff_"));
         }
 
         [NUnit.Framework.Test]

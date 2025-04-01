@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -544,8 +544,8 @@ namespace iText.Kernel.Pdf {
             NUnit.Framework.Assert.AreEqual("Off1", off.GetAsDictionary(0).GetAsString(PdfName.Name).ToUnicodeString()
                 );
             NUnit.Framework.Assert.IsNull(dDict.GetAsArray(PdfName.Creator));
-            NUnit.Framework.Assert.AreEqual("OCConfigName0", dDict.GetAsString(PdfName.Name).ToUnicodeString());
-            NUnit.Framework.Assert.IsNull(dDict.GetAsName(PdfName.BaseState));
+            NUnit.Framework.Assert.AreEqual("Name", dDict.GetAsString(PdfName.Name).ToUnicodeString());
+            NUnit.Framework.Assert.AreEqual(PdfName.ON, dDict.GetAsName(PdfName.BaseState));
             PdfArray asArray = dDict.GetAsArray(PdfName.AS);
             NUnit.Framework.Assert.AreEqual(1, asArray.Size());
             NUnit.Framework.Assert.AreEqual(1, asArray.GetAsDictionary(0).GetAsArray(PdfName.Category).Size());
@@ -553,8 +553,8 @@ namespace iText.Kernel.Pdf {
                 (0));
             NUnit.Framework.Assert.AreEqual("noPrint1", asArray.GetAsDictionary(0).GetAsArray(PdfName.OCGs).GetAsDictionary
                 (0).GetAsString(PdfName.Name).ToUnicodeString());
-            NUnit.Framework.Assert.IsNull(dDict.GetAsName(PdfName.Intent));
-            NUnit.Framework.Assert.IsNull(dDict.GetAsName(PdfName.ListMode));
+            NUnit.Framework.Assert.AreEqual(PdfName.View, dDict.GetAsName(PdfName.Intent));
+            NUnit.Framework.Assert.AreEqual(PdfName.VisiblePages, dDict.GetAsName(PdfName.ListMode));
         }
 
         [NUnit.Framework.Test]
@@ -665,8 +665,8 @@ namespace iText.Kernel.Pdf {
             NUnit.Framework.Assert.AreEqual("from_Off1", off.GetAsDictionary(2).GetAsString(PdfName.Name).ToUnicodeString
                 ());
             NUnit.Framework.Assert.IsNull(dDict.GetAsArray(PdfName.Creator));
-            NUnit.Framework.Assert.AreEqual("OCConfigName0", dDict.GetAsString(PdfName.Name).ToUnicodeString());
-            NUnit.Framework.Assert.IsNull(dDict.GetAsName(PdfName.BaseState));
+            NUnit.Framework.Assert.AreEqual("Name", dDict.GetAsString(PdfName.Name).ToUnicodeString());
+            NUnit.Framework.Assert.AreEqual(PdfName.ON, dDict.GetAsName(PdfName.BaseState));
             PdfArray asArray = dDict.GetAsArray(PdfName.AS);
             NUnit.Framework.Assert.AreEqual(1, asArray.Size());
             NUnit.Framework.Assert.AreEqual(1, asArray.GetAsDictionary(0).GetAsArray(PdfName.Category).Size());
@@ -677,8 +677,8 @@ namespace iText.Kernel.Pdf {
                 (0).GetAsString(PdfName.Name).ToUnicodeString());
             NUnit.Framework.Assert.AreEqual("from_noPrint1", asArray.GetAsDictionary(0).GetAsArray(PdfName.OCGs).GetAsDictionary
                 (1).GetAsString(PdfName.Name).ToUnicodeString());
-            NUnit.Framework.Assert.IsNull(dDict.GetAsName(PdfName.Intent));
-            NUnit.Framework.Assert.IsNull(dDict.GetAsName(PdfName.ListMode));
+            NUnit.Framework.Assert.AreEqual(PdfName.View, dDict.GetAsName(PdfName.Intent));
+            NUnit.Framework.Assert.AreEqual(PdfName.VisiblePages, dDict.GetAsName(PdfName.ListMode));
         }
 
         // Copy OCGs from different locations (OCMDs, annotations, content streams, xObjects) test block
@@ -929,6 +929,30 @@ namespace iText.Kernel.Pdf {
             OcgPropertiesCopierTest.CopyPagesAndAssertLayersName(names, fromDocBytes);
         }
 
+        [NUnit.Framework.Test]
+        public virtual void CopyEmptyOcgTest() {
+            byte[] fromDocBytes;
+            using (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                using (PdfDocument fromDocument = new PdfDocument(new PdfWriter(outputStream))) {
+                    PdfDictionary DDic = new PdfDictionary();
+                    DDic.Put(PdfName.ON, new PdfArray());
+                    DDic.Put(PdfName.Order, new PdfArray());
+                    DDic.Put(PdfName.RBGroups, new PdfArray());
+                    PdfDictionary OcDic = new PdfDictionary();
+                    OcDic.Put(PdfName.D, DDic);
+                    OcDic.Put(PdfName.OCGs, new PdfArray());
+                    fromDocument.GetCatalog().Put(PdfName.OCProperties, OcDic);
+                }
+                fromDocBytes = outputStream.ToArray();
+            }
+            using (PdfDocument toDocument = new PdfDocument(new PdfWriter(new ByteArrayOutputStream()))) {
+                using (PdfDocument fromDocument = new PdfDocument(new PdfReader(new MemoryStream(fromDocBytes)))) {
+                    fromDocument.CopyPagesTo(1, 1, toDocument);
+                    NUnit.Framework.Assert.IsNull(toDocument.GetCatalog().GetOCProperties(false));
+                }
+            }
+        }
+
         private static byte[] GetDocumentWithAllDFields() {
             byte[] fromDocBytes;
             using (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -976,12 +1000,13 @@ namespace iText.Kernel.Pdf {
                     off2.SetOn(false);
                     pdfResource.MakeIndirect(fromDocument);
                     PdfOCProperties ocProperties = fromDocument.GetCatalog().GetOCProperties(true);
+                    PdfDictionary dDictionary = ocProperties.GetPdfObject().GetAsDictionary(PdfName.D);
                     // Creator (will be not copied)
-                    ocProperties.GetPdfObject().Put(PdfName.Creator, new PdfString("CreatorName", PdfEncodings.UNICODE_BIG));
+                    dDictionary.Put(PdfName.Creator, new PdfString("CreatorName", PdfEncodings.UNICODE_BIG));
                     // Name (will be automatically changed)
-                    ocProperties.GetPdfObject().Put(PdfName.Name, new PdfString("Name", PdfEncodings.UNICODE_BIG));
+                    dDictionary.Put(PdfName.Name, new PdfString("Name", PdfEncodings.UNICODE_BIG));
                     // BaseState (will be not copied)
-                    ocProperties.GetPdfObject().Put(PdfName.BaseState, PdfName.OFF);
+                    dDictionary.Put(PdfName.BaseState, PdfName.ON);
                     // AS (will be automatically changed)
                     PdfArray asArray = new PdfArray();
                     PdfDictionary dict = new PdfDictionary();
@@ -993,14 +1018,14 @@ namespace iText.Kernel.Pdf {
                     ocgs.Add(locked1.GetPdfObject());
                     dict.Put(PdfName.OCGs, ocgs);
                     asArray.Add(dict);
-                    ocProperties.GetPdfObject().Put(PdfName.AS, asArray);
+                    dDictionary.Put(PdfName.AS, asArray);
                     PdfLayer noPrint1 = new PdfLayer("noPrint1", fromDocument);
                     pdfResource.AddProperties(noPrint1.GetPdfObject());
                     noPrint1.SetPrint("Print", false);
                     // Intent (will be not copied)
-                    ocProperties.GetPdfObject().Put(PdfName.Intent, PdfName.Design);
+                    dDictionary.Put(PdfName.Intent, PdfName.View);
                     // ListMode (will be not copied)
-                    ocProperties.GetPdfObject().Put(PdfName.ListMode, PdfName.VisiblePages);
+                    dDictionary.Put(PdfName.ListMode, PdfName.VisiblePages);
                 }
                 fromDocBytes = outputStream.ToArray();
             }

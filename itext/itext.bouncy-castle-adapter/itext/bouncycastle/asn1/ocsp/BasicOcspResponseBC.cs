@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -22,11 +22,12 @@
  */
 using System;
 using System.Collections.Generic;
+using iText.Bouncycastle.Asn1.X509;
 using Org.BouncyCastle.Asn1.Ocsp;
-using iText.Bouncycastle.Cert;
 using iText.Bouncycastle.Cert.Ocsp;
 using iText.Bouncycastle.Crypto;
 using iText.Bouncycastle.X509;
+using iText.Commons.Bouncycastle.Asn1;
 using iText.Commons.Bouncycastle.Asn1.Ocsp;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Cert.Ocsp;
@@ -86,11 +87,20 @@ namespace iText.Bouncycastle.Asn1.Ocsp {
         /// <summary><inheritDoc/></summary>
         public IEnumerable<IX509Certificate> GetCerts() {
             List<IX509Certificate> certificates = new List<IX509Certificate>();
-            foreach (Asn1Encodable asn1Encodable in GetBasicOcspResponse().Certs) {
-                certificates.Add(new X509CertificateBC(new X509CertificateParser()
-                    .ReadCertificate(asn1Encodable.GetEncoded())));
+            if (GetBasicOcspResponse() != null && GetBasicOcspResponse().Certs != null) {
+                foreach (Asn1Encodable asn1Encodable in GetBasicOcspResponse().Certs) {
+                    if (asn1Encodable != null) {
+                        certificates.Add(new X509CertificateBC(new X509CertificateParser()
+                            .ReadCertificate(asn1Encodable.GetEncoded())));
+                    }
+                }
             }
             return certificates;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public IX509Certificate[] GetOcspCerts() {
+            return ((List<IX509Certificate>)GetCerts()).ToArray();
         }
 
         /// <summary><inheritDoc/></summary>
@@ -106,6 +116,22 @@ namespace iText.Bouncycastle.Asn1.Ocsp {
                 rs[i] = new SingleResponseBC(SingleResponse.GetInstance(Asn1Sequence.GetInstance(s[i].GetEncoded())));
             }
             return rs;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public DateTime GetProducedAt() {
+            return GetBasicOcspResponse().TbsResponseData.ProducedAt.ToDateTime();
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public IAsn1Encodable GetExtensionParsedValue(IDerObjectIdentifier objectIdentifier) {
+            return new Asn1EncodableBC(GetBasicOcspResponse().TbsResponseData.ResponseExtensions
+                .GetExtensionParsedValue(((DerObjectIdentifierBC)objectIdentifier).GetDerObjectIdentifier()));
+        }
+
+        public IRespID GetResponderId()
+        {
+            return new RespIDBC(new X509NameBC(GetBasicOcspResponse().TbsResponseData.ResponderID.Name));
         }
     }
 }

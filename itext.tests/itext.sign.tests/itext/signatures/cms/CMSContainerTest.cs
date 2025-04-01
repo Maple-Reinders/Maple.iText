@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,6 +30,7 @@ using iText.Commons.Bouncycastle.Asn1;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Utils;
+using iText.Kernel.Crypto;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf;
 using iText.Signatures;
@@ -84,8 +85,8 @@ namespace iText.Signatures.Cms {
             si.SetMessageDigest(new byte[256]);
             si.SetOcspResponses(fakeOcspREsponses);
             si.SetCrlResponses(JavaCollectionsUtil.SingletonList(testCrlResponse));
-            si.SetDigestAlgorithm(new AlgorithmIdentifier(SecurityIDs.ID_SHA512));
-            si.SetSigningCertificateAndAddToSignedAttributes(signCert, SecurityIDs.ID_SHA512);
+            si.SetDigestAlgorithm(new AlgorithmIdentifier(OID.SHA_512));
+            si.SetSigningCertificateAndAddToSignedAttributes(signCert, OID.SHA_512);
             si.SetSignatureAlgorithm(new AlgorithmIdentifier(SignatureMechanisms.GetSignatureMechanismOid("RSA", DigestAlgorithms
                 .SHA512)));
             si.SetSignature(new byte[256]);
@@ -105,8 +106,8 @@ namespace iText.Signatures.Cms {
             SignerInfo si = new SignerInfo();
             si.SetSigningCertificate(signCert);
             si.SetMessageDigest(new byte[256]);
-            si.SetDigestAlgorithm(new AlgorithmIdentifier(SecurityIDs.ID_SHA512));
-            si.SetSigningCertificateAndAddToSignedAttributes(signCert, SecurityIDs.ID_SHA512);
+            si.SetDigestAlgorithm(new AlgorithmIdentifier(OID.SHA_512));
+            si.SetSigningCertificateAndAddToSignedAttributes(signCert, OID.SHA_512);
             si.SetSignatureAlgorithm(new AlgorithmIdentifier(SignatureMechanisms.GetSignatureMechanismOid("RSA", DigestAlgorithms
                 .SHA512)));
             si.SetSignature(new byte[256]);
@@ -127,10 +128,10 @@ namespace iText.Signatures.Cms {
             si.SetMessageDigest(new byte[256]);
             si.SetOcspResponses(fakeOcspREsponses);
             si.SetCrlResponses(JavaCollectionsUtil.SingletonList(testCrlResponse));
-            si.SetDigestAlgorithm(new AlgorithmIdentifier(SecurityIDs.ID_SHA512));
+            si.SetDigestAlgorithm(new AlgorithmIdentifier(OID.SHA_512));
             si.SetSignatureAlgorithm(new AlgorithmIdentifier(SignatureMechanisms.GetSignatureMechanismOid("RSA", DigestAlgorithms
                 .SHA512)));
-            si.SetSigningCertificateAndAddToSignedAttributes(signCert, SecurityIDs.ID_SHA512);
+            si.SetSigningCertificateAndAddToSignedAttributes(signCert, OID.SHA_512);
             si.SetSignature(new byte[256]);
             sut.SetSignerInfo(si);
             long size = sut.GetSizeEstimation();

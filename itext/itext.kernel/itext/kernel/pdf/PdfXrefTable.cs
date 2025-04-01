@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,11 +25,12 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using iText.Commons;
-using iText.Commons.Actions.Data;
+using iText.Commons.Actions;
 using iText.Commons.Utils;
 using iText.IO.Source;
-using iText.Kernel.Actions.Data;
+using iText.Kernel.Actions.Events;
 using iText.Kernel.Exceptions;
+using iText.Kernel.Validation.Context;
 
 namespace iText.Kernel.Pdf {
     /// <summary>A representation of a cross-referenced table of a PDF document.</summary>
@@ -184,28 +185,6 @@ namespace iText.Kernel.Pdf {
             return xref[index];
         }
 
-        /// <summary>Convenience method to write the fingerprint preceding the trailer.</summary>
-        /// <remarks>
-        /// Convenience method to write the fingerprint preceding the trailer.
-        /// The fingerprint contains information on iText products used in the generation or manipulation
-        /// of an outputted PDF file.
-        /// </remarks>
-        /// <param name="document">pdfDocument to write the fingerprint to</param>
-        protected internal static void WriteKeyInfo(PdfDocument document) {
-            PdfWriter writer = document.GetWriter();
-            ICollection<ProductData> products = document.GetFingerPrint().GetProducts();
-            if (products.IsEmpty()) {
-                writer.WriteString(MessageFormatUtil.Format("%iText-{0}-no-registered-products\n", ITextCoreProductData.GetInstance
-                    ().GetVersion()));
-            }
-            else {
-                foreach (ProductData productData in products) {
-                    writer.WriteString(MessageFormatUtil.Format("%iText-{0}-{1}\n", productData.GetPublicProductName(), productData
-                        .GetVersion()));
-                }
-            }
-        }
-
         /// <summary>Creates next available indirect reference.</summary>
         /// <param name="document">
         /// is the current
@@ -290,7 +269,7 @@ namespace iText.Kernel.Pdf {
                 xref = null;
                 return;
             }
-            document.CheckIsoConformance(this, IsoKey.XREF_TABLE);
+            document.CheckIsoConformance(new XrefTableValidationContext(this));
             long startxref = writer.GetCurrentPos();
             long xRefStmPos = -1;
             if (xrefStream != null) {
@@ -303,7 +282,9 @@ namespace iText.Kernel.Pdf {
                 int offsetSize = GetOffsetSize(Math.Max(startxref, Size()));
                 xrefStream.Put(PdfName.W, new PdfArray(JavaUtil.ArraysAsList((PdfObject)new PdfNumber(1), new PdfNumber(offsetSize
                     ), new PdfNumber(2))));
-                xrefStream.Put(PdfName.Info, document.GetDocumentInfo().GetPdfObject());
+                if (document.GetTrailer().Get(PdfName.Info) != null) {
+                    xrefStream.Put(PdfName.Info, document.GetTrailer().Get(PdfName.Info));
+                }
                 xrefStream.Put(PdfName.Root, document.GetCatalog().GetPdfObject());
                 PdfArray index = new PdfArray();
                 foreach (int? section in sections) {
@@ -400,12 +381,13 @@ namespace iText.Kernel.Pdf {
                 writer.Write(document.GetTrailer());
                 writer.Write('\n');
             }
-            WriteKeyInfo(document);
+            EventManager.GetInstance().OnEvent(new AddFingerPrintEvent(document));
             writer.WriteString("startxref\n").WriteLong(startxref).WriteString("\n%%EOF\n");
             xref = null;
             freeReferencesLinkedList.Clear();
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Change the state of the cross-reference table to mark that reading of the document
         /// was completed.
@@ -413,13 +395,27 @@ namespace iText.Kernel.Pdf {
         internal virtual void MarkReadingCompleted() {
             readingCompleted = true;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
+        /// <summary>
+        /// Change the state of the cross-reference table to unmark that reading of the document
+        /// was completed.
+        /// </summary>
+        internal virtual void UnmarkReadingCompleted() {
+            readingCompleted = false;
+        }
+//\endcond
+
+//\cond DO_NOT_DOCUMENT
         /// <summary>Check if reading of the document was completed.</summary>
         /// <returns>true if reading was completed and false otherwise</returns>
         internal virtual bool IsReadingCompleted() {
             return readingCompleted;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Set up appropriate state for the free references list.</summary>
         /// <param name="pdfDocument">
         /// is the current
@@ -474,7 +470,9 @@ namespace iText.Kernel.Pdf {
             }
             freeReferencesLinkedList.Put(0, prevFreeRef);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Method is used for object streams to avoid reuse existed references.</summary>
         /// <param name="document">
         /// is the current
@@ -486,8 +484,10 @@ namespace iText.Kernel.Pdf {
             Add(reference);
             return (PdfIndirectReference)reference.SetState(PdfObject.MODIFIED);
         }
+//\endcond
 
-        /// <summary>Clear the state of the cross-reference table.</summary>
+//\cond DO_NOT_DOCUMENT
+        /// <summary>Clear the state of the cross-reference table without free references removal.</summary>
         internal virtual void Clear() {
             for (int i = 1; i <= count; i++) {
                 if (xref[i] != null && xref[i].IsFree()) {
@@ -497,6 +497,17 @@ namespace iText.Kernel.Pdf {
             }
             count = 1;
         }
+//\endcond
+
+//\cond DO_NOT_DOCUMENT
+        /// <summary>Clear the state of the cross-reference table including free references.</summary>
+        internal virtual void ClearAllReferences() {
+            for (int i = 1; i <= count; i++) {
+                xref[i] = null;
+            }
+            count = 1;
+        }
+//\endcond
 
         private IList<int> CreateSections(PdfDocument document, bool dropObjectsFromObjectStream) {
             IList<int> sections = new List<int>();

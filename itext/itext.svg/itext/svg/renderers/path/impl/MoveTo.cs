@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,14 +23,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using iText.Commons.Utils;
 using iText.Kernel.Geom;
-using iText.Kernel.Pdf.Canvas;
-using iText.StyledXmlParser.Css.Util;
 using iText.Svg.Exceptions;
 
 namespace iText.Svg.Renderers.Path.Impl {
     /// <summary>Implements moveTo(M) attribute of SVG's path element</summary>
     public class MoveTo : AbstractPathShape {
+//\cond DO_NOT_DOCUMENT
         internal const int ARGUMENT_SIZE = 2;
+//\endcond
 
         public MoveTo()
             : this(false) {
@@ -40,10 +40,12 @@ namespace iText.Svg.Renderers.Path.Impl {
             : base(relative) {
         }
 
-        public override void Draw(PdfCanvas canvas) {
-            float x = CssDimensionParsingUtils.ParseAbsoluteLength(coordinates[0]);
-            float y = CssDimensionParsingUtils.ParseAbsoluteLength(coordinates[1]);
-            canvas.MoveTo(x, y);
+        public override void Draw() {
+            double x = ParseHorizontalLength(coordinates[0]);
+            double y = ParseVerticalLength(coordinates[1]);
+            double[] points = new double[] { x, y };
+            ApplyTransform(points);
+            context.GetCurrentCanvas().MoveTo(points[0], points[1]);
         }
 
         public override void SetCoordinates(String[] inputCoordinates, Point startPoint) {
@@ -53,8 +55,8 @@ namespace iText.Svg.Renderers.Path.Impl {
             }
             this.coordinates = new String[] { inputCoordinates[0], inputCoordinates[1] };
             if (IsRelative()) {
-                this.coordinates = copier.MakeCoordinatesAbsolute(coordinates, new double[] { startPoint.x, startPoint.y }
-                    );
+                this.coordinates = copier.MakeCoordinatesAbsolute(coordinates, new double[] { startPoint.GetX(), startPoint
+                    .GetY() });
             }
         }
     }

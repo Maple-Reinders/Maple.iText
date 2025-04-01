@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,14 +21,17 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
+using System.IO;
 using iText.IO.Font.Constants;
 using iText.Kernel.Font;
 using iText.Kernel.Geom;
+using iText.Kernel.Logs;
 using iText.Kernel.Pdf.Annot;
 using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Tagging;
 using iText.Kernel.Utils;
 using iText.Test;
+using iText.Test.Attributes;
 
 namespace iText.Kernel.Pdf {
     [NUnit.Framework.Category("IntegrationTest")]
@@ -304,6 +307,154 @@ namespace iText.Kernel.Pdf {
             secondPage.AddAnnotation(linkExplicitDest);
             document.Close();
             NUnit.Framework.Assert.IsTrue(CheckParentTree(outFile, cmpFile));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void ObjRefAsStreamTest() {
+            String pdf = sourceFolder + "objRefAsStream.pdf";
+            String outPdf = destinationFolder + "objRefAsStream.pdf";
+            String cmpPdf = sourceFolder + "cmp_objRefAsStream.pdf";
+            PdfDocument taggedPdf = new PdfDocument(new PdfReader(pdf), CompareTool.CreateTestPdfWriter(outPdf));
+            taggedPdf.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, destinationFolder, "diff"
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.TAG_STRUCTURE_INIT_FAILED)]
+        public virtual void ObjRefAsInvalidType() {
+            String pdf = sourceFolder + "objRefAsInvalidType.pdf";
+            PdfDocument doc = new PdfDocument(new PdfReader(pdf));
+            NUnit.Framework.Assert.IsNull(doc.GetStructTreeRoot());
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void UnregisterObjRefAsStreamTest() {
+            String pdf = sourceFolder + "objRefAsStream.pdf";
+            String outPdf = destinationFolder + "objRefAsStreamUnregisterMcr.pdf";
+            String cmpPdf = sourceFolder + "cmp_objRefAsStreamUnregisterMcr.pdf";
+            PdfDocument taggedPdf = new PdfDocument(new PdfReader(pdf), CompareTool.CreateTestPdfWriter(outPdf));
+            PdfStructElem elem = (PdfStructElem)taggedPdf.GetStructTreeRoot().GetKids()[0].GetKids()[0];
+            elem.RemoveKid(0);
+            taggedPdf.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, destinationFolder, "diff"
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(KernelLogMessageConstant.STRUCT_PARENT_INDEX_MISSED_AND_RECREATED, Count = 4)]
+        public virtual void AllObjRefDontHaveStructParentTest() {
+            String pdf = sourceFolder + "allObjRefDontHaveStructParent.pdf";
+            String outPdf = destinationFolder + "allObjRefDontHaveStructParent.pdf";
+            String cmpPdf = sourceFolder + "cmp_allObjRefDontHaveStructParent.pdf";
+            PdfDocument taggedPdf = new PdfDocument(new PdfReader(pdf), new PdfWriter(outPdf));
+            taggedPdf.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, destinationFolder, "diff"
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(KernelLogMessageConstant.XOBJECT_STRUCT_PARENT_INDEX_MISSED_AND_RECREATED)]
+        public virtual void XObjDoesntHaveStructParentTest() {
+            String pdf = sourceFolder + "xObjDoesntHaveStructParentTest.pdf";
+            String outPdf = destinationFolder + "xObjDoesntHaveStructParentTest.pdf";
+            String cmpPdf = sourceFolder + "cmp_xObjDoesntHaveStructParentTest.pdf";
+            PdfDocument taggedPdf = new PdfDocument(new PdfReader(pdf), new PdfWriter(outPdf));
+            taggedPdf.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, destinationFolder, "diff"
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.TAG_STRUCTURE_INIT_FAILED)]
+        public virtual void ObjRefNoStructParentNoModificationTest() {
+            String pdf = sourceFolder + "objRefNoStructParent.pdf";
+            String outPdf = destinationFolder + "objRefNoStructParentNoModification.pdf";
+            PdfReader reader = new PdfReader(pdf).SetStrictnessLevel(PdfReader.StrictnessLevel.CONSERVATIVE);
+            PdfDocument doc = new PdfDocument(reader, CompareTool.CreateTestPdfWriter(outPdf));
+            PdfArray nums = doc.GetCatalog().GetPdfObject().GetAsDictionary(PdfName.StructTreeRoot).GetAsDictionary(PdfName
+                .ParentTree).GetAsArray(PdfName.Nums);
+            NUnit.Framework.Assert.IsNull(GetStructParentEntry(nums.Get(3)));
+            NUnit.Framework.Assert.IsNull(GetStructParentEntry(nums.Get(5)));
+            NUnit.Framework.Assert.IsNull(GetStructParentEntry(nums.Get(7)));
+            NUnit.Framework.Assert.IsNull(GetStructParentEntry(nums.Get(9)));
+            doc.Close();
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(KernelLogMessageConstant.STRUCT_PARENT_INDEX_MISSED_AND_RECREATED, Count = 4)]
+        public virtual void ObjRefNoStructParentModificationTest() {
+            String pdf = sourceFolder + "objRefNoStructParent.pdf";
+            String outPdf = destinationFolder + "objRefNoStructParentModification.pdf";
+            String cmpPdf = sourceFolder + "cmp_objRefNoStructParentModification.pdf";
+            PdfDocument doc = new PdfDocument(new PdfReader(pdf), CompareTool.CreateTestPdfWriter(outPdf));
+            doc.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, destinationFolder, "diff"
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.TAG_STRUCTURE_INIT_FAILED)]
+        public virtual void XObjNoStructParentNoModificationTest() {
+            String pdf = sourceFolder + "xObjNoStructParent.pdf";
+            String outPdf = destinationFolder + "xObjNoStructParentNoModification.pdf";
+            PdfReader reader = new PdfReader(pdf).SetStrictnessLevel(PdfReader.StrictnessLevel.CONSERVATIVE);
+            PdfDocument doc = new PdfDocument(reader, new PdfWriter(outPdf));
+            PdfObject obj = doc.GetCatalog().GetPdfObject().GetAsDictionary(PdfName.StructTreeRoot).GetAsDictionary(PdfName
+                .ParentTree).GetAsArray(PdfName.Nums).Get(1);
+            PdfStream xObj = ((PdfDictionary)((PdfArray)obj).Get(0)).GetAsDictionary(PdfName.K).GetAsStream(PdfName.Stm
+                );
+            NUnit.Framework.Assert.IsNull(xObj.Get(PdfName.StructParent));
+            doc.Close();
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(KernelLogMessageConstant.XOBJECT_STRUCT_PARENT_INDEX_MISSED_AND_RECREATED)]
+        public virtual void XObjNoStructParentModificationTest() {
+            String pdf = sourceFolder + "xObjNoStructParent.pdf";
+            String outPdf = destinationFolder + "xObjNoStructParentModification.pdf";
+            String cmpPdf = sourceFolder + "cmp_xObjNoStructParentModification.pdf";
+            PdfDocument doc = new PdfDocument(new PdfReader(pdf), CompareTool.CreateTestPdfWriter(outPdf));
+            doc.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, destinationFolder, "diff"
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(KernelLogMessageConstant.STRUCT_PARENT_INDEX_MISSED_AND_RECREATED)]
+        public virtual void ObjRefNoStructParentNoReaderTest() {
+            String outPdf = destinationFolder + "objRefNoStructParentNoReader.pdf";
+            String cmpPdf = sourceFolder + "cmp_objRefNoStructParentNoReader.pdf";
+            PdfDocument pdfDoc = new PdfDocument(CompareTool.CreateTestPdfWriter(outPdf));
+            pdfDoc.SetTagged();
+            PdfPage page = pdfDoc.AddNewPage();
+            PdfDictionary mcrDic = new PdfDictionary();
+            mcrDic.Put(PdfName.Pg, page.GetPdfObject());
+            mcrDic.Put(PdfName.MCID, new PdfNumber(0));
+            mcrDic.Put(PdfName.Obj, new PdfDictionary());
+            PdfDictionary elemDic = new PdfDictionary();
+            elemDic.Put(PdfName.P, pdfDoc.GetStructTreeRoot().GetPdfObject());
+            PdfStructElem elem = new PdfStructElem(elemDic);
+            elem.MakeIndirect(pdfDoc);
+            PdfMcr mcr = new PdfObjRef(mcrDic, elem);
+            elem.AddKid(0, mcr);
+            pdfDoc.GetStructTreeRoot().AddKid(elem);
+            pdfDoc.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, destinationFolder, "diff"
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.CREATED_ROOT_TAG_HAS_MAPPING)]
+        public virtual void CopyPageWithMultipleDocumentTagsTest() {
+            PdfDocument pdfDoc = new PdfDocument(new PdfReader(sourceFolder + "pdfWithMultipleDocumentTags.pdf"), new 
+                PdfWriter(new MemoryStream()));
+            NUnit.Framework.Assert.DoesNotThrow(() => pdfDoc.GetTagStructureContext().NormalizeDocumentRootTag());
+        }
+
+        private PdfObject GetStructParentEntry(PdfObject obj) {
+            return ((PdfDictionary)obj).GetAsDictionary(PdfName.K).GetAsDictionary(PdfName.Obj).Get(PdfName.StructParent
+                );
         }
 
         private bool CheckParentTree(String outFileName, String cmpFileName) {

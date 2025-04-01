@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,27 +27,53 @@ using System.Text;
 namespace iText.IO.Font.Cmap {
     public class CMapByteCid : AbstractCMap {
         protected internal class Cursor {
-            public int offset;
+            private int offset;
 
-            public int length;
+            private int length;
 
             public Cursor(int offset, int length) {
                 this.offset = offset;
                 this.length = length;
             }
+
+            /// <summary>Retrieves the offset of the object.</summary>
+            /// <returns>offset value</returns>
+            public virtual int GetOffset() {
+                return offset;
+            }
+
+            /// <summary>Sets the offset of the object.</summary>
+            /// <param name="offset">offset value</param>
+            public virtual void SetOffset(int offset) {
+                this.offset = offset;
+            }
+
+            /// <summary>Retrieves the length of the object.</summary>
+            /// <returns>length value</returns>
+            public virtual int GetLength() {
+                return length;
+            }
+
+            /// <summary>Sets the length value of the object.</summary>
+            /// <param name="length">length value</param>
+            public virtual void SetLength(int length) {
+                this.length = length;
+            }
         }
 
-        private IList<int[]> planes = new List<int[]>();
+        private readonly IList<int[]> planes = new List<int[]>();
 
         public CMapByteCid() {
             planes.Add(new int[256]);
         }
 
+//\cond DO_NOT_DOCUMENT
         internal override void AddChar(String mark, CMapObject code) {
             if (code.IsNumber()) {
                 EncodeSequence(DecodeStringToByte(mark), (int)code.GetValue());
             }
         }
+//\endcond
 
         /// <summary>Decode byte sequence.</summary>
         /// <param name="cidBytes">byteCodeBytes</param>
@@ -65,11 +91,12 @@ namespace iText.IO.Font.Cmap {
         }
 
         protected internal virtual int DecodeSingle(byte[] cidBytes, CMapByteCid.Cursor cursor) {
-            int end = cursor.offset + cursor.length;
+            int end = cursor.GetOffset() + cursor.GetLength();
             int currentPlane = 0;
-            while (cursor.offset < end) {
-                int one = cidBytes[cursor.offset++] & 0xff;
-                cursor.length--;
+            while (cursor.GetOffset() < end) {
+                int one = cidBytes[cursor.GetOffset()] & 0xff;
+                cursor.SetOffset(cursor.GetOffset() + 1);
+                cursor.SetLength(cursor.GetLength() - 1);
                 int[] plane = planes[currentPlane];
                 int cid = plane[one];
                 if ((cid & 0x8000) == 0) {

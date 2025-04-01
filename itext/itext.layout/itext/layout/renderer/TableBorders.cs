@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,6 +30,7 @@ using iText.Layout.Borders;
 using iText.Layout.Properties;
 
 namespace iText.Layout.Renderer {
+//\cond DO_NOT_DOCUMENT
     internal abstract class TableBorders {
         /// <summary>Horizontal borders of the table.</summary>
         /// <remarks>
@@ -156,8 +157,7 @@ namespace iText.Layout.Renderer {
         protected internal abstract float GetCellVerticalAddition(float[] indents);
 
         // endregion
-        protected internal abstract void BuildBordersArrays(CellRenderer cell, int row, int col, int[] rowspansToDeduct
-            );
+        protected internal abstract void BuildBordersArrays(CellRenderer cell, int row, int col);
 
         protected internal abstract iText.Layout.Renderer.TableBorders UpdateBordersOnNewPage(bool isOriginalNonSplitRenderer
             , bool isFooterOrHeader, TableRenderer currentRenderer, TableRenderer headerRenderer, TableRenderer footerRenderer
@@ -166,7 +166,6 @@ namespace iText.Layout.Renderer {
         // endregion
         protected internal virtual iText.Layout.Renderer.TableBorders ProcessAllBordersAndEmptyRows() {
             CellRenderer[] currentRow;
-            int[] rowspansToDeduct = new int[numberOfColumns];
             int numOfRowsToRemove = 0;
             if (!rows.IsEmpty()) {
                 for (int row = startRow - largeTableIndexOffset; row <= finishRow - largeTableIndexOffset; row++) {
@@ -174,26 +173,17 @@ namespace iText.Layout.Renderer {
                     bool hasCells = false;
                     for (int col = 0; col < numberOfColumns; col++) {
                         if (null != currentRow[col]) {
-                            int colspan = (int)currentRow[col].GetPropertyAsInteger(Property.COLSPAN);
-                            if (rowspansToDeduct[col] > 0) {
-                                int rowspan = (int)currentRow[col].GetPropertyAsInteger(Property.ROWSPAN) - rowspansToDeduct[col];
-                                if (rowspan < 1) {
-                                    ILogger logger = ITextLogManager.GetLogger(typeof(TableRenderer));
-                                    logger.LogWarning(iText.IO.Logs.IoLogMessageConstant.UNEXPECTED_BEHAVIOUR_DURING_TABLE_ROW_COLLAPSING);
-                                    rowspan = 1;
-                                }
-                                currentRow[col].SetProperty(Property.ROWSPAN, rowspan);
-                                if (0 != numOfRowsToRemove) {
-                                    RemoveRows(row - numOfRowsToRemove, numOfRowsToRemove);
-                                    row -= numOfRowsToRemove;
-                                    numOfRowsToRemove = 0;
-                                }
+                            if (0 != numOfRowsToRemove) {
+                                // Decrease rowspans if necessary
+                                UpdateRowspanForNextNonEmptyCellInEachColumn(numOfRowsToRemove, row);
+                                // Remove empty rows
+                                RemoveRows(row - numOfRowsToRemove, numOfRowsToRemove);
+                                row -= numOfRowsToRemove;
+                                numOfRowsToRemove = 0;
                             }
-                            BuildBordersArrays(currentRow[col], row, col, rowspansToDeduct);
+                            BuildBordersArrays(currentRow[col], row, col);
                             hasCells = true;
-                            for (int i = 0; i < colspan; i++) {
-                                rowspansToDeduct[col + i] = 0;
-                            }
+                            int colspan = (int)currentRow[col].GetPropertyAsInteger(Property.COLSPAN);
                             col += colspan - 1;
                         }
                         else {
@@ -204,17 +194,14 @@ namespace iText.Layout.Renderer {
                     }
                     if (!hasCells) {
                         if (row == rows.Count - 1) {
-                            RemoveRows(row - rowspansToDeduct[0], rowspansToDeduct[0]);
+                            RemoveRows(row - numOfRowsToRemove, numOfRowsToRemove);
                             // delete current row
-                            rows.JRemoveAt(row - rowspansToDeduct[0]);
+                            rows.JRemoveAt(row - numOfRowsToRemove);
                             SetFinishRow(finishRow - 1);
                             ILogger logger = ITextLogManager.GetLogger(typeof(TableRenderer));
                             logger.LogWarning(iText.IO.Logs.IoLogMessageConstant.LAST_ROW_IS_NOT_COMPLETE);
                         }
                         else {
-                            for (int i = 0; i < numberOfColumns; i++) {
-                                rowspansToDeduct[i]++;
-                            }
                             numOfRowsToRemove++;
                         }
                     }
@@ -224,17 +211,6 @@ namespace iText.Layout.Renderer {
                 SetFinishRow(startRow);
             }
             return this;
-        }
-
-        private void RemoveRows(int startRow, int numOfRows) {
-            for (int row = startRow; row < startRow + numOfRows; row++) {
-                rows.JRemoveAt(startRow);
-                horizontalBorders.JRemoveAt(startRow + 1);
-                for (int j = 0; j <= numberOfColumns; j++) {
-                    verticalBorders[j].JRemoveAt(startRow + 1);
-                }
-            }
-            SetFinishRow(finishRow - numOfRows);
         }
 
         // region init
@@ -419,6 +395,61 @@ namespace iText.Layout.Renderer {
             }
             return indents;
         }
+
         // endregion
+        private void RemoveRows(int startRow, int numOfRows) {
+            for (int row = startRow; row < startRow + numOfRows; row++) {
+                rows.JRemoveAt(startRow);
+                horizontalBorders.JRemoveAt(startRow + 1);
+                for (int j = 0; j <= numberOfColumns; j++) {
+                    verticalBorders[j].JRemoveAt(startRow + 1);
+                }
+            }
+            SetFinishRow(finishRow - numOfRows);
+        }
+
+        private void UpdateRowspanForNextNonEmptyCellInEachColumn(int numOfRowsToRemove, int row) {
+            // We go by columns in a current row which is not empty. For each column we look for
+            // a non-empty cell going up by rows (going down in a table). For each such cell we
+            // collect data to be able to analyze its rowspan.
+            // Iterate by columns
+            int c = 0;
+            while (c < numberOfColumns) {
+                int r = row;
+                CellRenderer[] cr = null;
+                // Look for non-empty cell in a column
+                while (r < rows.Count && (cr == null || cr[c] == null)) {
+                    cr = rows[r];
+                    ++r;
+                }
+                // Found a cell
+                if (cr != null && cr[c] != null) {
+                    CellRenderer cell = cr[c];
+                    int origRowspan = (int)cell.GetPropertyAsInteger(Property.ROWSPAN);
+                    int spansToRestore = 0;
+                    // Here we analyze whether current cell's rowspan touches a non-empty row before
+                    // numOfRowsToRemove. If it doesn't touch it we will need to 'restore' a few
+                    // rowspans which is a difference between the current (non-empty) row and the row
+                    // where we found non-empty cell for this column
+                    if (row - numOfRowsToRemove < r - origRowspan) {
+                        spansToRestore = r - row - 1;
+                    }
+                    int rowspan = origRowspan;
+                    rowspan = rowspan - numOfRowsToRemove;
+                    if (rowspan < 1) {
+                        rowspan = 1;
+                    }
+                    rowspan += spansToRestore;
+                    rowspan = Math.Min(rowspan, origRowspan);
+                    cell.SetProperty(Property.ROWSPAN, rowspan);
+                    int colspan = (int)cell.GetPropertyAsInteger(Property.COLSPAN);
+                    c += colspan;
+                }
+                else {
+                    ++c;
+                }
+            }
+        }
     }
+//\endcond
 }

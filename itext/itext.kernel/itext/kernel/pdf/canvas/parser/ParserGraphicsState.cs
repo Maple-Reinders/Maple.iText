@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -35,10 +35,13 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
         // NOTE: From the spec default value of this field should be the boundary of the entire imageable portion of the output page.
         private Path clippingPath;
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Internal empty and default constructor.</summary>
         internal ParserGraphicsState() {
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Copy constructor.</summary>
         /// <param name="source">the Graphics State to copy from</param>
         internal ParserGraphicsState(iText.Kernel.Pdf.Canvas.Parser.ParserGraphicsState source)
@@ -47,6 +50,7 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
                 clippingPath = new Path(source.clippingPath);
             }
         }
+//\endcond
 
         public override void UpdateCtm(Matrix newCtm) {
             base.UpdateCtm(newCtm);
@@ -58,6 +62,7 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
         /// <summary>Intersects the current clipping path with the given path.</summary>
         /// <remarks>
         /// Intersects the current clipping path with the given path.
+        /// <para />
         /// <strong>Note:</strong> Coordinates of the given path should be in
         /// the transformed user space.
         /// </remarks>
@@ -76,17 +81,19 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
             Path pathCopy = new Path(path);
             pathCopy.CloseAllSubpaths();
             Clipper clipper = new Clipper();
-            ClipperBridge.AddPath(clipper, clippingPath, PolyType.SUBJECT);
-            ClipperBridge.AddPath(clipper, pathCopy, PolyType.CLIP);
+            ClipperBridge clipperBridge = new ClipperBridge(clippingPath, pathCopy);
+            clipperBridge.AddPath(clipper, clippingPath, PolyType.SUBJECT);
+            clipperBridge.AddPath(clipper, pathCopy, PolyType.CLIP);
             PolyTree resultTree = new PolyTree();
             clipper.Execute(ClipType.INTERSECTION, resultTree, PolyFillType.NON_ZERO, ClipperBridge.GetFillType(fillingRule
                 ));
-            clippingPath = ClipperBridge.ConvertToPath(resultTree);
+            clippingPath = clipperBridge.ConvertToPath(resultTree);
         }
 
         /// <summary>Getter for the current clipping path.</summary>
         /// <remarks>
         /// Getter for the current clipping path.
+        /// <para />
         /// <strong>Note:</strong> The returned clipping path is in the transformed user space, so
         /// if you want to get it in default user space, apply transformation matrix (
         /// <see cref="iText.Kernel.Pdf.Canvas.CanvasGraphicsState.GetCtm()"/>
@@ -100,6 +107,7 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
         /// <summary>Sets the current clipping path to the specified path.</summary>
         /// <remarks>
         /// Sets the current clipping path to the specified path.
+        /// <para />
         /// <strong>Note:</strong>This method doesn't modify existing clipping path,
         /// it simply replaces it with the new one instead.
         /// </remarks>

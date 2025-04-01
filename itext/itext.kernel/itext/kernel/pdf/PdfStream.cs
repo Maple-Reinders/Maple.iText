@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -156,6 +156,7 @@ namespace iText.Kernel.Pdf {
             SetState(MUST_BE_INDIRECT);
         }
 
+//\cond DO_NOT_DOCUMENT
         //NOTE This constructor only for PdfReader.
         internal PdfStream(long offset, PdfDictionary keys)
             : base() {
@@ -170,6 +171,7 @@ namespace iText.Kernel.Pdf {
                 this.length = length.IntValue();
             }
         }
+//\endcond
 
         /// <summary>Gets output stream.</summary>
         /// <returns>output stream</returns>

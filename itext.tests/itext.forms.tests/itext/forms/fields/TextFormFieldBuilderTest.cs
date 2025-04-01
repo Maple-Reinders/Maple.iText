@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -63,9 +63,15 @@ namespace iText.Forms.Fields {
         }
 
         [NUnit.Framework.Test]
+        public virtual void CreateTextWithIncorrectNameTest() {
+            NUnit.Framework.Assert.DoesNotThrow(() => new TextFormFieldBuilder(DUMMY_DOCUMENT, "incorrect.name").SetWidgetRectangle
+                (DUMMY_RECTANGLE).CreateText());
+        }
+
+        [NUnit.Framework.Test]
         public virtual void CreateTextWithConformanceLevelTest() {
             PdfTextFormField textFormField = new TextFormFieldBuilder(DUMMY_DOCUMENT, DUMMY_NAME).SetWidgetRectangle(DUMMY_RECTANGLE
-                ).SetConformanceLevel(PdfAConformanceLevel.PDF_A_1A).CreateText();
+                ).SetConformance(PdfConformance.PDF_A_1A).CreateText();
             PdfDictionary expectedDictionary = new PdfDictionary();
             expectedDictionary.Put(PdfName.Ff, new PdfNumber(0));
             CompareTexts(expectedDictionary, textFormField, true);
@@ -90,9 +96,15 @@ namespace iText.Forms.Fields {
         }
 
         [NUnit.Framework.Test]
+        public virtual void CreateMultilineTextWithIncorrectNameTest() {
+            NUnit.Framework.Assert.DoesNotThrow(() => new TextFormFieldBuilder(DUMMY_DOCUMENT, "incorrect.name").SetWidgetRectangle
+                (DUMMY_RECTANGLE).CreateMultilineText());
+        }
+
+        [NUnit.Framework.Test]
         public virtual void CreateMultilineTextWithConformanceLevelTest() {
             PdfTextFormField textFormField = new TextFormFieldBuilder(DUMMY_DOCUMENT, DUMMY_NAME).SetWidgetRectangle(DUMMY_RECTANGLE
-                ).SetConformanceLevel(PdfAConformanceLevel.PDF_A_1A).CreateMultilineText();
+                ).SetConformance(PdfConformance.PDF_A_1A).CreateMultilineText();
             PdfDictionary expectedDictionary = new PdfDictionary();
             expectedDictionary.Put(PdfName.Ff, new PdfNumber(PdfTextFormField.FF_MULTILINE));
             CompareTexts(expectedDictionary, textFormField, true);

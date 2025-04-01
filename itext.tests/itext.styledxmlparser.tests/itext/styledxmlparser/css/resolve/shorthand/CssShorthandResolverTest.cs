@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -494,6 +494,7 @@ namespace iText.StyledXmlParser.Css.Resolve.Shorthand {
             CompareResolvedProps(resolvedShorthandProps, expectedResolvedProperties);
         }
 
+//\cond DO_NOT_DOCUMENT
         internal static void CompareResolvedProps(IList<CssDeclaration> actual, ICollection<String> expected) {
             ICollection<String> actualSet = new HashSet<String>();
             foreach (CssDeclaration cssDecl in actual) {
@@ -523,5 +524,6 @@ namespace iText.StyledXmlParser.Css.Resolve.Shorthand {
                 NUnit.Framework.Assert.Fail(sb.ToString());
             }
         }
+//\endcond
     }
 }

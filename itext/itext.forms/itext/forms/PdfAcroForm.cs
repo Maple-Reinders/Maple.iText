@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -373,7 +373,7 @@ namespace iText.Forms {
         /// objects
         /// </returns>
         public virtual IDictionary<String, PdfFormField> GetAllFormFields() {
-            if (fields.Count == 0) {
+            if (fields.IsEmpty()) {
                 fields = PopulateFormFieldsMap();
             }
             IDictionary<String, PdfFormField> allFields = new LinkedDictionary<String, PdfFormField>(fields);
@@ -1382,10 +1382,10 @@ namespace iText.Forms {
                 float[] transformedRectArr = new float[] { float.MaxValue, float.MaxValue, -float.MaxValue, -float.MaxValue
                      };
                 foreach (Point p in transformedAppBoxPoints) {
-                    transformedRectArr[0] = (float)Math.Min(transformedRectArr[0], p.x);
-                    transformedRectArr[1] = (float)Math.Min(transformedRectArr[1], p.y);
-                    transformedRectArr[2] = (float)Math.Max(transformedRectArr[2], p.x);
-                    transformedRectArr[3] = (float)Math.Max(transformedRectArr[3], p.y);
+                    transformedRectArr[0] = (float)Math.Min(transformedRectArr[0], p.GetX());
+                    transformedRectArr[1] = (float)Math.Min(transformedRectArr[1], p.GetY());
+                    transformedRectArr[2] = (float)Math.Max(transformedRectArr[2], p.GetX());
+                    transformedRectArr[3] = (float)Math.Max(transformedRectArr[3], p.GetY());
                 }
                 transformedRect = new Rectangle(transformedRectArr[0], transformedRectArr[1], transformedRectArr[2] - transformedRectArr
                     [0], transformedRectArr[3] - transformedRectArr[1]);

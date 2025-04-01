@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,8 +24,32 @@ using System;
 
 namespace iText.IO.Font.Otf {
     public class FeatureRecord {
-        public String tag;
+        private String tag;
 
-        public int[] lookups;
+        private int[] lookups;
+
+        /// <summary>Retrieves the tag of the feature record.</summary>
+        /// <returns>tag</returns>
+        public virtual String GetTag() {
+            return tag;
+        }
+
+        /// <summary>Sets the tag of the feature record.</summary>
+        /// <param name="tag">tag</param>
+        public virtual void SetTag(String tag) {
+            this.tag = tag;
+        }
+
+        /// <summary>Retrieves the lookups of the feature record.</summary>
+        /// <returns>lookups</returns>
+        public virtual int[] GetLookups() {
+            return lookups;
+        }
+
+        /// <summary>Sets the lookups of the feature record.</summary>
+        /// <param name="lookups">lookups</param>
+        public virtual void SetLookups(int[] lookups) {
+            this.lookups = lookups;
+        }
     }
 }

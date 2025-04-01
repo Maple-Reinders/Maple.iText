@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,6 +28,7 @@ using iText.Layout.Minmaxwidth;
 using iText.Layout.Properties;
 
 namespace iText.Layout.Renderer {
+//\cond DO_NOT_DOCUMENT
     internal sealed class RotationUtils {
         private RotationUtils() {
         }
@@ -243,4 +244,5 @@ namespace iText.Layout.Renderer {
             }
         }
     }
+//\endcond
 }

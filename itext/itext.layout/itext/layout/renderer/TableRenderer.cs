@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -71,7 +71,9 @@ namespace iText.Layout.Renderer {
         ///     </remarks>
         protected internal bool isOriginalNonSplitRenderer = true;
 
+//\cond DO_NOT_DOCUMENT
         internal TableBorders bordersHandler;
+//\endcond
 
         private float[] columnWidths = null;
 
@@ -196,9 +198,11 @@ namespace iText.Layout.Renderer {
             return rect;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual Table GetTable() {
             return (Table)GetModelElement();
         }
+//\endcond
 
         private void InitializeHeaderAndFooter(bool isFirstOnThePage) {
             Table table = (Table)GetModelElement();
@@ -473,16 +477,16 @@ namespace iText.Layout.Renderer {
                 // if cell is in the last row on the page, its borders shouldn't collapse with the next row borders
                 while (cellProcessingQueue.Count > 0) {
                     TableRenderer.CellRendererInfo currentCellInfo = cellProcessingQueue.JRemoveFirst();
-                    col = currentCellInfo.column;
-                    CellRenderer cell = currentCellInfo.cellRenderer;
+                    col = currentCellInfo.GetColumn();
+                    CellRenderer cell = currentCellInfo.GetCellRenderer();
                     int colspan = (int)cell.GetPropertyAsInteger(Property.COLSPAN);
                     int rowspan = (int)cell.GetPropertyAsInteger(Property.ROWSPAN);
                     if (1 != rowspan) {
                         cellWithBigRowspanAdded = true;
                     }
-                    targetOverflowRowIndex[col] = currentCellInfo.finishRowInd;
+                    targetOverflowRowIndex[col] = currentCellInfo.GetFinishRowInd();
                     // This cell came from the future (split occurred and we need to place cell with big rowpsan into the current area)
-                    bool currentCellHasBigRowspan = (row != currentCellInfo.finishRowInd);
+                    bool currentCellHasBigRowspan = (row != currentCellInfo.GetFinishRowInd());
                     if (cell.HasOwnOrModelProperty(Property.HEIGHT)) {
                         rowHasCellWithSetHeight = true;
                     }
@@ -495,7 +499,7 @@ namespace iText.Layout.Renderer {
                         colOffset += countedColumnWidth[l];
                     }
                     float rowspanOffset = 0;
-                    for (int m = row - 1; m > currentCellInfo.finishRowInd - rowspan && m >= 0; m--) {
+                    for (int m = row - 1; m > currentCellInfo.GetFinishRowInd() - rowspan && m >= 0; m--) {
                         rowspanOffset += (float)heights[m];
                     }
                     float cellLayoutBoxHeight = rowspanOffset + (!currentCellHasBigRowspan || hasContent ? layoutBox.GetHeight
@@ -512,8 +516,8 @@ namespace iText.Layout.Renderer {
                         cell.SetProperty(Property.WIDTH, UnitValue.CreatePointValue(cellWidth));
                     }
                     // Apply cell borders
-                    float[] cellIndents = bordersHandler.GetCellBorderIndents(currentCellInfo.finishRowInd, col, rowspan, colspan
-                        );
+                    float[] cellIndents = bordersHandler.GetCellBorderIndents(currentCellInfo.GetFinishRowInd(), col, rowspan, 
+                        colspan);
                     if (!(bordersHandler is SeparatedTableBorders)) {
                         // Bottom indent to be applied consists of two parts which should be summed up:
                         // a) half of the border of the current row (in case it is the last row on the area)
@@ -588,9 +592,9 @@ namespace iText.Layout.Renderer {
                             currentRow[col] = (CellRenderer)cellResult.GetSplitRenderer();
                         }
                         else {
-                            rows[currentCellInfo.finishRowInd][col] = null;
+                            rows[currentCellInfo.GetFinishRowInd()][col] = null;
                             currentRow[col] = cell;
-                            rowMoves.Put(col, currentCellInfo.finishRowInd);
+                            rowMoves.Put(col, currentCellInfo.GetFinishRowInd());
                         }
                     }
                     else {
@@ -807,7 +811,7 @@ namespace iText.Layout.Renderer {
                                 rowspans[col] = ((Cell)cellSplit.GetModelElement()).GetRowspan();
                             }
                             if (splits[col].GetStatus() != LayoutResult.NOTHING && (hasContent || cellWithBigRowspanAdded)) {
-                                childRenderers.Add(cellSplit);
+                                splitResult[0].AddChildRenderer(cellSplit);
                             }
                             LayoutArea cellOccupiedArea = currentRow[col].GetOccupiedArea();
                             if (hasContent || cellWithBigRowspanAdded || splits[col].GetStatus() == LayoutResult.NOTHING) {
@@ -908,10 +912,14 @@ namespace iText.Layout.Renderer {
                             );
                     }
                     else {
-                        int status = ((occupiedArea.GetBBox().GetHeight() - (null == footerRenderer ? 0 : footerRenderer.GetOccupiedArea
-                            ().GetBBox().GetHeight()) - (null == headerRenderer ? 0 : headerRenderer.GetOccupiedArea().GetBBox().GetHeight
-                            () - headerRenderer.bordersHandler.GetMaxBottomWidth()) == 0) && (isAndWasComplete || isFirstOnThePage
-                            )) ? LayoutResult.NOTHING : LayoutResult.PARTIAL;
+                        float footerHeight = null == footerRenderer ? 0 : footerRenderer.GetOccupiedArea().GetBBox().GetHeight();
+                        float headerHeight = null == headerRenderer ? 0 : headerRenderer.GetOccupiedArea().GetBBox().GetHeight() -
+                             headerRenderer.bordersHandler.GetMaxBottomWidth();
+                        float captionHeight = null == captionRenderer ? 0 : captionRenderer.GetOccupiedArea().GetBBox().GetHeight(
+                            );
+                        float heightDiff = occupiedArea.GetBBox().GetHeight() - footerHeight - headerHeight - captionHeight;
+                        int status = JavaUtil.FloatCompare(0, heightDiff) == 0 && (isAndWasComplete || isFirstOnThePage) ? LayoutResult
+                            .NOTHING : LayoutResult.PARTIAL;
                         if ((status == LayoutResult.NOTHING && true.Equals(GetPropertyAsBoolean(Property.FORCED_PLACEMENT))) || wasHeightClipped
                             ) {
                             if (wasHeightClipped) {
@@ -1277,7 +1285,12 @@ namespace iText.Layout.Renderer {
             splitRenderer.rowRange = rowRange;
             splitRenderer.parent = parent;
             splitRenderer.modelElement = modelElement;
+            // Do not use splitRenderer.addAllChildRenderers(childRenderers); here
+            // because we want to share childRenderers with parent renderer. They are still used.
+            // It's ok to set all parent's child renderers because they are collected while layouting.
+            // The ones which have not been layouted are not there.
             splitRenderer.childRenderers = childRenderers;
+            splitRenderer.SetThisAsParent(childRenderers);
             splitRenderer.AddAllProperties(GetOwnProperties());
             splitRenderer.headerRenderer = headerRenderer;
             splitRenderer.footerRenderer = footerRenderer;
@@ -1802,7 +1815,6 @@ namespace iText.Layout.Renderer {
                     ));
                 headerOrFooterRenderer.SetProperty(Property.VERTICAL_BORDER_SPACING, this.GetPropertyAsFloat(Property.VERTICAL_BORDER_SPACING
                     ));
-                headerOrFooterRenderer.SetProperty(Property.BORDER, Border.NO_BORDER);
                 headerOrFooterRenderer.SetProperty(Property.BORDER_LEFT, Border.NO_BORDER);
                 headerOrFooterRenderer.SetProperty(Property.BORDER_TOP, Border.NO_BORDER);
                 headerOrFooterRenderer.SetProperty(Property.BORDER_RIGHT, Border.NO_BORDER);
@@ -1873,11 +1885,11 @@ namespace iText.Layout.Renderer {
 
         /// <summary>This are a structs used for convenience in layout.</summary>
         private class CellRendererInfo {
-            public CellRenderer cellRenderer;
+            private readonly CellRenderer cellRenderer;
 
-            public int column;
+            private readonly int column;
 
-            public int finishRowInd;
+            private readonly int finishRowInd;
 
             public CellRendererInfo(CellRenderer cellRenderer, int column, int finishRow) {
                 this.cellRenderer = cellRenderer;
@@ -1885,6 +1897,24 @@ namespace iText.Layout.Renderer {
                 // When a cell has a rowspan, this is the index of the finish row of the cell.
                 // Otherwise, this is simply the index of the row of the cell in the {@link #rows} array.
                 this.finishRowInd = finishRow;
+            }
+
+            /// <summary>Retrieves the cell renderer.</summary>
+            /// <returns>cell renderer</returns>
+            public virtual CellRenderer GetCellRenderer() {
+                return cellRenderer;
+            }
+
+            /// <summary>Retrieves the column.</summary>
+            /// <returns>column</returns>
+            public virtual int GetColumn() {
+                return column;
+            }
+
+            /// <summary>Retrieves the finish row index.</summary>
+            /// <returns>finish row index</returns>
+            public virtual int GetFinishRowInd() {
+                return finishRowInd;
             }
         }
 
@@ -1970,6 +2000,7 @@ namespace iText.Layout.Renderer {
             overflowRows.GetCell(targetOverflowRowIndex[col] - row, col).occupiedArea = cellOccupiedArea;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void ApplyMarginsAndPaddingsAndCalculateColumnWidths(Rectangle layoutBox) {
             UnitValue[] margins = GetMargins();
             if (!margins[1].IsPointValue()) {
@@ -1996,5 +2027,6 @@ namespace iText.Layout.Renderer {
             CalculateColumnWidths(layoutBox.GetWidth() - margins[1].GetValue() - margins[3].GetValue() - paddings[1].GetValue
                 () - paddings[3].GetValue());
         }
+//\endcond
     }
 }

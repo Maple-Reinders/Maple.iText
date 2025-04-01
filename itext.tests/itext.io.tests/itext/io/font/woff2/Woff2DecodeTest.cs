@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
+using iText.Commons.Utils;
 using iText.IO.Exceptions;
 using iText.Test;
 
@@ -68,7 +69,7 @@ namespace iText.IO.Font.Woff2 {
 
         protected internal void SaveFile(byte[] content, String fileName) {
             if (content != null) {
-                Stream os = new FileStream(fileName, FileMode.Create);
+                Stream os = FileUtil.GetFileOutputStream(fileName);
                 os.Write(content);
                 os.Dispose();
             }

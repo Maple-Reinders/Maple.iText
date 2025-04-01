@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,6 +33,8 @@ namespace iText.Bouncycastle.Asn1.X509 {
         private static readonly CrlReasonBC INSTANCE = new CrlReasonBC(null);
 
         private const int KEY_COMPROMISE = Org.BouncyCastle.Asn1.X509.CrlReason.KeyCompromise;
+
+        private const int REMOVE_FROM_CRL = Org.BouncyCastle.Asn1.X509.CrlReason.RemoveFromCrl;
 
         /// <summary>
         /// Creates new wrapper instance for
@@ -69,6 +71,11 @@ namespace iText.Bouncycastle.Asn1.X509 {
         /// <summary><inheritDoc/></summary>
         public virtual int GetKeyCompromise() {
             return KEY_COMPROMISE;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public virtual int GetRemoveFromCRL() {
+            return REMOVE_FROM_CRL;
         }
     }
 }

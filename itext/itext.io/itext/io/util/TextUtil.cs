@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -50,6 +50,15 @@ namespace iText.IO.Util {
         };
 
         private TextUtil() {
+        }
+        
+        /// <summary>
+        /// Checks if the passed code point corresponds to diacritic.
+        /// </summary>
+        /// <param name="codePoint">the code point to check</param>
+        /// <returns>true if passed code point is diacritic, false otherwise</returns>
+        public static bool IsDiacritic(int codePoint) {
+            return codePoint > 0x0300 && codePoint <= 0x036F;
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,9 +24,9 @@ using System;
 using System.Collections.Generic;
 using iText.Layout.Borders;
 using iText.Layout.Element;
-using iText.Layout.Properties;
 
 namespace iText.Layout.Renderer {
+//\cond DO_NOT_DOCUMENT
     internal sealed class TableBorderUtil {
         private TableBorderUtil() {
         }
@@ -34,10 +34,7 @@ namespace iText.Layout.Renderer {
         public static Border GetCellSideBorder(Cell cellModel, int borderType) {
             Border cellModelSideBorder = cellModel.GetProperty<Border>(borderType);
             if (null == cellModelSideBorder && !cellModel.HasProperty(borderType)) {
-                cellModelSideBorder = cellModel.GetProperty<Border>(Property.BORDER);
-                if (null == cellModelSideBorder && !cellModel.HasProperty(Property.BORDER)) {
-                    cellModelSideBorder = cellModel.GetDefaultProperty<Border>(Property.BORDER);
-                }
+                cellModelSideBorder = cellModel.GetDefaultProperty<Border>(borderType);
             }
             return cellModelSideBorder;
         }
@@ -76,9 +73,13 @@ namespace iText.Layout.Renderer {
 
         public static IList<Border> CreateAndFillBorderList(IList<Border> originalList, Border borderToCollapse, int
              size) {
-            IList<Border> borderList = new List<Border>();
+            IList<Border> borderList;
             if (null != originalList) {
+                borderList = new List<Border>(originalList.Count + size);
                 borderList.AddAll(originalList);
+            }
+            else {
+                borderList = new List<Border>(size);
             }
             while (borderList.Count < size) {
                 borderList.Add(borderToCollapse);
@@ -93,4 +94,5 @@ namespace iText.Layout.Renderer {
             return borderList;
         }
     }
+//\endcond
 }

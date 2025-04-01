@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -21,6 +21,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.IO;
+using System.Runtime.CompilerServices;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Utils;
 using Org.BouncyCastle.Crypto;
@@ -63,16 +65,7 @@ namespace iText.Bouncycastlefips.Crypto {
         /// </param>
         public CipherCBCnoPadBCFips(bool forEncryption, byte[] key, byte[] initVector) {
             FipsAes.Key aesKey = new FipsAes.Key(key);
-            IBlockCipherService provider = CryptoServicesRegistrar.CreateService(aesKey);
-
-            IBlockCipherBuilder<IParameters<Algorithm>> cipherBuilder = null;
-            if (forEncryption) {
-                cipherBuilder = provider.CreateBlockEncryptorBuilder(FipsAes.Cbc.WithIV(initVector));
-            }
-            else {
-                cipherBuilder = provider.CreateBlockDecryptorBuilder(FipsAes.Cbc.WithIV(initVector));
-            }
-
+            IBlockCipherBuilder<IParameters<Algorithm>> cipherBuilder = createBuilder(forEncryption, aesKey, initVector);
             blockCipher = cipherBuilder.BuildBlockCipher(memoryStream);
         }
 
@@ -81,14 +74,14 @@ namespace iText.Bouncycastlefips.Crypto {
             if (inpLen % blockCipher.BlockSize != 0) {
                 throw new ArgumentException("Not multiple of block: " + inpLen);
             }
-            try {
-                blockCipher.Stream.Write(inp, inpOff, inpLen);
-                blockCipher.Stream.Flush();
-                return memoryStream.ToArray();
+            if (memoryStream.Length != 0) {
+                throw new ArgumentException("Cipher memory stream is not empty!");
             }
-            finally {
-                memoryStream.SetLength(0);
+
+            using (Stream stream = blockCipher.Stream) {
+                stream.Write(inp, inpOff, inpLen);
             }
+            return memoryStream.ToArray();
         }
         
         /// <summary>Indicates whether some other object is "equal to" this one. Compares wrapped objects.</summary>
@@ -115,6 +108,22 @@ namespace iText.Bouncycastlefips.Crypto {
         /// </summary>
         public override String ToString() {
             return blockCipher.ToString();
+        }
+
+        // Disabling optimization here allows to avoid random failures on encryption/decryption
+        // Though the code seems straighforward here and in the bc-fips counterpart
+        [MethodImplAttribute(MethodImplOptions.NoOptimization)]
+        private static IBlockCipherBuilder<IParameters<Algorithm>> createBuilder(bool forEncryption, FipsAes.Key aesKey, byte[] initVector) {
+            IBlockCipherService provider = CryptoServicesRegistrar.CreateService<IBlockCipherService>(
+                (ICryptoServiceType<IBlockCipherService>) aesKey);
+            IBlockCipherBuilder<IParameters<Algorithm>> cipherBuilder = null;
+            if (forEncryption) {
+                cipherBuilder = provider.CreateBlockEncryptorBuilder<FipsAes.ParametersWithIV>(FipsAes.Cbc.WithIV(initVector));
+            } else {
+                cipherBuilder = provider.CreateBlockDecryptorBuilder<FipsAes.ParametersWithIV>(FipsAes.Cbc.WithIV(initVector));
+            }
+
+            return cipherBuilder;
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,11 +24,13 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using iText.Commons;
+using iText.Forms.Fields;
 using iText.Forms.Form;
 using iText.Forms.Form.Element;
 using iText.Forms.Logs;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Tagging;
 using iText.Kernel.Pdf.Tagutils;
 using iText.Layout;
@@ -48,6 +50,7 @@ namespace iText.Forms.Form.Renderer {
         /// <summary>The flat renderer.</summary>
         protected internal IRenderer flatRenderer;
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Creates a new
         /// <see cref="AbstractFormFieldRenderer"/>
@@ -57,9 +60,10 @@ namespace iText.Forms.Form.Renderer {
         internal AbstractFormFieldRenderer(IFormField modelElement)
             : base(modelElement) {
         }
+//\endcond
 
         /// <summary>Checks if form fields need to be flattened.</summary>
-        /// <returns>true, if fields need to be flattened</returns>
+        /// <returns>true, if fields need to be flattened.</returns>
         public virtual bool IsFlatten() {
             if (parent != null) {
                 // First check parent. This is a workaround for the case when some fields are inside other fields
@@ -79,7 +83,7 @@ namespace iText.Forms.Form.Renderer {
         }
 
         /// <summary>Gets the default value of the form field.</summary>
-        /// <returns>the default value of the form field</returns>
+        /// <returns>the default value of the form field.</returns>
         public virtual String GetDefaultValue() {
             String defaultValue = this.GetProperty<String>(FormProperty.FORM_FIELD_VALUE);
             return defaultValue == null ? modelElement.GetDefaultProperty<String>(FormProperty.FORM_FIELD_VALUE) : defaultValue;
@@ -159,20 +163,6 @@ namespace iText.Forms.Form.Renderer {
         }
 
         /// <summary><inheritDoc/></summary>
-        public override void DrawChildren(DrawContext drawContext) {
-            drawContext.GetCanvas().SaveState();
-            bool flatten = IsFlatten();
-            if (flatten) {
-                drawContext.GetCanvas().Rectangle(ApplyBorderBox(occupiedArea.GetBBox(), false)).Clip().EndPath();
-                flatRenderer.Draw(drawContext);
-            }
-            else {
-                ApplyAcroField(drawContext);
-            }
-            drawContext.GetCanvas().RestoreState();
-        }
-
-        /// <summary><inheritDoc/></summary>
         public override MinMaxWidth GetMinMaxWidth() {
             childRenderers.Clear();
             flatRenderer = null;
@@ -182,12 +172,43 @@ namespace iText.Forms.Form.Renderer {
             return minMaxWidth;
         }
 
+        /// <summary><inheritDoc/></summary>
+        public override void DrawChildren(DrawContext drawContext) {
+            drawContext.GetCanvas().SaveState();
+            bool flatten = IsFlatten();
+            if (flatten) {
+                PdfCanvas canvas = drawContext.GetCanvas();
+                canvas.Rectangle(ApplyBorderBox(occupiedArea.GetBBox(), false)).Clip().EndPath();
+                flatRenderer.Draw(drawContext);
+            }
+            else {
+                ApplyAcroField(drawContext);
+                WriteAcroFormFieldLangAttribute(drawContext.GetDocument());
+            }
+            drawContext.GetCanvas().RestoreState();
+        }
+
+        /// <summary>Applies the accessibility properties to the form field.</summary>
+        /// <param name="formField">The form field to which the accessibility properties should be applied.</param>
+        /// <param name="pdfDocument">The document to which the form field belongs.</param>
+        protected internal virtual void ApplyAccessibilityProperties(PdfFormField formField, PdfDocument pdfDocument
+            ) {
+            if (!pdfDocument.IsTagged()) {
+                return;
+            }
+            AccessibilityProperties properties = ((IAccessibleElement)this.modelElement).GetAccessibilityProperties();
+            String alternativeDescription = properties.GetAlternateDescription();
+            if (alternativeDescription != null && !String.IsNullOrEmpty(alternativeDescription)) {
+                formField.SetAlternativeName(alternativeDescription);
+            }
+        }
+
         /// <summary>Adjusts the field layout.</summary>
         /// <param name="layoutContext">layout context</param>
         protected internal abstract void AdjustFieldLayout(LayoutContext layoutContext);
 
         /// <summary>Creates the flat renderer instance.</summary>
-        /// <returns>the renderer instance</returns>
+        /// <returns>the renderer instance.</returns>
         protected internal abstract IRenderer CreateFlatRenderer();
 
         /// <summary>Applies the AcroField widget.</summary>
@@ -195,7 +216,7 @@ namespace iText.Forms.Form.Renderer {
         protected internal abstract void ApplyAcroField(DrawContext drawContext);
 
         /// <summary>Gets the model id.</summary>
-        /// <returns>the model id</returns>
+        /// <returns>the model id.</returns>
         protected internal virtual String GetModelId() {
             return ((IFormField)GetModelElement()).GetId();
         }
@@ -203,7 +224,7 @@ namespace iText.Forms.Form.Renderer {
         /// <summary>Checks if the renderer fits a certain width and height.</summary>
         /// <param name="availableWidth">the available width</param>
         /// <param name="availableHeight">the available height</param>
-        /// <returns>true, if the renderer fits</returns>
+        /// <returns>true, if the renderer fits.</returns>
         protected internal virtual bool IsRendererFit(float availableWidth, float availableHeight) {
             if (occupiedArea == null) {
                 return false;
@@ -213,42 +234,47 @@ namespace iText.Forms.Form.Renderer {
                 .VISIBLE));
         }
 
-        /// <summary>Gets the accessibility language.</summary>
-        /// <returns>the accessibility language</returns>
+        /// <summary>
+        /// Gets the accessibility language using
+        /// <see cref="iText.Layout.Tagging.IAccessibleElement.GetAccessibilityProperties()"/>.
+        /// </summary>
+        /// <returns>the accessibility language.</returns>
         protected internal virtual String GetLang() {
-            return this.GetProperty<String>(FormProperty.FORM_ACCESSIBILITY_LANGUAGE);
+            String language = null;
+            if (this.GetModelElement() is IAccessibleElement) {
+                language = ((IAccessibleElement)this.GetModelElement()).GetAccessibilityProperties().GetLanguage();
+            }
+            return language;
         }
 
-        /// <summary>Gets the conformance level.</summary>
-        /// <remarks>Gets the conformance level. If the conformance level is not set, the conformance level of the document is used.
-        ///     </remarks>
+        /// <summary>Gets the conformance.</summary>
+        /// <remarks>Gets the conformance. If the conformance is not set, the conformance of the document is used.</remarks>
         /// <param name="document">the document</param>
-        /// <returns>the conformance level or null if the conformance level is not set.</returns>
-        protected internal virtual PdfAConformanceLevel GetConformanceLevel(PdfDocument document) {
-            PdfAConformanceLevel conformanceLevel = this.GetProperty<PdfAConformanceLevel>(FormProperty.FORM_CONFORMANCE_LEVEL
-                );
-            if (conformanceLevel != null) {
-                return conformanceLevel;
+        /// <returns>the conformance or null if the conformance is not set.</returns>
+        protected internal virtual PdfConformance GetConformance(PdfDocument document) {
+            PdfConformance conformance = this.GetProperty<PdfConformance>(FormProperty.FORM_CONFORMANCE_LEVEL);
+            if (conformance != null) {
+                return conformance;
             }
             if (document == null) {
                 return null;
             }
-            if (document.GetConformanceLevel() is PdfAConformanceLevel) {
-                return (PdfAConformanceLevel)document.GetConformanceLevel();
-            }
-            return null;
+            return document.GetConformance();
         }
 
         /// <summary>Determines, whether the layout is based in the renderer itself or flat renderer.</summary>
         /// <returns>
         /// 
         /// <see langword="true"/>
-        /// if layout is based on flat renderer, false otherwise
+        /// if layout is based on flat renderer, false otherwise.
         /// </returns>
         protected internal virtual bool IsLayoutBasedOnFlatRenderer() {
             return true;
         }
 
+        /// <summary>Sets the form accessibility language identifier of the form element in case the document is tagged.
+        ///     </summary>
+        /// <param name="pdfDoc">the document which contains form field</param>
         protected internal virtual void WriteAcroFormFieldLangAttribute(PdfDocument pdfDoc) {
             if (pdfDoc.IsTagged()) {
                 TagTreePointer formParentPointer = pdfDoc.GetTagStructureContext().GetAutoTaggingPointer();
@@ -259,41 +285,6 @@ namespace iText.Forms.Form.Renderer {
                     formPointer.GetProperties().SetLanguage(GetLang());
                 }
                 formParentPointer.MoveToParent();
-            }
-        }
-
-        /// <summary>Deletes all margin properties.</summary>
-        /// <remarks>
-        /// Deletes all margin properties. Used in
-        /// <c>applyAcroField</c>
-        /// to not apply margins twice as we already use area
-        /// with margins applied (margins shouldn't be an interactive part of the field, i.e. included into its occupied
-        /// area).
-        /// </remarks>
-        /// <returns>the map of deleted margins</returns>
-        internal virtual IDictionary<int, Object> DeleteMargins() {
-            IDictionary<int, Object> margins = new Dictionary<int, Object>();
-            margins.Put(Property.MARGIN_TOP, this.modelElement.GetOwnProperty<UnitValue>(Property.MARGIN_TOP));
-            margins.Put(Property.MARGIN_BOTTOM, this.modelElement.GetOwnProperty<UnitValue>(Property.MARGIN_BOTTOM));
-            margins.Put(Property.MARGIN_LEFT, this.modelElement.GetOwnProperty<UnitValue>(Property.MARGIN_LEFT));
-            margins.Put(Property.MARGIN_RIGHT, this.modelElement.GetOwnProperty<UnitValue>(Property.MARGIN_RIGHT));
-            modelElement.DeleteOwnProperty(Property.MARGIN_RIGHT);
-            modelElement.DeleteOwnProperty(Property.MARGIN_LEFT);
-            modelElement.DeleteOwnProperty(Property.MARGIN_TOP);
-            modelElement.DeleteOwnProperty(Property.MARGIN_BOTTOM);
-            return margins;
-        }
-
-        /// <summary>Applies the properties to the model element.</summary>
-        /// <param name="properties">the properties to apply</param>
-        internal virtual void ApplyProperties(IDictionary<int, Object> properties) {
-            foreach (KeyValuePair<int, Object> integerObjectEntry in properties) {
-                if (integerObjectEntry.Value != null) {
-                    modelElement.SetProperty(integerObjectEntry.Key, integerObjectEntry.Value);
-                }
-                else {
-                    modelElement.DeleteOwnProperty(integerObjectEntry.Key);
-                }
             }
         }
 

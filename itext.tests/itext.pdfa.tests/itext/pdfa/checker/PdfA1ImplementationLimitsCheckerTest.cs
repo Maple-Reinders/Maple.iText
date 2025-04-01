@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -34,7 +34,7 @@ using iText.Test;
 namespace iText.Pdfa.Checker {
     [NUnit.Framework.Category("UnitTest")]
     public class PdfA1ImplementationLimitsCheckerTest : ExtendedITextTest {
-        private PdfA1Checker pdfA1Checker = new PdfA1Checker(PdfAConformanceLevel.PDF_A_1B);
+        private PdfA1Checker pdfA1Checker = new PdfA1Checker(PdfAConformance.PDF_A_1B);
 
         private const int MAX_ARRAY_CAPACITY = 8191;
 

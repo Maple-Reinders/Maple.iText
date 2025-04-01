@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -39,5 +39,29 @@ namespace iText.Commons.Bouncycastle.Asn1.X509 {
         /// wrapped distribution point.
         /// </returns>
         IDistributionPointName GetDistributionPoint();
+
+        /// <summary>
+        /// Calls actual
+        /// <c>getCRLIssuer</c>
+        /// method for the wrapped DistributionPoint object.
+        /// </summary>
+        /// <returns>
+        /// 
+        /// <see cref="IGeneralNames"/>
+        /// wrapped CRL issuer.
+        /// </returns>
+        IGeneralNames GetCRLIssuer();
+
+        /// <summary>
+        /// Calls actual
+        /// <c>getReasons</c>
+        /// method for the wrapped DistributionPoint object.
+        /// </summary>
+        /// <returns>
+        /// 
+        /// <see cref="IReasonFlags"/>
+        /// wrapped reason codes.
+        /// </returns>
+        IReasonFlags GetReasons();
     }
 }

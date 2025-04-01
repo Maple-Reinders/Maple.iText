@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Linq;
+using iText.Commons.Utils;
 using iText.Forms;
 using iText.Forms.Fields;
 using iText.Kernel.Pdf;
@@ -77,7 +78,7 @@ namespace iText.Forms.Xfa {
             String outFileName = destinationFolder + "createXFAFormTest.pdf";
             String cmpFileName = sourceFolder + "cmp_createXFAFormTest.pdf";
             PdfDocument doc = new PdfDocument(new PdfWriter(outFileName));
-            XfaForm xfa = new XfaForm(new FileStream(XML, FileMode.Open, FileAccess.Read));
+            XfaForm xfa = new XfaForm(FileUtil.GetInputStreamForFile(XML));
             xfa.Write(doc);
             doc.AddNewPage();
             doc.Close();
@@ -121,6 +122,17 @@ namespace iText.Forms.Xfa {
             XElement node = (XElement) xfa.FindDatasetsNode("Number1");
             NUnit.Framework.Assert.IsNotNull(node);
             NUnit.Framework.Assert.AreEqual("Number1", node.Name.LocalName);
+        }
+        
+        [NUnit.Framework.Test]
+        public virtual void ExtractNodeTextByPathText() {
+             String inFileName = sourceFolder + "TextField1.pdf";
+             using (PdfDocument pdfDocument = new PdfDocument(new PdfReader(inFileName)))
+             {
+                 XfaForm xfaForm = new XfaForm(pdfDocument);
+                 Assert.AreEqual("Test", xfaForm.GetNodeTextByPath("xdp.datasets.data.form1"));
+                 Assert.IsNull(xfaForm.GetNodeTextByPath("xdp.datasets.noElement"));
+             }
         }
     }
 }

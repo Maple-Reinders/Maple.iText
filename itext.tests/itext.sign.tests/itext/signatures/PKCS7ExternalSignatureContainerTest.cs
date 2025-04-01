@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,6 +28,7 @@ using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Utils;
 using iText.IO.Source;
+using iText.Kernel.Crypto;
 using iText.Kernel.Pdf;
 using iText.Signatures.Testutils;
 using iText.Signatures.Testutils.Builder;
@@ -88,7 +89,7 @@ namespace iText.Signatures {
         public virtual void TestTroughPdfSigner() {
             String outFileName = DESTINATION_FOLDER + "testTroughPdfSigner.pdf";
             String cmpFileName = SOURCE_FOLDER + "cmp_testTroughPdfSigner.pdf";
-            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), new FileStream(outFileName, FileMode.Create
+            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), FileUtil.GetFileOutputStream(outFileName
                 ), new StampingProperties());
             PKCS7ExternalSignatureContainer pkcs7ExternalSignatureContainer = new PKCS7ExternalSignatureContainer(pk, 
                 chain, DigestAlgorithms.SHA256);
@@ -100,7 +101,7 @@ namespace iText.Signatures {
         public virtual void TestTroughPdfSignerWithCrlClient() {
             String outFileName = DESTINATION_FOLDER + "testTroughPdfSignerWithCrlClient.pdf";
             String cmpFileName = SOURCE_FOLDER + "cmp_testTroughPdfSignerWithCrlClient.pdf";
-            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), new FileStream(outFileName, FileMode.Create
+            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), FileUtil.GetFileOutputStream(outFileName
                 ), new StampingProperties());
             PKCS7ExternalSignatureContainer pkcs7ExternalSignatureContainer = new PKCS7ExternalSignatureContainer(pk, 
                 chain, DigestAlgorithms.SHA256);
@@ -117,7 +118,7 @@ namespace iText.Signatures {
         public virtual void TestTroughPdfSignerWithOcspClient() {
             String outFileName = DESTINATION_FOLDER + "testTroughPdfSignerWithOcspClient.pdf";
             String cmpFileName = SOURCE_FOLDER + "cmp_testTroughPdfSignerWithOcspClient.pdf";
-            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), new FileStream(outFileName, FileMode.Create
+            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), FileUtil.GetFileOutputStream(outFileName
                 ), new StampingProperties());
             PKCS7ExternalSignatureContainer pkcs7ExternalSignatureContainer = new PKCS7ExternalSignatureContainer(pk, 
                 chain, DigestAlgorithms.SHA256);
@@ -135,7 +136,7 @@ namespace iText.Signatures {
             if (FIPS_MODE) {
                 cmpFileName = cmpFileName.Replace(".pdf", "_FIPS.pdf");
             }
-            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), new FileStream(outFileName, FileMode.Create
+            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), FileUtil.GetFileOutputStream(outFileName
                 ), new StampingProperties());
             PKCS7ExternalSignatureContainer pkcs7ExternalSignatureContainer = new PKCS7ExternalSignatureContainer(pk, 
                 chain, DigestAlgorithms.SHA256);
@@ -149,7 +150,7 @@ namespace iText.Signatures {
         public virtual void TestTroughPdfSignerWithCadesType() {
             String outFileName = DESTINATION_FOLDER + "testTroughPdfSignerWithCadesType.pdf";
             String cmpFileName = SOURCE_FOLDER + "cmp_testTroughPdfSignerWithCadesType.pdf";
-            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), new FileStream(outFileName, FileMode.Create
+            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), FileUtil.GetFileOutputStream(outFileName
                 ), new StampingProperties());
             PKCS7ExternalSignatureContainer pkcs7ExternalSignatureContainer = new PKCS7ExternalSignatureContainer(pk, 
                 chain, DigestAlgorithms.SHA256);
@@ -162,7 +163,7 @@ namespace iText.Signatures {
         public virtual void TestTroughPdfSignerWithSignaturePolicy() {
             String outFileName = DESTINATION_FOLDER + "testTroughPdfSignerWithSignaturePolicy.pdf";
             String cmpFileName = SOURCE_FOLDER + "cmp_testTroughPdfSignerWithSignaturePolicy.pdf";
-            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), new FileStream(outFileName, FileMode.Create
+            PdfSigner pdfSigner = new PdfSigner(new PdfReader(CreateSimpleDocument()), FileUtil.GetFileOutputStream(outFileName
                 ), new StampingProperties());
             PKCS7ExternalSignatureContainer pkcs7ExternalSignatureContainer = new PKCS7ExternalSignatureContainer(pk, 
                 chain, DigestAlgorithms.SHA256);

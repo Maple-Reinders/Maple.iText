@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -179,6 +179,7 @@ namespace iText.Layout {
                 logger.LogError(iText.IO.Logs.IoLogMessageConstant.PASSED_PAGE_SHALL_BE_ON_WHICH_CANVAS_WILL_BE_RENDERED);
             }
             this.page = page;
+            this.pdfCanvas.SetDrawingOnPage(this.IsAutoTaggingEnabled());
         }
 
         /// <returns>true if autotagging of canvas content is enabled. Default value - false.</returns>

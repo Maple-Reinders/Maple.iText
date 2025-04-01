@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -122,6 +122,18 @@ namespace iText.StyledXmlParser.Css.Resolve.Shorthand {
         [NUnit.Framework.Test]
         public virtual void GapWithTwoValidValuesTest() {
             IShorthandResolver resolver = new GapShorthandResolver();
+            String shorthand = "10px 15px";
+            IList<CssDeclaration> resolvedShorthand = resolver.ResolveShorthand(shorthand);
+            NUnit.Framework.Assert.AreEqual(2, resolvedShorthand.Count);
+            NUnit.Framework.Assert.AreEqual(CommonCssConstants.ROW_GAP, resolvedShorthand[0].GetProperty());
+            NUnit.Framework.Assert.AreEqual("10px", resolvedShorthand[0].GetExpression());
+            NUnit.Framework.Assert.AreEqual(CommonCssConstants.COLUMN_GAP, resolvedShorthand[1].GetProperty());
+            NUnit.Framework.Assert.AreEqual("15px", resolvedShorthand[1].GetExpression());
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void GridGapWithTwoValidValuesTest() {
+            IShorthandResolver resolver = new GapShorthandResolver(CommonCssConstants.GRID_GAP);
             String shorthand = "10px 15px";
             IList<CssDeclaration> resolvedShorthand = resolver.ResolveShorthand(shorthand);
             NUnit.Framework.Assert.AreEqual(2, resolvedShorthand.Count);

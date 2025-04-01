@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -59,10 +59,12 @@ namespace iText.Commons.Actions {
             return true;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Obtains stored meta info associated with the event.</summary>
         /// <returns>meta info</returns>
         internal virtual IMetaInfo GetMetaInfo() {
             return metaInfo;
         }
+//\endcond
     }
 }

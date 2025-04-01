@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -28,6 +28,7 @@ using System.Drawing;
 using System.IO;
 
 namespace iText.IO.Image {
+    //\cond DO_NOT_DOCUMENT 
     internal class DrawingImageFactory {
         /// <summary>Gets an instance of an Image from <see cref="System.Drawing.Image"/></summary>
         /// <param name="image">the <see cref="System.Drawing.Image"/> to convert</param>
@@ -224,5 +225,6 @@ namespace iText.IO.Image {
             return ImageDataFactory.Create(ms.ToArray());
         }
     }
+   //\endcond 
 }
 #endif

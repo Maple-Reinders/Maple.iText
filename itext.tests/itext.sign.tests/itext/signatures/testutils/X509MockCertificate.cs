@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -112,7 +112,12 @@ namespace iText.Signatures.Testutils
         {
             throw new NotImplementedException();
         }
-        
+
+        public DateTime GetNotAfter()
+        {
+            throw new NotImplementedException();
+        }
+
         public IX500Name GetSubjectDN()
         {
             return null;
@@ -126,6 +131,14 @@ namespace iText.Signatures.Testutils
         public IList GetExtendedKeyUsage()
         {
             return this.extendedKeyUsage;
+        }
+        
+        public bool[] GetKeyUsage() {
+            throw new NotImplementedException();
+        }
+        
+        public int GetBasicConstraints() {
+            throw new NotImplementedException();
         }
     }
 }

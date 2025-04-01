@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using iText.Kernel.Colors;
 using iText.Kernel.Pdf;
 
 namespace iText.Kernel.Pdf.Annot {
+//\cond DO_NOT_DOCUMENT
     internal class InteriorColorUtil {
         private InteriorColorUtil() {
         }
@@ -80,4 +81,5 @@ namespace iText.Kernel.Pdf.Annot {
             }
         }
     }
+//\endcond
 }

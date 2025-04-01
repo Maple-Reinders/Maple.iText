@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
+using iText.Commons.Utils;
 using iText.IO.Util;
 using iText.Test;
 
@@ -52,7 +53,7 @@ namespace iText.IO.Image {
         [NUnit.Framework.Test]
         public virtual void OpenBmp3() {
             String imageFileName = sourceFolder + "WP_20140410_001_monochrome.bmp";
-            using (FileStream fis = new FileStream(imageFileName, FileMode.Open, FileAccess.Read)) {
+            using (Stream fis = FileUtil.GetInputStreamForFile(imageFileName)) {
                 byte[] imageBytes = StreamUtil.InputStreamToArray(fis);
                 // Test this a more specific entry point
                 ImageData img = ImageDataFactory.CreateBmp(imageBytes, false);

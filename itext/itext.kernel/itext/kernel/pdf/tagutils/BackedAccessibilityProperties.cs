@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,12 +28,15 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Tagging;
 
 namespace iText.Kernel.Pdf.Tagutils {
+//\cond DO_NOT_DOCUMENT
     internal class BackedAccessibilityProperties : AccessibilityProperties {
         private readonly TagTreePointer pointerToBackingElem;
 
+//\cond DO_NOT_DOCUMENT
         internal BackedAccessibilityProperties(TagTreePointer pointerToBackingElem) {
             this.pointerToBackingElem = new TagTreePointer(pointerToBackingElem);
         }
+//\endcond
 
         public override String GetRole() {
             return GetBackingElem().GetRole().GetValue();
@@ -189,4 +192,5 @@ namespace iText.Kernel.Pdf.Tagutils {
             return pdfString != null ? pdfString.ToUnicodeString() : null;
         }
     }
+//\endcond
 }

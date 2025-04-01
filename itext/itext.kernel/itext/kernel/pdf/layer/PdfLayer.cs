@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -52,9 +52,17 @@ namespace iText.Kernel.Pdf.Layer {
 
         protected internal bool locked = false;
 
+        [Obsolete]
         protected internal iText.Kernel.Pdf.Layer.PdfLayer parent;
 
+        // After removing deprecated parent rename to parents
+        protected internal ICollection<iText.Kernel.Pdf.Layer.PdfLayer> parentLayers;
+
+        [Obsolete]
         protected internal IList<iText.Kernel.Pdf.Layer.PdfLayer> children;
+
+        // After removing deprecated children rename to children
+        protected internal ICollection<iText.Kernel.Pdf.Layer.PdfLayer> childLayers;
 
         /// <summary>Creates a new layer by existing dictionary, which must be an indirect object.</summary>
         /// <param name="layerDictionary">the layer dictionary, must have an indirect reference.</param>
@@ -114,20 +122,26 @@ namespace iText.Kernel.Pdf.Layer {
         /// <remarks>Adds a child layer. Nested layers can only have one parent.</remarks>
         /// <param name="childLayer">the child layer</param>
         public virtual void AddChild(iText.Kernel.Pdf.Layer.PdfLayer childLayer) {
-            if (childLayer.parent != null) {
-                throw new ArgumentException("Illegal argument: childLayer");
+            if (childLayer.parentLayers == null) {
+                childLayer.parentLayers = new LinkedHashSet<iText.Kernel.Pdf.Layer.PdfLayer>();
             }
-            childLayer.parent = this;
-            if (children == null) {
-                children = new List<iText.Kernel.Pdf.Layer.PdfLayer>();
+            childLayer.parentLayers.Add(this);
+            if (childLayers == null) {
+                childLayers = new LinkedHashSet<iText.Kernel.Pdf.Layer.PdfLayer>();
             }
-            children.Add(childLayer);
+            childLayers.Add(childLayer);
         }
 
-        /// <summary>Gets the parent of this layer, be it a title layer, or a usual one.</summary>
-        /// <returns>the parent of the layer, or null if it has no parent</returns>
+        /// <summary>Gets the first parent of this layer, be it a title layer, or a usual one.</summary>
+        /// <returns>the first parent of the layer, or null if it has no parent</returns>
         public virtual iText.Kernel.Pdf.Layer.PdfLayer GetParent() {
-            return parent;
+            return parentLayers == null ? null : new List<iText.Kernel.Pdf.Layer.PdfLayer>(parentLayers)[0];
+        }
+
+        /// <summary>Gets all parents of this layer.</summary>
+        /// <returns>list of parents of the layer, or null if it has no parent</returns>
+        public virtual IList<iText.Kernel.Pdf.Layer.PdfLayer> GetParents() {
+            return parentLayers == null ? null : new List<iText.Kernel.Pdf.Layer.PdfLayer>(parentLayers);
         }
 
         /// <summary>Sets the name of the layer to be displayed in the Layers panel.</summary>
@@ -435,7 +449,7 @@ namespace iText.Kernel.Pdf.Layer {
         /// </remarks>
         /// <returns>the list of the current child layers, null if the layer has no children.</returns>
         public virtual IList<iText.Kernel.Pdf.Layer.PdfLayer> GetChildren() {
-            return children == null ? null : new List<iText.Kernel.Pdf.Layer.PdfLayer>(children);
+            return childLayers == null ? null : new List<iText.Kernel.Pdf.Layer.PdfLayer>(childLayers);
         }
 
         protected internal override bool IsWrappedObjectMustBeIndirect() {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,6 +29,7 @@ using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf;
 
 namespace iText.Kernel.Utils {
+    /// <summary>Helper class to split the document based on some condition.</summary>
     public class PdfSplitter {
         private PdfDocument pdfDocument;
 
@@ -192,6 +193,12 @@ namespace iText.Kernel.Utils {
             return ExtractPageRanges(JavaCollectionsUtil.SingletonList(pageRange))[0];
         }
 
+        /// <summary>Gets the document to be split.</summary>
+        /// <returns>
+        /// 
+        /// <see cref="iText.Kernel.Pdf.PdfDocument"/>
+        /// to be split.
+        /// </returns>
         public virtual PdfDocument GetPdfDocument() {
             return pdfDocument;
         }
@@ -212,19 +219,11 @@ namespace iText.Kernel.Utils {
             return new PdfWriter(new ByteArrayOutputStream());
         }
 
-        private PdfDocument CreatePdfDocument(PageRange currentPageRange) {
-            PdfDocument newDocument = new PdfDocument(GetNextPdfWriter(currentPageRange), new DocumentProperties().SetEventCountingMetaInfo
-                (metaInfo));
-            if (pdfDocument.IsTagged() && preserveTagged) {
-                newDocument.SetTagged();
-            }
-            if (pdfDocument.HasOutlines() && preserveOutlines) {
-                newDocument.InitializeOutlines();
-            }
-            return newDocument;
-        }
-
+        /// <summary>The event listener which is called when another document is ready.</summary>
         public interface IDocumentReadyListener {
+            /// <summary>Performs some action in case document is ready, e.g. closes the document.</summary>
+            /// <param name="pdfDocument">the current document created as a result of the original document split</param>
+            /// <param name="pageRange">original document page range corresponding to the current document</param>
             void DocumentReady(PdfDocument pdfDocument, PageRange pageRange);
         }
 
@@ -250,6 +249,18 @@ namespace iText.Kernel.Utils {
                 }
             }
             return documentList;
+        }
+
+        private PdfDocument CreatePdfDocument(PageRange currentPageRange) {
+            PdfDocument newDocument = new PdfDocument(GetNextPdfWriter(currentPageRange), new DocumentProperties().SetEventCountingMetaInfo
+                (metaInfo));
+            if (pdfDocument.IsTagged() && preserveTagged) {
+                newDocument.SetTagged();
+            }
+            if (pdfDocument.HasOutlines() && preserveOutlines) {
+                newDocument.InitializeOutlines();
+            }
+            return newDocument;
         }
 
         private PdfDocument SplitByOutline(String outlineTitle) {
@@ -287,41 +298,6 @@ namespace iText.Kernel.Utils {
             return toDocument;
         }
 
-        private PdfPage GetPageByOutline(int fromPage, PdfOutline outline) {
-            int size = pdfDocument.GetNumberOfPages();
-            for (int i = fromPage; i <= size; i++) {
-                PdfPage pdfPage = pdfDocument.GetPage(i);
-                IList<PdfOutline> outlineList = pdfPage.GetOutlines(false);
-                if (outlineList != null) {
-                    foreach (PdfOutline pdfOutline in outlineList) {
-                        if (pdfOutline.Equals(outline)) {
-                            return pdfPage;
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-
-        /// <summary>the next element in the entire hierarchy</summary>
-        /// <param name="outline"></param>
-        private PdfOutline GetAbsoluteTreeNextOutline(PdfOutline outline) {
-            PdfObject nextPdfObject = outline.GetContent().Get(PdfName.Next);
-            PdfOutline nextPdfOutline = null;
-            if (outline.GetParent() != null && nextPdfObject != null) {
-                foreach (PdfOutline pdfOutline in outline.GetParent().GetAllChildren()) {
-                    if (pdfOutline.GetContent().GetIndirectReference().Equals(nextPdfObject.GetIndirectReference())) {
-                        nextPdfOutline = pdfOutline;
-                        break;
-                    }
-                }
-            }
-            if (nextPdfOutline == null && outline.GetParent() != null) {
-                nextPdfOutline = GetAbsoluteTreeNextOutline(outline.GetParent());
-            }
-            return nextPdfOutline;
-        }
-
         private PageRange GetNextRange(int startPage, int endPage, long size) {
             PdfResourceCounter counter = new PdfResourceCounter(pdfDocument.GetTrailer());
             IDictionary<int, PdfObject> resources = counter.GetResources();
@@ -346,6 +322,41 @@ namespace iText.Kernel.Utils {
                 --currentPage;
             }
             return new PageRange().AddPageSequence(startPage, currentPage - 1);
+        }
+
+        /// <summary>the next element in the entire hierarchy</summary>
+        /// <param name="outline"></param>
+        private PdfOutline GetAbsoluteTreeNextOutline(PdfOutline outline) {
+            PdfObject nextPdfObject = outline.GetContent().Get(PdfName.Next);
+            PdfOutline nextPdfOutline = null;
+            if (outline.GetParent() != null && nextPdfObject != null) {
+                foreach (PdfOutline pdfOutline in outline.GetParent().GetAllChildren()) {
+                    if (pdfOutline.GetContent().GetIndirectReference().Equals(nextPdfObject.GetIndirectReference())) {
+                        nextPdfOutline = pdfOutline;
+                        break;
+                    }
+                }
+            }
+            if (nextPdfOutline == null && outline.GetParent() != null) {
+                nextPdfOutline = GetAbsoluteTreeNextOutline(outline.GetParent());
+            }
+            return nextPdfOutline;
+        }
+
+        private PdfPage GetPageByOutline(int fromPage, PdfOutline outline) {
+            int size = pdfDocument.GetNumberOfPages();
+            for (int i = fromPage; i <= size; i++) {
+                PdfPage pdfPage = pdfDocument.GetPage(i);
+                IList<PdfOutline> outlineList = pdfPage.GetOutlines(false);
+                if (outlineList != null) {
+                    foreach (PdfOutline pdfOutline in outlineList) {
+                        if (pdfOutline.Equals(outline)) {
+                            return pdfPage;
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
         private long XrefLength(int size) {

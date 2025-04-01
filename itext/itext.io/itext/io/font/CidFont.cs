@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -35,6 +35,7 @@ namespace iText.IO.Font {
 
         private ICollection<String> compatibleCmaps;
 
+//\cond DO_NOT_DOCUMENT
         internal CidFont(String fontName, String cmap, ICollection<String> compatibleCmaps) {
             this.fontName = fontName;
             this.compatibleCmaps = compatibleCmaps;
@@ -47,6 +48,7 @@ namespace iText.IO.Font {
             }
             InitializeCidFontProperties(fontDesc, cmap);
         }
+//\endcond
 
         public virtual bool CompatibleWith(String cmap) {
             if (cmap.Equals(PdfEncodings.IDENTITY_H) || cmap.Equals(PdfEncodings.IDENTITY_V)) {

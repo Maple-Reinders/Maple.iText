@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,6 +27,7 @@ using iText.StyledXmlParser.Css;
 using iText.StyledXmlParser.Css.Selector;
 
 namespace iText.StyledXmlParser.Css.Page {
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// Class for a non standard
     /// <see cref="iText.StyledXmlParser.Css.CssRuleSet"/>.
@@ -65,4 +66,5 @@ namespace iText.StyledXmlParser.Css.Page {
             return sb.ToString();
         }
     }
+//\endcond
 }

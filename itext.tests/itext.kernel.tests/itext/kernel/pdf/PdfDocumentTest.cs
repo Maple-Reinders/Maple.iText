@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,7 +21,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
+using System.Collections.Generic;
 using System.IO;
+using iText.Commons.Utils;
 using iText.IO.Image;
 using iText.IO.Source;
 using iText.Kernel.Colors;
@@ -31,6 +33,7 @@ using iText.Kernel.Logs;
 using iText.Kernel.Pdf.Annot;
 using iText.Kernel.Pdf.Canvas;
 using iText.Kernel.Pdf.Filespec;
+using iText.Kernel.Pdf.Layer;
 using iText.Kernel.Pdf.Navigation;
 using iText.Kernel.Pdf.Tagging;
 using iText.Kernel.Pdf.Xobject;
@@ -434,8 +437,8 @@ namespace iText.Kernel.Pdf {
             String source = SOURCE_FOLDER + "invalid_outline.pdf";
             String destination = DESTINATION_FOLDER + "invalid_outline.pdf";
             String cmp = SOURCE_FOLDER + "cmp_invalid_outline.pdf";
-            PdfDocument document = new PdfDocument(new PdfReader(new FileStream(source, FileMode.Open, FileAccess.Read
-                )), CompareTool.CreateTestPdfWriter(destination));
+            PdfDocument document = new PdfDocument(new PdfReader(FileUtil.GetInputStreamForFile(source)), CompareTool.
+                CreateTestPdfWriter(destination));
             document.RemovePage(4);
             document.Close();
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(destination, cmp, DESTINATION_FOLDER, "diff_"
@@ -500,7 +503,7 @@ namespace iText.Kernel.Pdf {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE)]
         public virtual void RootCannotBeReferenceFromTrailerTest() {
             String filename = SOURCE_FOLDER + "rootCannotBeReferenceFromTrailerTest.pdf";
             PdfReader corruptedReader = new PdfReader(filename);
@@ -525,13 +528,37 @@ namespace iText.Kernel.Pdf {
         [NUnit.Framework.Test]
         public virtual void GetDefaultConformanceLevelTest() {
             PdfDocument document = new PdfDocument(new PdfWriter(new MemoryStream()));
-            NUnit.Framework.Assert.IsNull(document.GetConformanceLevel());
+            NUnit.Framework.Assert.IsNotNull(document.GetConformance());
+            NUnit.Framework.Assert.IsFalse(document.GetConformance().IsPdfAOrUa());
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void OcgWithTwoParentsTest() {
+            String inputPdf = "ocgWithTwoParents.pdf";
+            PdfDocument doc = new PdfDocument(new PdfReader(SOURCE_FOLDER + inputPdf));
+            IList<PdfLayer> layerList = doc.GetCatalog().GetOCProperties(false).GetLayers();
+            NUnit.Framework.Assert.AreEqual(2, layerList[4].GetParents().Count);
+            doc.Close();
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CreatePdfDocumentWithAAndUaMetadataTest() {
+            String outputPdf = "pdfDocWithAAndUaMetadata.pdf";
+            WriterProperties writerProperties = new WriterProperties().AddPdfAXmpMetadata(PdfAConformance.PDF_A_3A).AddPdfUaXmpMetadata
+                (PdfUAConformance.PDF_UA_1);
+            PdfDocument doc = new PdfDocument(new PdfWriter(DESTINATION_FOLDER + outputPdf, writerProperties));
+            doc.AddNewPage();
+            doc.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(DESTINATION_FOLDER + outputPdf, SOURCE_FOLDER
+                 + "cmp_" + outputPdf, DESTINATION_FOLDER));
         }
 
         private class IgnoreTagStructurePdfDocument : PdfDocument {
+//\cond DO_NOT_DOCUMENT
             internal IgnoreTagStructurePdfDocument(PdfReader reader)
                 : base(reader) {
             }
+//\endcond
 
             protected internal override void TryInitTagStructure(PdfDictionary str) {
             }

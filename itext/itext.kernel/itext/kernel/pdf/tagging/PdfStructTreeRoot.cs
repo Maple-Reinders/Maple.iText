@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,6 +29,7 @@ using iText.Commons.Utils;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Filespec;
+using iText.Kernel.Pdf.Tagutils;
 
 namespace iText.Kernel.Pdf.Tagging {
     /// <summary>Represents a wrapper-class for structure tree root dictionary.</summary>
@@ -368,18 +369,6 @@ namespace iText.Kernel.Pdf.Tagging {
             return GetParentTreeHandler().FindMcrByMcid(pageDict, mcid);
         }
 
-        public virtual PdfMcr FindMcrByMcid(PdfDocument document, int mcid) {
-            int amountOfPages = document.GetNumberOfPages();
-            for (int i = 1; i <= amountOfPages; ++i) {
-                PdfPage page = document.GetPage(i);
-                PdfMcr mcr = FindMcrByMcid(page.GetPdfObject(), mcid);
-                if (mcr != null) {
-                    return mcr;
-                }
-            }
-            return null;
-        }
-
         public virtual PdfObjRef FindObjRefByStructParentIndex(PdfDictionary pageDict, int structParentIndex) {
             return GetParentTreeHandler().FindObjRefByStructParentIndex(pageDict, structParentIndex);
         }
@@ -399,7 +388,7 @@ namespace iText.Kernel.Pdf.Tagging {
                 GetPdfObject().Put(PdfName.IDTree, this.idTree.BuildTree().MakeIndirect(GetDocument()));
             }
             if (!GetDocument().IsAppendMode()) {
-                FlushAllKids(this);
+                iText.Kernel.Pdf.Tagging.PdfStructTreeRoot.FlushAllKids(this);
             }
             base.Flush();
         }
@@ -568,10 +557,13 @@ namespace iText.Kernel.Pdf.Tagging {
             return this.idTree;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual ParentTreeHandler GetParentTreeHandler() {
             return parentTreeHandler;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void AddKidObject(int index, PdfDictionary structElem) {
             if (index == -1) {
                 GetKidsObject().Add(structElem);
@@ -588,18 +580,16 @@ namespace iText.Kernel.Pdf.Tagging {
             }
             SetModified();
         }
+//\endcond
 
         protected internal override bool IsWrappedObjectMustBeIndirect() {
             return true;
         }
 
-        private void FlushAllKids(IStructureNode elem) {
-            foreach (IStructureNode kid in elem.GetKids()) {
-                if (kid is PdfStructElem && !((PdfStructElem)kid).IsFlushed()) {
-                    FlushAllKids(kid);
-                    ((PdfStructElem)kid).Flush();
-                }
-            }
+        private static void FlushAllKids(iText.Kernel.Pdf.Tagging.PdfStructTreeRoot elem) {
+            TagTreeIterator iterator = new TagTreeIterator(elem, TagTreeIterator.TreeTraversalOrder.POST_ORDER);
+            iterator.AddHandler(new TagTreeIteratorFlusher());
+            iterator.Traverse();
         }
 
         private void IfKidIsStructElementAddToList(PdfObject kid, IList<IStructureNode> kids) {

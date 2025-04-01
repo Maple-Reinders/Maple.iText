@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -51,7 +51,9 @@ namespace iText.Layout.Renderer {
 
         protected internal float imageHeight;
 
+//\cond DO_NOT_DOCUMENT
         internal float[] matrix = new float[6];
+//\endcond
 
         private float? height;
 
@@ -340,15 +342,19 @@ namespace iText.Layout.Renderer {
             return initialOccupiedAreaBBox;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary><inheritDoc/></summary>
         internal override bool HasAspectRatio() {
             return true;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary><inheritDoc/></summary>
         internal override float? GetAspectRatio() {
             return imageWidth / imageHeight;
         }
+//\endcond
 
         /// <summary>
         /// Gets original width of the image, not the width set by
@@ -449,7 +455,8 @@ namespace iText.Layout.Renderer {
             }
             float? horizontalScaling = this.GetPropertyAsFloat(Property.HORIZONTAL_SCALING, 1f);
             float? verticalScaling = this.GetPropertyAsFloat(Property.VERTICAL_SCALING, 1f);
-            if (xObject is PdfFormXObject && width != imageWidth) {
+            if (xObject is PdfFormXObject && (JavaUtil.FloatCompare((float)width, imageWidth) != 0 || JavaUtil.FloatCompare
+                ((float)height, imageHeight) != 0)) {
                 horizontalScaling *= width / imageWidth;
                 verticalScaling *= height / imageHeight;
             }

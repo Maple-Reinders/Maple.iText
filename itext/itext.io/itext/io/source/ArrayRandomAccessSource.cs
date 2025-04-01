@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using System;
 using iText.IO.Exceptions;
 
 namespace iText.IO.Source {
+//\cond DO_NOT_DOCUMENT
     /// <summary>A RandomAccessSource that is based on an underlying byte array</summary>
     internal class ArrayRandomAccessSource : IRandomAccessSource {
         private byte[] array;
@@ -70,4 +71,5 @@ namespace iText.IO.Source {
             array = null;
         }
     }
+//\endcond
 }

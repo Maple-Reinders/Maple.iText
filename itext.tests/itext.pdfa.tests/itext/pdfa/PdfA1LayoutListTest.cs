@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
+using iText.Commons.Utils;
 using iText.IO.Font;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
@@ -50,11 +51,10 @@ namespace iText.Pdfa {
         public virtual void ListTest01() {
             String outPdf = destinationFolder + "pdfA1b_listTest01.pdf";
             String cmpPdf = cmpFolder + "cmp_pdfA1b_listTest01.pdf";
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(new PdfWriter(outPdf), PdfAConformanceLevel.PDF_A_1B, outputIntent
-                );
+            PdfADocument pdfDocument = new PdfADocument(new PdfWriter(outPdf), PdfAConformance.PDF_A_1B, outputIntent);
             Document doc = new Document(pdfDocument);
             pdfDocument.SetTagged();
             PdfFont textfont = PdfFontFactory.CreateFont(sourceFolder + "FreeSans.ttf", PdfEncodings.WINANSI, PdfFontFactory.EmbeddingStrategy

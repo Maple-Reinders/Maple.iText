@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,10 +24,12 @@ using System;
 using Microsoft.Extensions.Logging;
 using iText.Commons;
 using iText.Commons.Utils;
+using iText.Forms;
 using iText.Forms.Exceptions;
 using iText.Forms.Form;
 using iText.Forms.Form.Renderer;
 using iText.Forms.Logs;
+using iText.Kernel.Pdf.Tagutils;
 using iText.Layout.Renderer;
 
 namespace iText.Forms.Form.Element {
@@ -59,12 +61,12 @@ namespace iText.Forms.Form.Element {
         /// instance.
         /// </returns>
         public virtual iText.Forms.Form.Element.ComboBoxField SetSelected(int index) {
-            if (index < 0 || index >= this.GetItems().Count) {
-                String message = MessageFormatUtil.Format(FormsExceptionMessageConstant.INDEX_OUT_OF_BOUNDS, index, this.GetItems
+            if (index < 0 || index >= this.GetOptions().Count) {
+                String message = MessageFormatUtil.Format(FormsExceptionMessageConstant.INDEX_OUT_OF_BOUNDS, index, this.GetOptions
                     ().Count);
                 throw new IndexOutOfRangeException(message);
             }
-            SetSelected(this.GetItems()[index]);
+            SetSelected(this.GetOptions()[index]);
             return this;
         }
 
@@ -79,7 +81,7 @@ namespace iText.Forms.Form.Element {
             ClearSelected();
             selectedExportValue = value;
             bool found = false;
-            foreach (SelectFieldItem option in this.GetItems()) {
+            foreach (SelectFieldItem option in this.GetOptions()) {
                 if (option.GetExportValue().Equals(value)) {
                     if (!found) {
                         option.GetElement().SetProperty(FormProperty.FORM_FIELD_SELECTED, true);
@@ -119,7 +121,7 @@ namespace iText.Forms.Form.Element {
         /// </param>
         public override void AddOption(SelectFieldItem option) {
             bool found = false;
-            foreach (SelectFieldItem item in this.GetItems()) {
+            foreach (SelectFieldItem item in this.GetOptions()) {
                 if (item.GetExportValue().Equals(option.GetExportValue())) {
                     found = true;
                     break;
@@ -137,12 +139,21 @@ namespace iText.Forms.Form.Element {
             if (selectedExportValue == null) {
                 return null;
             }
-            foreach (SelectFieldItem option in this.GetItems()) {
+            foreach (SelectFieldItem option in this.GetOptions()) {
                 if (option.GetExportValue().Equals(selectedExportValue)) {
                     return option;
                 }
             }
             return null;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public override AccessibilityProperties GetAccessibilityProperties() {
+            if (tagProperties == null) {
+                tagProperties = new FormDefaultAccessibilityProperties(FormDefaultAccessibilityProperties.FORM_FIELD_LIST_BOX
+                    );
+            }
+            return tagProperties;
         }
 
         protected override IRenderer MakeNewRenderer() {
@@ -151,7 +162,7 @@ namespace iText.Forms.Form.Element {
 
         private void ClearSelected() {
             this.selectedExportValue = null;
-            foreach (SelectFieldItem option in this.GetItems()) {
+            foreach (SelectFieldItem option in this.GetOptions()) {
                 option.GetElement().DeleteOwnProperty(FormProperty.FORM_FIELD_SELECTED);
             }
         }

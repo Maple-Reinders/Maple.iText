@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -71,7 +71,7 @@ namespace iText.Forms.Fields {
             else {
                 annotation = new PdfWidgetAnnotation(GetWidgetRectangle());
                 field = PdfFormCreator.CreateButtonFormField(annotation, GetDocument());
-                if (null != GetConformanceLevel()) {
+                if (null != GetConformance() && GetConformance().IsPdfAOrUa()) {
                     annotation.SetFlag(PdfAnnotation.PRINT);
                 }
             }
@@ -79,7 +79,7 @@ namespace iText.Forms.Fields {
             if (this.GetFont() != null) {
                 field.SetFont(this.GetFont());
             }
-            field.pdfAConformanceLevel = GetConformanceLevel();
+            field.pdfConformance = GetConformance();
             field.SetPushButton(true);
             field.SetFieldName(GetFormFieldName());
             field.text = caption;

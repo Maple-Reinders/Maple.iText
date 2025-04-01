@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
+using iText.Commons.Utils;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Filespec;
 using iText.Pdfa.Exceptions;
@@ -36,10 +37,10 @@ namespace iText.Pdfa {
         [NUnit.Framework.Test]
         public virtual void FileSpecCheckTest01() {
             PdfWriter writer = new PdfWriter(new MemoryStream());
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_1B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_1B, outputIntent);
             PdfDictionary fileNames = new PdfDictionary();
             pdfDocument.GetCatalog().Put(PdfName.Names, fileNames);
             PdfDictionary embeddedFiles = new PdfDictionary();
@@ -59,10 +60,10 @@ namespace iText.Pdfa {
         [NUnit.Framework.Test]
         public virtual void FileSpecCheckTest02() {
             PdfWriter writer = new PdfWriter(new MemoryStream());
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_1B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_1B, outputIntent);
             PdfStream stream = new PdfStream();
             pdfDocument.GetCatalog().Put(new PdfName("testStream"), stream);
             PdfFileSpec spec = PdfFileSpec.CreateEmbeddedFileSpec(pdfDocument, sourceFolder + "sample.wav", "sample.wav"
@@ -77,10 +78,10 @@ namespace iText.Pdfa {
         [NUnit.Framework.Test]
         public virtual void FileSpecCheckTest03() {
             PdfWriter writer = new PdfWriter(new MemoryStream());
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_1B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_1B, outputIntent);
             PdfStream stream = new PdfStream();
             pdfDocument.GetCatalog().Put(new PdfName("testStream"), stream);
             PdfFileSpec spec = PdfFileSpec.CreateEmbeddedFileSpec(pdfDocument, sourceFolder + "sample.wav", "sample.wav"

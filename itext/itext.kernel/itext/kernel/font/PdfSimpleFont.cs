@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -261,28 +261,20 @@ namespace iText.Kernel.Font {
             byte[] contentBytes = characterCodes.GetValueBytes();
             foreach (byte b in contentBytes) {
                 int code = b & 0xff;
-                Glyph glyph = null;
-                CMapToUnicode toUnicodeCMap = GetToUnicode();
-                if (toUnicodeCMap != null && toUnicodeCMap.Lookup(code) != null && (glyph = GetFontProgram().GetGlyphByCode
-                    (code)) != null) {
-                    if (!JavaUtil.ArraysEquals(toUnicodeCMap.Lookup(code), glyph.GetChars())) {
-                        // Copy the glyph because the original one may be reused (e.g. standard Helvetica font program)
-                        glyph = new Glyph(glyph);
-                        glyph.SetChars(toUnicodeCMap.Lookup(code));
-                    }
-                }
-                else {
-                    int uni = enc.GetUnicode(code);
-                    if (uni > -1) {
-                        glyph = GetGlyph(uni);
-                    }
-                    else {
-                        if (enc.GetBaseEncoding() == null) {
-                            glyph = GetFontProgram().GetGlyphByCode(code);
-                        }
-                    }
+                Glyph glyph = GetFontProgram().GetGlyphByCode(code);
+                int uni = enc.GetUnicode(code);
+                if (glyph == null && uni > -1) {
+                    glyph = GetGlyph(uni);
                 }
                 if (glyph != null) {
+                    char[] chars;
+                    CMapToUnicode toUnicodeCMap = GetToUnicode();
+                    if (toUnicodeCMap != null && (chars = toUnicodeCMap.Lookup(code)) != null && !JavaUtil.ArraysEquals(chars, 
+                        glyph.GetChars())) {
+                        // Copy the glyph because the original one may be reused (e.g. standard Helvetica font program)
+                        glyph = new Glyph(glyph);
+                        glyph.SetChars(chars);
+                    }
                     list.Add(glyph);
                 }
                 else {
@@ -300,7 +292,7 @@ namespace iText.Kernel.Font {
         public override float GetContentWidth(PdfString content) {
             float width = 0;
             GlyphLine glyphLine = DecodeIntoGlyphLine(content);
-            for (int i = glyphLine.start; i < glyphLine.end; i++) {
+            for (int i = glyphLine.GetStart(); i < glyphLine.GetEnd(); i++) {
                 width += glyphLine.Get(i).GetWidth();
             }
             return width;
@@ -472,9 +464,9 @@ namespace iText.Kernel.Font {
             AddFontStream(fontDescriptor);
             int flags = fontProgram.GetPdfFontFlags();
             // reset both flags
-            flags &= ~(FontDescriptorFlags.Symbolic | FontDescriptorFlags.Nonsymbolic);
+            flags &= ~(FontDescriptorFlags.SYMBOLIC | FontDescriptorFlags.NONSYMBOLIC);
             // set fontSpecific based on font encoding
-            flags |= fontEncoding.IsFontSpecific() ? FontDescriptorFlags.Symbolic : FontDescriptorFlags.Nonsymbolic;
+            flags |= fontEncoding.IsFontSpecific() ? FontDescriptorFlags.SYMBOLIC : FontDescriptorFlags.NONSYMBOLIC;
             fontDescriptor.Put(PdfName.Flags, new PdfNumber(flags));
             return fontDescriptor;
         }

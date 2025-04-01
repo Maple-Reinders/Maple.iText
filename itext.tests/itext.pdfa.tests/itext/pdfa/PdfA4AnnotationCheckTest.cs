@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,7 +21,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
-using System.IO;
 using iText.Commons.Utils;
 using iText.IO.Source;
 using iText.Kernel.Geom;
@@ -55,7 +54,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4ForbiddenAnnotations1Test() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             PdfAnnotation annot = new PdfFileAttachmentAnnotation(new Rectangle(100, 100, 100, 100));
             page.AddAnnotation(annot);
@@ -68,7 +67,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4ForbiddenAnnotations2Test() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             PdfAnnotation annot = new PdfSoundAnnotation(new Rectangle(100, 100, 100, 100), new PdfStream());
             page.AddAnnotation(annot);
@@ -81,7 +80,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4ForbiddenAnnotations3Test() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             PdfAnnotation annot = new Pdf3DAnnotation(new Rectangle(100, 100, 100, 100), new PdfArray());
             page.AddAnnotation(annot);
@@ -95,7 +94,7 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "pdfA4AllowedAnnotations1Test.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_pdfA4AllowedAnnotations1Test.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            using (PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent())) {
+            using (PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent())) {
                 PdfPage page = doc.AddNewPage();
                 PdfAnnotation annot = new PdfLinkAnnotation(new Rectangle(100, 100, 100, 100));
                 annot.SetFlag(PdfAnnotation.PRINT);
@@ -109,7 +108,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4eForbiddenAnnotations1Test() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4E, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4E, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             PdfAnnotation annot = new PdfFileAttachmentAnnotation(new Rectangle(100, 100, 100, 100));
             page.AddAnnotation(annot);
@@ -122,7 +121,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4eForbiddenAnnotations2Test() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4E, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4E, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             PdfAnnotation annot = new PdfSoundAnnotation(new Rectangle(100, 100, 100, 100), new PdfStream());
             page.AddAnnotation(annot);
@@ -136,7 +135,7 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "pdfA4eAllowedAnnotations1Test.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_pdfA4eAllowedAnnotations1Test.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            using (PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4E, CreateOutputIntent())) {
+            using (PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4E, CreateOutputIntent())) {
                 PdfPage page = doc.AddNewPage();
                 PdfAnnotation annot = new PdfLinkAnnotation(new Rectangle(100, 100, 100, 100));
                 annot.SetFlag(PdfAnnotation.PRINT);
@@ -151,10 +150,9 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "pdfA4eAllowedAnnotations2Test.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_pdfA4eAllowedAnnotations2Test.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            using (PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4E, CreateOutputIntent())) {
+            using (PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4E, CreateOutputIntent())) {
                 PdfPage page = doc.AddNewPage();
-                PdfStream stream3D = new PdfStream(doc, new FileStream(CMP_FOLDER + "teapot.u3d", FileMode.Open, FileAccess.Read
-                    ));
+                PdfStream stream3D = new PdfStream(doc, FileUtil.GetInputStreamForFile(CMP_FOLDER + "teapot.u3d"));
                 stream3D.Put(PdfName.Type, PdfName._3D);
                 stream3D.Put(PdfName.Subtype, new PdfName("U3D"));
                 stream3D.SetCompressionLevel(CompressionConstants.UNDEFINED_COMPRESSION);
@@ -179,7 +177,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4fForbiddenAnnotations1Test() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             AddSimpleEmbeddedFile(doc);
             PdfAnnotation annot = new PdfSoundAnnotation(new Rectangle(100, 100, 100, 100), new PdfStream());
@@ -193,7 +191,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4fForbiddenAnnotations2Test() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             AddSimpleEmbeddedFile(doc);
             PdfAnnotation annot = new Pdf3DAnnotation(new Rectangle(100, 100, 100, 100), new PdfArray());
@@ -207,7 +205,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4fForbiddenAnnotations3Test() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             AddSimpleEmbeddedFile(doc);
             PdfAnnotation annot = new PdfScreenAnnotation(new Rectangle(100, 100, 100, 100));
@@ -221,7 +219,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4fForbiddenAnnotations4Test() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             AddSimpleEmbeddedFile(doc);
             PdfAnnotation annot = new PdfTextAnnotation(new Rectangle(100, 100, 100, 100));
@@ -237,7 +235,7 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "pdfA4fAllowedAnnotations1Test.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_pdfA4fAllowedAnnotations1Test.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            using (PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent())) {
+            using (PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent())) {
                 PdfPage page = doc.AddNewPage();
                 AddSimpleEmbeddedFile(doc);
                 PdfAnnotation annot = new PdfFileAttachmentAnnotation(new Rectangle(100, 100, 100, 100));
@@ -254,7 +252,7 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "pdfA4fAllowedAnnotations2Test.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_pdfA4fAllowedAnnotations2Test.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            using (PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent())) {
+            using (PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent())) {
                 PdfPage page = doc.AddNewPage();
                 AddSimpleEmbeddedFile(doc);
                 PdfAnnotation annot = new PdfLinkAnnotation(new Rectangle(100, 100, 100, 100));
@@ -270,7 +268,7 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "pdfA4AllowedAnnotWithoutApTest.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_pdfA4AllowedAnnotWithoutApTest.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            using (PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent())) {
+            using (PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent())) {
                 PdfPage page = doc.AddNewPage();
                 PdfAnnotation annot = new PdfA4AnnotationCheckTest.PdfProjectionAnnotation(new Rectangle(100, 100, 100, 100
                     ));
@@ -285,7 +283,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4ForbiddenAKeyWidgetAnnotationTest() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             AddSimpleEmbeddedFile(doc);
             PdfAnnotation annot = new PdfWidgetAnnotation(new Rectangle(100, 100, 100, 100));
@@ -302,7 +300,7 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "pdfA4AllowedAAKeyWidgetAnnotationTest.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_pdfA4AllowedAAKeyWidgetAnnotationTest.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            using (PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent())) {
+            using (PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent())) {
                 PdfPage page = doc.AddNewPage();
                 PdfAnnotation annot = new PdfWidgetAnnotation(new Rectangle(100, 100, 100, 100));
                 annot.GetPdfObject().Put(PdfName.AA, (new PdfAction()).GetPdfObject());
@@ -317,7 +315,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4BtnAppearanceContainsNStreamWidgetAnnotationTest() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             AddSimpleEmbeddedFile(doc);
             PdfAnnotation annot = new PdfWidgetAnnotation(new Rectangle(100, 100, 100, 100));
@@ -334,7 +332,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4AppearanceContainsNDictWidgetAnnotationTest() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             AddSimpleEmbeddedFile(doc);
             PdfAnnotation annot = new PdfWidgetAnnotation(new Rectangle(100, 100, 100, 100));
@@ -351,7 +349,7 @@ namespace iText.Pdfa {
         public virtual void PdfA4AppearanceContainsOtherKeyWidgetAnnotationTest() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4F, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4F, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             AddSimpleEmbeddedFile(doc);
             PdfAnnotation annot = new PdfWidgetAnnotation(new Rectangle(100, 100, 100, 100));
@@ -369,7 +367,7 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "pdfA4ForbiddenAAKeyAnnotationTest.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_pdfA4ForbiddenAAKeyAnnotationTest.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent());
             PdfPage page = doc.AddNewPage();
             PdfAnnotation annot = new PdfLinkAnnotation(new Rectangle(100, 100, 100, 100));
             PdfDictionary dict = new PdfDictionary();
@@ -397,8 +395,8 @@ namespace iText.Pdfa {
         }
 
         private PdfOutputIntent CreateOutputIntent() {
-            return new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", new FileStream(SOURCE_FOLDER
-                 + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read));
+            return new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", FileUtil.GetInputStreamForFile
+                (SOURCE_FOLDER + "sRGB Color Space Profile.icm"));
         }
 
         private sealed class PdfProjectionAnnotation : PdfAnnotation {

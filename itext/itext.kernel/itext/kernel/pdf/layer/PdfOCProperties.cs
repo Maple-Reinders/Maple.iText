@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,7 +22,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using iText.Commons;
+using iText.Commons.Utils;
 using iText.IO.Font;
+using iText.Kernel.Logs;
 using iText.Kernel.Pdf;
 
 namespace iText.Kernel.Pdf.Layer {
@@ -41,7 +45,9 @@ namespace iText.Kernel.Pdf.Layer {
     /// must be indirect.
     /// </remarks>
     public class PdfOCProperties : PdfObjectWrapper<PdfDictionary> {
+//\cond DO_NOT_DOCUMENT
         internal const String OC_CONFIG_NAME_PATTERN = "OCConfigName";
+//\endcond
 
         private IList<PdfLayer> layers = new List<PdfLayer>();
 
@@ -131,22 +137,28 @@ namespace iText.Kernel.Pdf.Layer {
                 }
             }
             GetPdfObject().Put(PdfName.OCGs, gr);
-            // Save radio groups.
-            PdfArray rbGroups = null;
-            PdfDictionary d = GetPdfObject().GetAsDictionary(PdfName.D);
-            if (d != null) {
-                rbGroups = d.GetAsArray(PdfName.RBGroups);
+            PdfDictionary filledDDictionary = new PdfDictionary();
+            // Save radio groups,Name,BaseState,Intent,ListMode
+            PdfDictionary dDictionary = GetPdfObject().GetAsDictionary(PdfName.D);
+            if (dDictionary != null) {
+                iText.Kernel.Pdf.Layer.PdfOCProperties.CopyDDictionaryField(PdfName.RBGroups, dDictionary, filledDDictionary
+                    );
+                iText.Kernel.Pdf.Layer.PdfOCProperties.CopyDDictionaryField(PdfName.Name, dDictionary, filledDDictionary);
+                iText.Kernel.Pdf.Layer.PdfOCProperties.CopyDDictionaryField(PdfName.BaseState, dDictionary, filledDDictionary
+                    );
+                iText.Kernel.Pdf.Layer.PdfOCProperties.CopyDDictionaryField(PdfName.Intent, dDictionary, filledDDictionary
+                    );
+                iText.Kernel.Pdf.Layer.PdfOCProperties.CopyDDictionaryField(PdfName.ListMode, dDictionary, filledDDictionary
+                    );
             }
-            d = new PdfDictionary();
-            if (rbGroups != null) {
-                d.Put(PdfName.RBGroups, rbGroups);
+            if (filledDDictionary.Get(PdfName.Name) == null) {
+                filledDDictionary.Put(PdfName.Name, new PdfString(CreateUniqueName(), PdfEncodings.UNICODE_BIG));
             }
-            d.Put(PdfName.Name, new PdfString(CreateUniqueName(), PdfEncodings.UNICODE_BIG));
-            GetPdfObject().Put(PdfName.D, d);
+            GetPdfObject().Put(PdfName.D, filledDDictionary);
             IList<PdfLayer> docOrder = new List<PdfLayer>(layers);
             for (int i = 0; i < docOrder.Count; i++) {
                 PdfLayer layer = docOrder[i];
-                if (layer.GetParent() != null) {
+                if (layer.GetParents() != null) {
                     docOrder.Remove(layer);
                     i--;
                 }
@@ -156,7 +168,7 @@ namespace iText.Kernel.Pdf.Layer {
                 PdfLayer layer = (PdfLayer)element;
                 GetOCGOrder(order, layer);
             }
-            d.Put(PdfName.Order, order);
+            filledDDictionary.Put(PdfName.Order, order);
             PdfArray off = new PdfArray();
             foreach (Object element in layers) {
                 PdfLayer layer = (PdfLayer)element;
@@ -165,10 +177,7 @@ namespace iText.Kernel.Pdf.Layer {
                 }
             }
             if (off.Size() > 0) {
-                d.Put(PdfName.OFF, off);
-            }
-            else {
-                d.Remove(PdfName.OFF);
+                filledDDictionary.Put(PdfName.OFF, off);
             }
             PdfArray locked = new PdfArray();
             foreach (PdfLayer layer in layers) {
@@ -177,12 +186,8 @@ namespace iText.Kernel.Pdf.Layer {
                 }
             }
             if (locked.Size() > 0) {
-                d.Put(PdfName.Locked, locked);
+                filledDDictionary.Put(PdfName.Locked, locked);
             }
-            else {
-                d.Remove(PdfName.Locked);
-            }
-            d.Remove(PdfName.AS);
             AddASEvent(PdfName.View, PdfName.Zoom);
             AddASEvent(PdfName.View, PdfName.View);
             AddASEvent(PdfName.Print, PdfName.Print);
@@ -191,6 +196,27 @@ namespace iText.Kernel.Pdf.Layer {
                 this.RemoveNotRegisteredOcgs();
             }
             return GetPdfObject();
+        }
+
+        /// <summary>
+        /// Checks if optional content group default configuration dictionary field value matches
+        /// the required value for this field, if one exists.
+        /// </summary>
+        /// <param name="field">default configuration dictionary field.</param>
+        /// <param name="value">value of that field.</param>
+        /// <returns>boolean indicating if field meets requirement.</returns>
+        public static bool CheckDDictonaryFieldValue(PdfName field, PdfObject value) {
+            // dictionary D BaseState should have the value ON
+            if (PdfName.BaseState.Equals(field) && !PdfName.ON.Equals(value)) {
+                return false;
+            }
+            else {
+                //for dictionary D Intent should have the value View
+                if (PdfName.Intent.Equals(field) && !PdfName.View.Equals(value)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public override void Flush() {
@@ -263,6 +289,22 @@ namespace iText.Kernel.Pdf.Layer {
             }
             if (kids.Size() > 0) {
                 order.Add(kids);
+            }
+        }
+
+        private static void CopyDDictionaryField(PdfName fieldToAdd, PdfDictionary fromDictionary, PdfDictionary toDictionary
+            ) {
+            PdfObject value = fromDictionary.Get(fieldToAdd);
+            if (value != null) {
+                if (iText.Kernel.Pdf.Layer.PdfOCProperties.CheckDDictonaryFieldValue(fieldToAdd, value)) {
+                    toDictionary.Put(fieldToAdd, value);
+                }
+                else {
+                    ILogger logger = ITextLogManager.GetLogger(typeof(iText.Kernel.Pdf.Layer.PdfOCProperties));
+                    String warnText = MessageFormatUtil.Format(KernelLogMessageConstant.INVALID_DDICTIONARY_FIELD_VALUE, fieldToAdd
+                        , value);
+                    logger.LogWarning(warnText);
+                }
             }
         }
 
@@ -364,7 +406,9 @@ namespace iText.Kernel.Pdf.Layer {
                 }
                 PdfArray orderArray = d.GetAsArray(PdfName.Order);
                 if (orderArray != null && !orderArray.IsEmpty()) {
-                    ReadOrderFromDictionary(null, orderArray, layerMap);
+                    ICollection<PdfIndirectReference> layerReferences = new HashSet<PdfIndirectReference>();
+                    IDictionary<PdfString, PdfLayer> titleLayers = new Dictionary<PdfString, PdfLayer>();
+                    ReadOrderFromDictionary(null, orderArray, layerMap, layerReferences, titleLayers);
                 }
             }
             // Add the layers which should not be displayed on the panel to the order list
@@ -377,23 +421,28 @@ namespace iText.Kernel.Pdf.Layer {
 
         /// <summary>Reads the /Order in the /D entry and initialized the parent-child hierarchy.</summary>
         private void ReadOrderFromDictionary(PdfLayer parent, PdfArray orderArray, IDictionary<PdfIndirectReference
-            , PdfLayer> layerMap) {
+            , PdfLayer> layerMap, ICollection<PdfIndirectReference> layerReferences, IDictionary<PdfString, PdfLayer
+            > titleLayers) {
             for (int i = 0; i < orderArray.Size(); i++) {
                 PdfObject item = orderArray.Get(i);
                 if (item.GetObjectType() == PdfObject.DICTIONARY) {
                     PdfLayer layer = layerMap.Get(item.GetIndirectReference());
-                    if (layer != null) {
+                    if (layer == null) {
+                        continue;
+                    }
+                    if (!layerReferences.Contains(layer.GetIndirectReference())) {
+                        layerReferences.Add(layer.GetIndirectReference());
                         layers.Add(layer);
                         layer.onPanel = true;
-                        if (parent != null) {
-                            parent.AddChild(layer);
-                        }
-                        if (i + 1 < orderArray.Size() && orderArray.Get(i + 1).GetObjectType() == PdfObject.ARRAY) {
-                            PdfArray nextArray = orderArray.GetAsArray(i + 1);
-                            if (nextArray.Size() > 0 && nextArray.Get(0).GetObjectType() != PdfObject.STRING) {
-                                ReadOrderFromDictionary(layer, orderArray.GetAsArray(i + 1), layerMap);
-                                i++;
-                            }
+                    }
+                    if (parent != null) {
+                        parent.AddChild(layer);
+                    }
+                    if (i + 1 < orderArray.Size() && orderArray.Get(i + 1).GetObjectType() == PdfObject.ARRAY) {
+                        PdfArray nextArray = orderArray.GetAsArray(i + 1);
+                        if (nextArray.Size() > 0 && nextArray.Get(0).GetObjectType() != PdfObject.STRING) {
+                            ReadOrderFromDictionary(layer, orderArray.GetAsArray(i + 1), layerMap, layerReferences, titleLayers);
+                            i++;
                         }
                     }
                 }
@@ -405,16 +454,22 @@ namespace iText.Kernel.Pdf.Layer {
                         }
                         PdfObject firstObj = subArray.Get(0);
                         if (firstObj.GetObjectType() == PdfObject.STRING) {
-                            PdfLayer titleLayer = PdfLayer.CreateTitleSilent(((PdfString)firstObj).ToUnicodeString(), GetDocument());
-                            titleLayer.onPanel = true;
-                            layers.Add(titleLayer);
+                            PdfString title = (PdfString)firstObj;
+                            PdfLayer titleLayer = titleLayers.Get(title);
+                            if (titleLayer == null) {
+                                titleLayer = PdfLayer.CreateTitleSilent(title.ToUnicodeString(), GetDocument());
+                                titleLayer.onPanel = true;
+                                layers.Add(titleLayer);
+                                titleLayers.Put(title, titleLayer);
+                            }
                             if (parent != null) {
                                 parent.AddChild(titleLayer);
                             }
-                            ReadOrderFromDictionary(titleLayer, new PdfArray(subArray.SubList(1, subArray.Size())), layerMap);
+                            ReadOrderFromDictionary(titleLayer, new PdfArray(subArray.SubList(1, subArray.Size())), layerMap, layerReferences
+                                , titleLayers);
                         }
                         else {
-                            ReadOrderFromDictionary(parent, subArray, layerMap);
+                            ReadOrderFromDictionary(parent, subArray, layerMap, layerReferences, titleLayers);
                         }
                     }
                 }

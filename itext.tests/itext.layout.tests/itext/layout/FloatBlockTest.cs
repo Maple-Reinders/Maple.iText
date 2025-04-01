@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -143,13 +143,21 @@ namespace iText.Layout {
         }
 
         private class ImageProperties {
+//\cond DO_NOT_DOCUMENT
             internal FloatPropertyValue? floatPropertyValue;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal ClearPropertyValue? clearPropertyValue;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal HorizontalAlignment? horizontalAlignment;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal UnitValue width;
+//\endcond
 
             public ImageProperties(FloatPropertyValue? floatPropertyValue, ClearPropertyValue? clearPropertyValue, HorizontalAlignment?
                  horizontalAlignment, UnitValue width) {

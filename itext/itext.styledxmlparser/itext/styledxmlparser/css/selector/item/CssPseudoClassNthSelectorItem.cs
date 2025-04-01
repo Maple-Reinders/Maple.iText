@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using iText.StyledXmlParser.Node;
 
 namespace iText.StyledXmlParser.Css.Selector.Item {
+//\cond DO_NOT_DOCUMENT
     internal class CssPseudoClassNthSelectorItem : CssPseudoClassChildSelectorItem {
         /// <summary>The nth A.</summary>
         private int nthA;
@@ -32,15 +33,14 @@ namespace iText.StyledXmlParser.Css.Selector.Item {
         /// <summary>The nth B.</summary>
         private int nthB;
 
+//\cond DO_NOT_DOCUMENT
         internal CssPseudoClassNthSelectorItem(String pseudoClass, String arguments)
             : base(pseudoClass, arguments) {
             GetNthArguments();
         }
+//\endcond
 
         public override bool Matches(INode node) {
-            if (!(node is IElementNode) || node is ICustomElementNode || node is IDocumentNode) {
-                return false;
-            }
             IList<INode> children = GetAllSiblings(node);
             return !children.IsEmpty() && ResolveNth(node, children);
         }
@@ -117,4 +117,5 @@ namespace iText.StyledXmlParser.Css.Selector.Item {
             }
         }
     }
+//\endcond
 }

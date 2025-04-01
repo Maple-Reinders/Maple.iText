@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -241,7 +241,7 @@ namespace iText.Forms.Fields {
         /// <see cref="PdfButtonFormField"/>
         /// </returns>
         public virtual iText.Forms.Fields.PdfButtonFormField SetImage(String image) {
-            Stream @is = new FileStream(image, FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(image);
             String str = Convert.ToBase64String(StreamUtil.InputStreamToArray(@is));
             return (iText.Forms.Fields.PdfButtonFormField)SetValue(str);
         }

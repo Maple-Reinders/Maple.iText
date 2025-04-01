@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,7 +25,6 @@ using Microsoft.Extensions.Logging;
 using iText.Commons;
 using iText.Commons.Utils;
 using iText.Kernel.Geom;
-using iText.Layout;
 using iText.Layout.Properties;
 using iText.Layout.Renderer;
 
@@ -205,7 +204,10 @@ namespace iText.Layout.Margincollapse {
             MarginsCollapse ownCollapseAfter;
             bool lastChildMarginJoinedToParent = prevChildMarginInfo != null && prevChildMarginInfo.IsIgnoreOwnMarginBottom
                 () && !lastKidCollapsedAfterHasClearanceApplied;
-            if (lastChildMarginJoinedToParent) {
+            //Checking prevChildMarginInfo#ownCollapseAfter for null, because there can be a case where margin collapse
+            //is enabled for the parent, but disabled for the child, in such a case prevChildMarginInfo#ownCollapseAfter
+            //value will be null and the above condition can still be met
+            if (lastChildMarginJoinedToParent && prevChildMarginInfo.GetOwnCollapseAfter() != null) {
                 ownCollapseAfter = prevChildMarginInfo.GetOwnCollapseAfter();
             }
             else {
@@ -455,7 +457,9 @@ namespace iText.Layout.Margincollapse {
         }
 
         private static bool IsBlockElement(IRenderer renderer) {
-            return renderer is BlockRenderer || renderer is TableRenderer;
+            // GridContainerRenderer is inherited from BlockRenderer but only not to copy/paste some overloads.
+            // It doesn't use BlockRenderer#layout internally.
+            return (renderer is BlockRenderer || renderer is TableRenderer) && !(renderer is GridContainerRenderer);
         }
 
         private static bool HasHeightProp(IRenderer renderer) {
@@ -497,11 +501,11 @@ namespace iText.Layout.Margincollapse {
         }
 
         private static bool HasTopBorders(IRenderer renderer) {
-            return iText.Layout.Margincollapse.MarginsCollapseHandler.HasBorders(renderer, Property.BORDER_TOP);
+            return renderer.GetModelElement().HasProperty(Property.BORDER_TOP);
         }
 
         private static bool HasBottomBorders(IRenderer renderer) {
-            return iText.Layout.Margincollapse.MarginsCollapseHandler.HasBorders(renderer, Property.BORDER_BOTTOM);
+            return renderer.GetModelElement().HasProperty(Property.BORDER_BOTTOM);
         }
 
         private static bool RendererIsFloated(IRenderer renderer) {
@@ -538,6 +542,12 @@ namespace iText.Layout.Margincollapse {
         private static void OverrideModelBottomMargin(IRenderer renderer, float collapsedMargins) {
             iText.Layout.Margincollapse.MarginsCollapseHandler.OverrideModelMargin(renderer, Property.MARGIN_BOTTOM, collapsedMargins
                 );
+            if (renderer.HasProperty(Property.TREAT_AS_CONTINUOUS_CONTAINER_RESULT)) {
+                ContinuousContainer continuousContainer = renderer.GetProperty<ContinuousContainer>(Property.TREAT_AS_CONTINUOUS_CONTAINER_RESULT
+                    );
+                continuousContainer.UpdateValueOfSavedProperty(Property.MARGIN_BOTTOM, UnitValue.CreatePointValue(collapsedMargins
+                    ));
+            }
         }
 
         private static float DefineMarginValueForCollapse(IRenderer renderer, int property) {
@@ -562,11 +572,6 @@ namespace iText.Layout.Margincollapse {
                     , property));
             }
             return padding != null && padding.GetValue() > 0;
-        }
-
-        private static bool HasBorders(IRenderer renderer, int property) {
-            IPropertyContainer modelElement = renderer.GetModelElement();
-            return modelElement.HasProperty(property) || modelElement.HasProperty(Property.BORDER);
         }
     }
 }

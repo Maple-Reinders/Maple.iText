@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,7 +21,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
-using System.IO;
 using iText.Bouncycastleconnector;
 using iText.Commons.Bouncycastle;
 using iText.Commons.Bouncycastle.Asn1;
@@ -29,6 +28,9 @@ using iText.Commons.Bouncycastle.Asn1.Esf;
 using iText.Commons.Bouncycastle.Asn1.X509;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
+using iText.Commons.Utils;
+using iText.Forms.Form.Element;
+using iText.Kernel.Crypto;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Signatures;
@@ -139,11 +141,14 @@ namespace iText.Signatures.Sign {
             IX509Certificate[] signChain = PemFileHelper.ReadFirstChain(signCertFileName);
             IPrivateKey signPrivateKey = PemFileHelper.ReadFirstKey(signCertFileName, password);
             IExternalSignature pks = new PrivateKeySignature(signPrivateKey, DigestAlgorithms.SHA256);
-            PdfSigner signer = new PdfSigner(new PdfReader(srcFileName), new FileStream(outFileName, FileMode.Create), 
-                new StampingProperties());
-            signer.SetFieldName("Signature1");
-            signer.GetSignatureAppearance().SetPageRect(new Rectangle(50, 650, 200, 100)).SetReason("Test").SetLocation
-                ("TestCity").SetLayer2Text("Approval test signature.\nCreated by iText.");
+            PdfSigner signer = new PdfSigner(new PdfReader(srcFileName), FileUtil.GetFileOutputStream(outFileName), new 
+                StampingProperties());
+            SignerProperties signerProperties = new SignerProperties().SetFieldName("Signature1");
+            signer.SetSignerProperties(signerProperties);
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID).SetContent
+                ("Approval test signature.\nCreated by iText.");
+            signerProperties.SetPageRect(new Rectangle(50, 650, 200, 100)).SetReason("Test").SetLocation("TestCity").SetSignatureAppearance
+                (appearance);
             if (sigPolicyIdentifier != null) {
                 signer.SignDetached(pks, signChain, null, null, null, 0, PdfSigner.CryptoStandard.CADES, sigPolicyIdentifier
                     );

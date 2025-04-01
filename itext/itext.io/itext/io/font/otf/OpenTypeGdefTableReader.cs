@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,11 +24,17 @@ using iText.IO.Source;
 
 namespace iText.IO.Font.Otf {
     public class OpenTypeGdefTableReader {
+//\cond DO_NOT_DOCUMENT
         internal const int FLAG_IGNORE_BASE = 2;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal const int FLAG_IGNORE_LIGATURE = 4;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal const int FLAG_IGNORE_MARK = 8;
+//\endcond
 
         private readonly int tableLocation;
 

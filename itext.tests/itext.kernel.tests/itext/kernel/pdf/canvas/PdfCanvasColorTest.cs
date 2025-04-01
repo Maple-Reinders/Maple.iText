@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,11 +23,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.IO;
+using iText.Commons.Utils;
 using iText.IO.Source;
 using iText.Kernel.Colors;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Colorspace;
+using iText.Kernel.Pdf.Colorspace.Shading;
 using iText.Kernel.Pdf.Function;
 using iText.Kernel.Utils;
 using iText.Test;
@@ -136,10 +138,9 @@ namespace iText.Kernel.Pdf.Canvas {
             PdfDocument document = new PdfDocument(writer);
             PdfPage page = document.AddNewPage();
             PdfCanvas canvas = new PdfCanvas(page);
-            FileStream streamGray = new FileStream(SOURCE_FOLDER + "BlackWhite.icc", FileMode.Open, FileAccess.Read);
-            FileStream streamRgb = new FileStream(SOURCE_FOLDER + "CIERGB.icc", FileMode.Open, FileAccess.Read);
-            FileStream streamCmyk = new FileStream(SOURCE_FOLDER + "USWebUncoated.icc", FileMode.Open, FileAccess.Read
-                );
+            Stream streamGray = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "BlackWhite.icc");
+            Stream streamRgb = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "CIERGB.icc");
+            Stream streamCmyk = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "USWebUncoated.icc");
             IccBased gray = new IccBased(streamGray, new float[] { 0.5f });
             IccBased rgb = new IccBased(streamRgb, new float[] { 1.0f, 0.5f, 0f });
             IccBased cmyk = new IccBased(streamCmyk, new float[] { 1.0f, 0.5f, 0f, 0f });
@@ -167,10 +168,9 @@ namespace iText.Kernel.Pdf.Canvas {
             PdfDocument document = new PdfDocument(CompareTool.CreateTestPdfWriter(DESTINATION_FOLDER + "colorTest05.pdf"
                 ));
             PdfPage page = document.AddNewPage();
-            FileStream streamGray = new FileStream(SOURCE_FOLDER + "BlackWhite.icc", FileMode.Open, FileAccess.Read);
-            FileStream streamRgb = new FileStream(SOURCE_FOLDER + "CIERGB.icc", FileMode.Open, FileAccess.Read);
-            FileStream streamCmyk = new FileStream(SOURCE_FOLDER + "USWebUncoated.icc", FileMode.Open, FileAccess.Read
-                );
+            Stream streamGray = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "BlackWhite.icc");
+            Stream streamRgb = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "CIERGB.icc");
+            Stream streamCmyk = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "USWebUncoated.icc");
             PdfCieBasedCs.IccBased gray = (PdfCieBasedCs.IccBased)new IccBased(streamGray).GetColorSpace();
             PdfCieBasedCs.IccBased rgb = (PdfCieBasedCs.IccBased)new IccBased(streamRgb).GetColorSpace();
             PdfCieBasedCs.IccBased cmyk = (PdfCieBasedCs.IccBased)new IccBased(streamCmyk).GetColorSpace();
@@ -333,8 +333,8 @@ namespace iText.Kernel.Pdf.Canvas {
             PdfDocument document = new PdfDocument(writer);
             PdfPage page = document.AddNewPage();
             PdfCanvas canvas = new PdfCanvas(page);
-            PdfShading axial = new PdfShading.Axial(new PdfDeviceCs.Rgb(), 36, 716, new float[] { 1, .784f, 0 }, 396, 
-                788, new float[] { 0, 0, 1 }, new bool[] { true, true });
+            AbstractPdfShading axial = new PdfAxialShading(new PdfDeviceCs.Rgb(), 36, 716, new float[] { 1, .784f, 0 }
+                , 396, 788, new float[] { 0, 0, 1 }, new bool[] { true, true });
             canvas.SetFillColor(new PatternColor(new PdfPattern.Shading(axial)));
             canvas.Rectangle(30, 300, 400, 400).Fill();
             canvas.Release();
@@ -351,8 +351,8 @@ namespace iText.Kernel.Pdf.Canvas {
             PdfDocument document = new PdfDocument(writer);
             PdfPage page = document.AddNewPage();
             PdfCanvas canvas = new PdfCanvas(page);
-            PdfShading radial = new PdfShading.Radial(new PdfDeviceCs.Rgb(), 200, 700, 50, new float[] { 1, 0.968f, 0.58f
-                 }, 300, 700, 100, new float[] { 0.968f, 0.541f, 0.42f });
+            AbstractPdfShading radial = new PdfRadialShading(new PdfDeviceCs.Rgb(), 200, 700, 50, new float[] { 1, 0.968f
+                , 0.58f }, 300, 700, 100, new float[] { 0.968f, 0.541f, 0.42f });
             canvas.SetFillColor(new PatternColor(new PdfPattern.Shading(radial)));
             canvas.Rectangle(30, 300, 400, 400).Fill();
             canvas.Release();
@@ -501,10 +501,10 @@ namespace iText.Kernel.Pdf.Canvas {
                 );
             float[] colorValue1 = pattern ? null : new float[] { 1.0f, 0.6f, 0.7f };
             float[] colorValue2 = pattern ? null : new float[] { 0.1f, 0.9f, 0.9f };
-            PdfPattern pattern1 = pattern ? new PdfPattern.Shading(new PdfShading.Axial(new PdfDeviceCs.Rgb(), 45, 750
-                , ColorConstants.PINK.GetColorValue(), 100, 760, ColorConstants.MAGENTA.GetColorValue())) : null;
-            PdfPattern pattern2 = pattern ? new PdfPattern.Shading(new PdfShading.Axial(new PdfDeviceCs.Rgb(), 45, 690
-                , ColorConstants.BLUE.GetColorValue(), 100, 710, ColorConstants.CYAN.GetColorValue())) : null;
+            PdfPattern pattern1 = pattern ? new PdfPattern.Shading(new PdfAxialShading(new PdfDeviceCs.Rgb(), 45, 750, 
+                ColorConstants.PINK.GetColorValue(), 100, 760, ColorConstants.MAGENTA.GetColorValue())) : null;
+            PdfPattern pattern2 = pattern ? new PdfPattern.Shading(new PdfAxialShading(new PdfDeviceCs.Rgb(), 45, 690, 
+                ColorConstants.BLUE.GetColorValue(), 100, 710, ColorConstants.CYAN.GetColorValue())) : null;
             canvas.SetColor(space, colorValue1, pattern1, true);
             canvas.SaveState();
             canvas.BeginText().MoveText(50, 750).SetFontAndSize(PdfFontFactory.CreateFont(), 16).ShowText("pinkish").EndText

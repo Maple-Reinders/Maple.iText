@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,14 +21,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
-using System.IO;
 using iText.Bouncycastleconnector;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Utils;
+using iText.Forms.Form.Element;
+using iText.Kernel.Crypto;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
-using iText.Signatures;
 using iText.Signatures.Testutils;
 using iText.Signatures.Testutils.Client;
 using iText.Test;
@@ -71,13 +71,17 @@ namespace iText.Signatures.Sign {
             IExternalSignature pks = new PrivateKeySignature(signRsaPrivateKey, DigestAlgorithms.SHA256);
             IX509Certificate[] tsaChain = PemFileHelper.ReadFirstChain(tsaCertFileName);
             IPrivateKey tsaPrivateKey = PemFileHelper.ReadFirstKey(tsaCertFileName, password);
-            PdfSigner signer = new PdfSigner(new PdfReader(srcFileName), new FileStream(outFileName, FileMode.Create), 
+            PdfSigner signer = new PdfSigner(new PdfReader(srcFileName), FileUtil.GetFileOutputStream(outFileName), 
                 new StampingProperties());
-            signer.SetFieldName("Signature1");
-            signer.GetSignatureAppearance().SetPageRect(new Rectangle(50, 650, 200, 100)).SetReason("Test").SetLocation
-                ("TestCity").SetLayer2Text("Approval test signature.\nCreated by iText.");
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID)
+                .SetContent("Approval test signature.\nCreated by iText.");
+            SignerProperties signerProperties = new SignerProperties()
+                    .SetFieldName("Signature1")
+                    .SetPageRect(new Rectangle(50, 650, 200, 100))
+                    .SetReason("Test").SetLocation("TestCity").SetSignatureAppearance(appearance);
+            signer.SetSignerProperties(signerProperties);  
             TestTsaClient testTsa = new TestTsaClient(JavaUtil.ArraysAsList(tsaChain), tsaPrivateKey);
-            signer.SignDetached(pks, signRsaChain, null, null, testTsa, 0, PdfSigner.CryptoStandard.CADES);
+            signer.SignDetached(new BouncyCastleDigest(), pks, signRsaChain, null, null, testTsa, 0, PdfSigner.CryptoStandard.CADES);
             TestSignUtils.BasicCheckSignedDoc(destinationFolder + "padesSignatureLevelTTest01.pdf", "Signature1");
             NUnit.Framework.Assert.IsNull(SignaturesCompareTool.CompareSignatures(outFileName, cmpFileName));
         }
@@ -118,7 +122,7 @@ namespace iText.Signatures.Sign {
             }
             IX509Certificate[] tsaChain = PemFileHelper.ReadFirstChain(tsaCertFileName);
             IPrivateKey tsaPrivateKey = PemFileHelper.ReadFirstKey(tsaCertFileName, password);
-            PdfSigner signer = new PdfSigner(new PdfReader(srcFileName), new FileStream(outFileName, FileMode.Create), 
+            PdfSigner signer = new PdfSigner(new PdfReader(srcFileName), FileUtil.GetFileOutputStream(outFileName), 
                 new StampingProperties().UseAppendMode());
             TestTsaClient testTsa = new TestTsaClient(JavaUtil.ArraysAsList(tsaChain), tsaPrivateKey);
             signer.Timestamp(testTsa, "timestampSig1");

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -50,23 +50,33 @@ namespace iText.IO.Codec {
 
         private const short HASHSTEP = 2039;
 
+//\cond DO_NOT_DOCUMENT
         // after predecessor character
         internal byte[] strChr_;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         // predecessor string
         internal short[] strNxt_;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         // hash table to find  predecessor + char pairs
         internal short[] strHsh_;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         // next code if adding new prestring + char
         internal short numStrings_;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// each entry corresponds to a code and contains the length of data
         /// that the code expands to when decoded.
         /// </summary>
         internal int[] strLen_;
+//\endcond
 
         /// <summary>Constructor allocate memory for string store data</summary>
         public LZWStringTable() {

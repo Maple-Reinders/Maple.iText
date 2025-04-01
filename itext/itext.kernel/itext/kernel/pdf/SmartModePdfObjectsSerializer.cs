@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,17 +22,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
-using iText.Commons.Bouncycastle.Crypto;
+using iText.Commons.Digest;
 using iText.IO.Source;
 using iText.Kernel.Exceptions;
 
 namespace iText.Kernel.Pdf {
+//\cond DO_NOT_DOCUMENT
     internal class SmartModePdfObjectsSerializer {
-        private IDigest sha512;
+        private IMessageDigest sha512;
 
         private Dictionary<SerializedObjectContent, PdfIndirectReference> serializedContentToObj = new Dictionary<
             SerializedObjectContent, PdfIndirectReference>();
 
+//\cond DO_NOT_DOCUMENT
         internal SmartModePdfObjectsSerializer() {
             try {
                 sha512 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest("SHA-512");
@@ -41,6 +43,7 @@ namespace iText.Kernel.Pdf {
                 throw new PdfException(e);
             }
         }
+//\endcond
 
         public virtual void SaveSerializedObject(SerializedObjectContent serializedContent, PdfIndirectReference objectReference
             ) {
@@ -179,4 +182,5 @@ namespace iText.Kernel.Pdf {
         private class SelfReferenceException : Exception {
         }
     }
+//\endcond
 }

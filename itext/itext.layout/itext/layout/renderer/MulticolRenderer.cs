@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -49,6 +49,8 @@ namespace iText.Layout.Renderer {
 
         private float columnGap;
 
+        private float containerWidth;
+
         private bool isFirstLayout = true;
 
         /// <summary>Creates a DivRenderer from its corresponding layout object.</summary>
@@ -74,12 +76,13 @@ namespace iText.Layout.Renderer {
             SetOverflowForAllChildren(this);
             Rectangle actualBBox = layoutContext.GetArea().GetBBox().Clone();
             float originalWidth = actualBBox.GetWidth();
-            ApplyWidth(actualBBox, originalWidth);
             ContinuousContainer.SetupContinuousContainerIfNeeded(this);
             ApplyPaddings(actualBBox, false);
             ApplyBorderBox(actualBBox, false);
             ApplyMargins(actualBBox, false);
-            CalculateColumnCountAndWidth(actualBBox.GetWidth());
+            ApplyWidth(actualBBox, originalWidth);
+            containerWidth = actualBBox.GetWidth();
+            CalculateColumnCountAndWidth(containerWidth);
             heightFromProperties = DetermineHeight(actualBBox);
             if (this.elementRenderer == null) {
                 // initialize elementRenderer on first layout when first child represents renderer of element which
@@ -109,8 +112,8 @@ namespace iText.Layout.Renderer {
                 }
                 else {
                     this.occupiedArea = CalculateContainerOccupiedArea(layoutContext, false);
-                    return new LayoutResult(LayoutResult.PARTIAL, this.occupiedArea, CreateSplitRenderer(layoutResult.GetSplitRenderers
-                        ()), CreateOverflowRenderer(layoutResult.GetOverflowRenderer()));
+                    return new LayoutResult(LayoutResult.PARTIAL, this.occupiedArea, GridMulticolUtil.CreateSplitRenderer(layoutResult
+                        .GetSplitRenderers(), this), CreateOverflowRenderer(layoutResult.GetOverflowRenderer()));
                 }
             }
         }
@@ -122,11 +125,16 @@ namespace iText.Layout.Renderer {
         }
 
         /// <summary>
-        /// Performs the drawing operation for the border of this renderer, if
-        /// defined by any of the
-        /// <see cref="iText.Layout.Properties.Property.BORDER"/>
-        /// values in either the layout
-        /// element or this
+        /// Performs the drawing operation for the border of this renderer, if defined by the
+        /// <see cref="iText.Layout.Properties.Property.BORDER_TOP"/>
+        /// ,
+        /// <see cref="iText.Layout.Properties.Property.BORDER_RIGHT"/>
+        /// ,
+        /// <see cref="iText.Layout.Properties.Property.BORDER_BOTTOM"/>
+        /// and
+        /// <see cref="iText.Layout.Properties.Property.BORDER_LEFT"/>
+        /// values in either
+        /// the layout element or this
         /// <see cref="IRenderer"/>
         /// itself.
         /// </summary>
@@ -156,6 +164,14 @@ namespace iText.Layout.Renderer {
             );
         }
 
+        /// <summary>Layouts multicol in the passed area.</summary>
+        /// <param name="layoutContext">the layout context</param>
+        /// <param name="actualBBox">the area to layout multicol on</param>
+        /// <returns>
+        /// the
+        /// <see cref="MulticolLayoutResult"/>
+        /// instance
+        /// </returns>
         protected internal virtual MulticolRenderer.MulticolLayoutResult LayoutInColumns(LayoutContext layoutContext
             , Rectangle actualBBox) {
             LayoutResult inifiniteHeighOneColumnLayoutResult = elementRenderer.Layout(new LayoutContext(new LayoutArea
@@ -167,25 +183,6 @@ namespace iText.Layout.Renderer {
             }
             approximateHeight = inifiniteHeighOneColumnLayoutResult.GetOccupiedArea().GetBBox().GetHeight() / columnCount;
             return BalanceContentAndLayoutColumns(layoutContext, actualBBox);
-        }
-
-        /// <summary>Creates a split renderer.</summary>
-        /// <param name="children">children of the split renderer</param>
-        /// <returns>
-        /// a new
-        /// <see cref="AbstractRenderer"/>
-        /// instance
-        /// </returns>
-        protected internal virtual AbstractRenderer CreateSplitRenderer(IList<IRenderer> children) {
-            AbstractRenderer splitRenderer = (AbstractRenderer)GetNextRenderer();
-            splitRenderer.parent = parent;
-            splitRenderer.modelElement = modelElement;
-            splitRenderer.occupiedArea = occupiedArea;
-            splitRenderer.isLastRendererForModelElement = false;
-            splitRenderer.SetChildRenderers(children);
-            splitRenderer.AddAllProperties(GetOwnProperties());
-            ContinuousContainer.SetupContinuousContainerIfNeeded(splitRenderer);
-            return splitRenderer;
         }
 
         /// <summary>Creates an overflow renderer.</summary>
@@ -256,28 +253,6 @@ namespace iText.Layout.Renderer {
                 height = maxHeight;
             }
             return height;
-        }
-
-        private void RecalculateHeightWidthAfterLayouting(Rectangle parentBBox, bool isFull) {
-            float? height = DetermineHeight(parentBBox);
-            if (height != null) {
-                height = UpdateOccupiedHeight((float)height, isFull);
-                float heightDelta = parentBBox.GetHeight() - (float)height;
-                parentBBox.MoveUp(heightDelta);
-                parentBBox.SetHeight((float)height);
-            }
-            ApplyWidth(parentBBox, parentBBox.GetWidth());
-        }
-
-        private float SafelyRetrieveFloatProperty(int property) {
-            Object value = this.GetProperty<Object>(property);
-            if (value is UnitValue) {
-                return ((UnitValue)value).GetValue();
-            }
-            if (value is Border) {
-                return ((Border)value).GetWidth();
-            }
-            return 0F;
         }
 
         private MulticolRenderer.MulticolLayoutResult BalanceContentAndLayoutColumns(LayoutContext prelayoutContext
@@ -361,36 +336,21 @@ namespace iText.Layout.Renderer {
 
         private LayoutArea CalculateContainerOccupiedArea(LayoutContext layoutContext, bool isFull) {
             LayoutArea area = layoutContext.GetArea().Clone();
-            float totalHeight = UpdateOccupiedHeight(approximateHeight, isFull);
-            area.GetBBox().SetHeight(totalHeight);
-            Rectangle initialBBox = layoutContext.GetArea().GetBBox();
-            area.GetBBox().SetY(initialBBox.GetY() + initialBBox.GetHeight() - area.GetBBox().GetHeight());
-            RecalculateHeightWidthAfterLayouting(area.GetBBox(), isFull);
-            return area;
-        }
-
-        private float UpdateOccupiedHeight(float initialHeight, bool isFull) {
-            if (isFull) {
-                initialHeight += SafelyRetrieveFloatProperty(Property.PADDING_BOTTOM);
-                initialHeight += SafelyRetrieveFloatProperty(Property.MARGIN_BOTTOM);
-                if (!this.HasOwnProperty(Property.BORDER) || this.GetProperty<Border>(Property.BORDER) == null) {
-                    initialHeight += SafelyRetrieveFloatProperty(Property.BORDER_BOTTOM);
+            Rectangle areaBBox = area.GetBBox();
+            float totalContainerHeight = GridMulticolUtil.UpdateOccupiedHeight(approximateHeight, isFull, this);
+            if (totalContainerHeight < areaBBox.GetHeight() || isFull) {
+                areaBBox.SetHeight(totalContainerHeight);
+                float? height = DetermineHeight(areaBBox);
+                if (height != null) {
+                    height = GridMulticolUtil.UpdateOccupiedHeight((float)height, isFull, this);
+                    areaBBox.SetHeight((float)height);
                 }
             }
-            initialHeight += SafelyRetrieveFloatProperty(Property.PADDING_TOP);
-            initialHeight += SafelyRetrieveFloatProperty(Property.MARGIN_TOP);
-            if (!this.HasOwnProperty(Property.BORDER) || this.GetProperty<Border>(Property.BORDER) == null) {
-                initialHeight += SafelyRetrieveFloatProperty(Property.BORDER_TOP);
-            }
-            // isFirstLayout is necessary to handle the case when multicol container layouted in more
-            // than 2 pages, and on the last page layout result is full, but there is no bottom border
-            float TOP_AND_BOTTOM = isFull && isFirstLayout ? 2 : 1;
-            // Multicol container layouted in more than 3 pages, and there is a page where there are no bottom and top borders
-            if (!isFull && !isFirstLayout) {
-                TOP_AND_BOTTOM = 0;
-            }
-            initialHeight += SafelyRetrieveFloatProperty(Property.BORDER) * TOP_AND_BOTTOM;
-            return initialHeight;
+            Rectangle initialBBox = layoutContext.GetArea().GetBBox();
+            areaBBox.SetY(initialBBox.GetY() + initialBBox.GetHeight() - areaBBox.GetHeight());
+            float totalContainerWidth = GridMulticolUtil.UpdateOccupiedWidth(containerWidth, this);
+            areaBBox.SetWidth(totalContainerWidth);
+            return area;
         }
 
         private BlockRenderer GetElementsRenderer() {

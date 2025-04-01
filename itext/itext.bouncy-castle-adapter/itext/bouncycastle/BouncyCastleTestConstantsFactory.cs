@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,13 +24,17 @@ using System;
 using iText.Commons.Bouncycastle;
 
 namespace iText.Bouncycastle {
+//\cond DO_NOT_DOCUMENT
     internal class BouncyCastleTestConstantsFactory : IBouncyCastleTestConstantsFactory {
+//\cond DO_NOT_DOCUMENT
         internal BouncyCastleTestConstantsFactory() {
         }
+//\endcond
 
         // Empty constructor.
         public virtual String GetCertificateInfoTestConst() {
             return "corrupted stream - out of bounds length found: 8 >= 6";
         }
     }
+//\endcond
 }

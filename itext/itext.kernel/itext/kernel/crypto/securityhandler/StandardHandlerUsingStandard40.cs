@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -163,7 +163,7 @@ namespace iText.Kernel.Crypto.Securityhandler {
             byte[] uValue = GetIsoBytes(encryptionDictionary.GetAsString(PdfName.U));
             byte[] oValue = GetIsoBytes(encryptionDictionary.GetAsString(PdfName.O));
             PdfNumber pValue = (PdfNumber)encryptionDictionary.Get(PdfName.P);
-            this.permissions = pValue.LongValue();
+            this.permissions = pValue.IntValue();
             this.documentId = documentId;
             keyLength = GetKeyLength(encryptionDictionary);
             byte[] paddedPassword = PadPassword(password);

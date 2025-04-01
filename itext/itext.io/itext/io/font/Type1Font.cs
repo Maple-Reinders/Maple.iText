@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -73,6 +73,26 @@ namespace iText.IO.Font {
         protected internal Type1Font(String baseFont)
             : this() {
             GetFontNames().SetFontName(baseFont);
+        }
+
+        /// <summary>
+        /// Fills missing character codes in
+        /// <c>codeToGlyph</c>
+        /// map.
+        /// </summary>
+        /// <param name="fontEncoding">to be used to map unicode values to character codes.</param>
+        public virtual void InitializeGlyphs(FontEncoding fontEncoding) {
+            for (int i = 0; i < 256; i++) {
+                int unicode = fontEncoding.GetUnicode(i);
+                // Original unicodeToGlyph will be the source of widths here
+                Glyph fontGlyph = unicodeToGlyph.Get(unicode);
+                if (fontGlyph == null) {
+                    continue;
+                }
+                Glyph glyph = new Glyph(i, fontGlyph.GetWidth(), unicode, fontGlyph.GetChars(), false);
+                codeToGlyph.Put(i, glyph);
+                unicodeToGlyph.Put(glyph.GetUnicode(), glyph);
+            }
         }
 
         public virtual bool IsBuiltInFont() {

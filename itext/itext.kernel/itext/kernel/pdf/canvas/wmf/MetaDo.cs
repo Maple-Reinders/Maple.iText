@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -177,22 +177,34 @@ namespace iText.Kernel.Pdf.Canvas.Wmf {
         public const int META_CREATEREGION = 0x06FF;
 
         /// <summary>PdfCanvas of the MetaDo object.</summary>
-        public PdfCanvas cb;
+        private readonly PdfCanvas cb;
 
         /// <summary>The InputMeta instance containing the data.</summary>
-        public InputMeta @in;
+        private readonly InputMeta @in;
 
+//\cond DO_NOT_DOCUMENT
         internal int left;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal int top;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal int right;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal int bottom;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal int inch;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal MetaState state = new MetaState();
+//\endcond
 
         /// <summary>Creates a MetaDo instance.</summary>
         /// <param name="in">inputstream containing the data</param>
@@ -804,6 +816,7 @@ namespace iText.Kernel.Pdf.Canvas.Wmf {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         internal static float GetArc(float xCenter, float yCenter, float xDot, float yDot) {
             double s = Math.Atan2(yDot - yCenter, xDot - xCenter);
             if (s < 0) {
@@ -811,6 +824,7 @@ namespace iText.Kernel.Pdf.Canvas.Wmf {
             }
             return (float)(s / Math.PI * 180);
         }
+//\endcond
 
         /// <summary>Wrap a BMP image in an WMF.</summary>
         /// <param name="image">the BMP image to be wrapped</param>

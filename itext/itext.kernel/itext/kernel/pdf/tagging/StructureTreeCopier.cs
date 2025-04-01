@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,6 +29,7 @@ using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf;
 
 namespace iText.Kernel.Pdf.Tagging {
+//\cond DO_NOT_DOCUMENT
     /// <summary>Internal helper class which is used to copy, clone or move tag structure across documents.</summary>
     internal class StructureTreeCopier {
         private static IList<PdfName> ignoreKeysForCopy = new List<PdfName>();
@@ -355,13 +356,14 @@ namespace iText.Kernel.Pdf.Tagging {
             }
             else {
                 copied = source.CopyTo(copyingParams.GetToDocument(), ignoreKeysForCopy, true);
-                PdfDictionary obj = source.GetAsDictionary(PdfName.Obj);
-                if (obj != null) {
+                PdfObject obj = source.Get(PdfName.Obj);
+                if (obj is PdfDictionary) {
+                    PdfDictionary objDic = (PdfDictionary)obj;
                     // Link annotations could be not added to the toDocument, so we need to identify this case.
                     // When obj.copyTo is called, and annotation was already copied, we would get this already created copy.
                     // If it was already copied and added, /P key would be set. Otherwise /P won't be set.
-                    obj = obj.CopyTo(copyingParams.GetToDocument(), JavaUtil.ArraysAsList(PdfName.P), false);
-                    copied.Put(PdfName.Obj, obj);
+                    objDic = objDic.CopyTo(copyingParams.GetToDocument(), JavaUtil.ArraysAsList(PdfName.P), false);
+                    copied.Put(PdfName.Obj, objDic);
                 }
                 PdfDictionary nsDict = source.GetAsDictionary(PdfName.NS);
                 if (nsDict != null) {
@@ -382,14 +384,19 @@ namespace iText.Kernel.Pdf.Tagging {
                 }
             }
             PdfObject k = source.Get(PdfName.K);
+            PdfDictionary lastCopiedTrPage = null;
             if (k != null) {
                 if (k.IsArray()) {
                     PdfArray kArr = (PdfArray)k;
                     PdfArray newArr = new PdfArray();
                     for (int i = 0; i < kArr.Size(); i++) {
-                        PdfObject copiedKid = CopyObjectKid(kArr.Get(i), copied, destPage, parentChangePg, copyingParams);
+                        PdfObject copiedKid = CopyObjectKid(kArr.Get(i), copied, destPage, parentChangePg, copyingParams, lastCopiedTrPage
+                            );
                         if (copiedKid != null) {
                             newArr.Add(copiedKid);
+                            if (copiedKid is PdfDictionary && PdfName.TR.Equals(((PdfDictionary)copiedKid).GetAsName(PdfName.S))) {
+                                lastCopiedTrPage = destPage;
+                            }
                         }
                     }
                     if (!newArr.IsEmpty()) {
@@ -402,7 +409,7 @@ namespace iText.Kernel.Pdf.Tagging {
                     }
                 }
                 else {
-                    PdfObject copiedKid = CopyObjectKid(k, copied, destPage, parentChangePg, copyingParams);
+                    PdfObject copiedKid = CopyObjectKid(k, copied, destPage, parentChangePg, copyingParams, lastCopiedTrPage);
                     if (copiedKid != null) {
                         copied.Put(PdfName.K, copiedKid);
                     }
@@ -412,7 +419,8 @@ namespace iText.Kernel.Pdf.Tagging {
         }
 
         private static PdfObject CopyObjectKid(PdfObject kid, PdfDictionary copiedParent, PdfDictionary destPage, 
-            bool parentChangePg, StructureTreeCopier.StructElemCopyingParams copyingParams) {
+            bool parentChangePg, StructureTreeCopier.StructElemCopyingParams copyingParams, PdfDictionary lastCopiedTrPage
+            ) {
             if (kid.IsNumber()) {
                 if (!parentChangePg) {
                     copyingParams.GetToDocument().GetStructTreeRoot().GetParentTreeHandler().RegisterMcr(new PdfMcrNumber((PdfNumber
@@ -423,11 +431,26 @@ namespace iText.Kernel.Pdf.Tagging {
             else {
                 if (kid.IsDictionary()) {
                     PdfDictionary kidAsDict = (PdfDictionary)kid;
-                    // if element is TD and its parent is TR which was copied, then we copy it in any case
+                    //if element is TD and its parent is TR which was copied, then we copy it in any case
                     if (copyingParams.GetObjectsToCopy().Contains(kidAsDict) || ShouldTableElementBeCopied(kidAsDict, copiedParent
                         )) {
+                        //if TR element is not connected to any page,
+                        //it should be copied to the same page as the last copied TR which connected to page
+                        PdfDictionary destination = destPage;
+                        if (PdfName.TR.Equals(kidAsDict.GetAsName(PdfName.S)) && !copyingParams.GetObjectsToCopy().Contains(kidAsDict
+                            )) {
+                            if (McrCheckUtil.IsTrContainsMcr(kidAsDict)) {
+                                return null;
+                            }
+                            if (lastCopiedTrPage == null) {
+                                return null;
+                            }
+                            else {
+                                destination = lastCopiedTrPage;
+                            }
+                        }
                         bool hasParent = kidAsDict.ContainsKey(PdfName.P);
-                        PdfDictionary copiedKid = CopyObject(kidAsDict, destPage, parentChangePg, copyingParams);
+                        PdfDictionary copiedKid = CopyObject(kidAsDict, destination, parentChangePg, copyingParams);
                         if (hasParent) {
                             copiedKid.Put(PdfName.P, copiedParent);
                         }
@@ -435,7 +458,7 @@ namespace iText.Kernel.Pdf.Tagging {
                             PdfMcr mcr;
                             if (copiedKid.ContainsKey(PdfName.Obj)) {
                                 mcr = new PdfObjRef(copiedKid, new PdfStructElem(copiedParent));
-                                PdfDictionary contentItemObject = copiedKid.GetAsDictionary(PdfName.Obj);
+                                PdfDictionary contentItemObject = (PdfDictionary)copiedKid.Get(PdfName.Obj);
                                 if (PdfName.Link.Equals(contentItemObject.GetAsName(PdfName.Subtype)) && !contentItemObject.ContainsKey(PdfName
                                     .P)) {
                                     // Some link annotations may be not copied, because their destination page is not copied.
@@ -456,10 +479,13 @@ namespace iText.Kernel.Pdf.Tagging {
             return null;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal static bool ShouldTableElementBeCopied(PdfDictionary obj, PdfDictionary parent) {
-            return (PdfName.TD.Equals(obj.Get(PdfName.S)) || PdfName.TH.Equals(obj.Get(PdfName.S))) && PdfName.TR.Equals
-                (parent.Get(PdfName.S));
+            PdfName role = obj.GetAsName(PdfName.S);
+            return ((PdfName.TD.Equals(role) || PdfName.TH.Equals(role)) && PdfName.TR.Equals(parent.Get(PdfName.S))) 
+                || PdfName.TR.Equals(role);
         }
+//\endcond
 
         private static PdfDictionary CopyNamespaceDict(PdfDictionary srcNsDict, StructureTreeCopier.StructElemCopyingParams
              copyingParams) {
@@ -608,11 +634,12 @@ namespace iText.Kernel.Pdf.Tagging {
         }
 
         private static IList<PdfDictionary> RetrieveParents(PdfMcr mcr, bool all) {
-            IList<PdfDictionary> parents = new List<PdfDictionary>();
+            ICollection<PdfDictionary> parents = new LinkedHashSet<PdfDictionary>();
             IStructureNode firstParent = mcr.GetParent();
             PdfDictionary previous = null;
             PdfDictionary current = firstParent is PdfStructElem ? ((PdfStructElem)firstParent).GetPdfObject() : null;
-            while (current != null && !PdfName.StructTreeRoot.Equals(current.GetAsName(PdfName.Type))) {
+            while (current != null && !PdfName.StructTreeRoot.Equals(current.GetAsName(PdfName.Type)) && !parents.Contains
+                (current)) {
                 if (all) {
                     parents.Add(current);
                 }
@@ -622,14 +649,20 @@ namespace iText.Kernel.Pdf.Tagging {
             if (!all) {
                 parents.Add(previous);
             }
-            return parents;
+            return new List<PdfDictionary>(parents);
         }
 
+//\cond DO_NOT_DOCUMENT
         internal class LastClonedAncestor {
+//\cond DO_NOT_DOCUMENT
             internal PdfDictionary ancestor;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal PdfDictionary clone;
+//\endcond
         }
+//\endcond
 
         private class StructElemCopyingParams {
             private readonly ICollection<PdfObject> objectsToCopy;
@@ -695,4 +728,5 @@ namespace iText.Kernel.Pdf.Tagging {
             }
         }
     }
+//\endcond
 }

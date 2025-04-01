@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -755,16 +755,17 @@ namespace iText.Kernel.Utils {
             return markup;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal class CustomPdfAnnotationFlattenFactory : PdfAnnotationFlattenFactory {
             public override IAnnotationFlattener GetAnnotationFlattenWorker(PdfName name) {
                 if (PdfName.Link.Equals(name)) {
-                    return new _IAnnotationFlattener_872();
+                    return new _IAnnotationFlattener_871();
                 }
                 return base.GetAnnotationFlattenWorker(name);
             }
 
-            private sealed class _IAnnotationFlattener_872 : IAnnotationFlattener {
-                public _IAnnotationFlattener_872() {
+            private sealed class _IAnnotationFlattener_871 : IAnnotationFlattener {
+                public _IAnnotationFlattener_871() {
                 }
 
                 public bool Flatten(PdfAnnotation annotation, PdfPage page) {
@@ -773,5 +774,6 @@ namespace iText.Kernel.Utils {
                 }
             }
         }
+//\endcond
     }
 }

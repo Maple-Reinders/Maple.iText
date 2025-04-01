@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,8 +22,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
+using iText.Forms;
 using iText.Forms.Form;
 using iText.Forms.Form.Renderer;
+using iText.Kernel.Pdf.Tagutils;
 using iText.Layout.Properties;
 using iText.Layout.Renderer;
 
@@ -64,6 +66,10 @@ namespace iText.Forms.Form.Element {
 
                 case FormProperty.FORM_FIELD_SIZE: {
                     return (T1)(Object)4;
+                }
+
+                case FormProperty.LIST_BOX_TOP_INDEX: {
+                    return (T1)(Object)0;
                 }
 
                 default: {
@@ -123,6 +129,27 @@ namespace iText.Forms.Form.Element {
                 }
             }
             return selectedStrings;
+        }
+
+        /// <summary>Sets the index of the first visible option in a scrollable list.</summary>
+        /// <param name="topIndex">the index of the first option</param>
+        /// <returns>
+        /// this
+        /// <see cref="ListBoxField"/>
+        /// instance
+        /// </returns>
+        public virtual iText.Forms.Form.Element.ListBoxField SetTopIndex(int topIndex) {
+            SetProperty(FormProperty.LIST_BOX_TOP_INDEX, topIndex);
+            return this;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public override AccessibilityProperties GetAccessibilityProperties() {
+            if (tagProperties == null) {
+                tagProperties = new FormDefaultAccessibilityProperties(FormDefaultAccessibilityProperties.FORM_FIELD_LIST_BOX
+                    );
+            }
+            return tagProperties;
         }
 
         protected override IRenderer MakeNewRenderer() {

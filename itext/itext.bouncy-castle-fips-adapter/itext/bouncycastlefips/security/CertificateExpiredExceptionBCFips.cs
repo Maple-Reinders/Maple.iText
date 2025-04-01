@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -26,7 +26,7 @@ using iText.Commons.Utils;
 using Org.BouncyCastle.Cert;
 
 namespace iText.Bouncycastlefips.Security {
-    /// <summary>Wrapper class for <see cref="ExpiredExceptionBCFips"/>.</summary>
+    /// <summary>Wrapper class for <see cref="CertificateExpiredException"/>.</summary>
     public class CertificateExpiredExceptionBCFips : AbstractCertificateExpiredException {
         private readonly CertificateExpiredException exception;
 

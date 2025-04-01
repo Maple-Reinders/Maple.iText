@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,13 +33,21 @@ namespace iText.Svg.Dummy.Renderers.Impl {
     /// for testing purposes
     /// </summary>
     public class DummySvgNodeRenderer : ISvgNodeRenderer {
+//\cond DO_NOT_DOCUMENT
         internal IDictionary<String, String> attributes;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal ISvgNodeRenderer parent;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal String name;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal bool drawn = false;
+//\endcond
 
         public DummySvgNodeRenderer()
             : this("dummy") {

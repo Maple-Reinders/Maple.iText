@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -25,6 +25,7 @@ using System.IO;
 using iText.StyledXmlParser.Exceptions;
 
 namespace iText.StyledXmlParser.Resolver.Resource {
+    //\cond DO_NOT_DOCUMENT 
     /// <summary>
     /// Implementation of the
     /// <see cref="System.IO.Stream"/>
@@ -145,4 +146,5 @@ namespace iText.StyledXmlParser.Resolver.Resource {
             }
         }
     }
+   //\endcond 
 }

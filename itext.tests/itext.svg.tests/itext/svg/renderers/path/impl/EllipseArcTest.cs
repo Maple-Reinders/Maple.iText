@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,8 +29,8 @@ namespace iText.Svg.Renderers.Path.Impl {
         private const double DELTA = 0.00001;
 
         private void AssertPointEqual(Point expected, Point actual) {
-            NUnit.Framework.Assert.AreEqual(expected.x, actual.x, DELTA);
-            NUnit.Framework.Assert.AreEqual(expected.y, actual.y, DELTA);
+            NUnit.Framework.Assert.AreEqual(expected.GetX(), actual.GetX(), DELTA);
+            NUnit.Framework.Assert.AreEqual(expected.GetY(), actual.GetY(), DELTA);
         }
 
         [NUnit.Framework.Test]

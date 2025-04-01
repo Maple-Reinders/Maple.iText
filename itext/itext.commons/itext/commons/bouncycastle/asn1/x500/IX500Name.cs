@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -20,6 +20,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using System;
 using iText.Commons.Bouncycastle.Asn1;
 
 namespace iText.Commons.Bouncycastle.Asn1.X500 {
@@ -28,5 +29,8 @@ namespace iText.Commons.Bouncycastle.Asn1.X500 {
     /// to switch between bouncy-castle and bouncy-castle FIPS implementations.
     /// </summary>
     public interface IX500Name : IAsn1Encodable {
+        /// <summary>Gets the RFC2253 name.</summary>
+        /// <returns>the RFC2253 name</returns>
+        String GetName();
     }
 }

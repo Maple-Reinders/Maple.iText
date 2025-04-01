@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -52,10 +52,16 @@ namespace iText.StyledXmlParser.Css.Resolve.Shorthand {
             shorthandResolvers.Put(CommonCssConstants.TEXT_DECORATION, new TextDecorationShorthandResolver());
             shorthandResolvers.Put(CommonCssConstants.FLEX, new FlexShorthandResolver());
             shorthandResolvers.Put(CommonCssConstants.FLEX_FLOW, new FlexFlowShorthandResolver());
-            shorthandResolvers.Put(CommonCssConstants.GAP, new GapShorthandResolver());
+            shorthandResolvers.Put(CommonCssConstants.GAP, new GapShorthandResolver(CommonCssConstants.GAP));
+            shorthandResolvers.Put(CommonCssConstants.GRID_GAP, new GapShorthandResolver(CommonCssConstants.GRID_GAP));
             shorthandResolvers.Put(CommonCssConstants.PLACE_ITEMS, new PlaceItemsShorthandResolver());
             shorthandResolvers.Put(CommonCssConstants.COLUMNS, new ColumnsShorthandResolver());
             shorthandResolvers.Put(CommonCssConstants.COLUMN_RULE, new ColumnRuleShortHandResolver());
+            shorthandResolvers.Put(CommonCssConstants.GRID_ROW, new GridRowShorthandResolver());
+            shorthandResolvers.Put(CommonCssConstants.GRID_COLUMN, new GridColumnShorthandResolver());
+            shorthandResolvers.Put(CommonCssConstants.GRID_TEMPLATE, new GridTemplateShorthandResolver());
+            shorthandResolvers.Put(CommonCssConstants.GRID, new GridShorthandResolver());
+            shorthandResolvers.Put(CommonCssConstants.MARKER, new MarkerShorthandResolver());
         }
 
         /// <summary>Gets a shorthand resolver.</summary>

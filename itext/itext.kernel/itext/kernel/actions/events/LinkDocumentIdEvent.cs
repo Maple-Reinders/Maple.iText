@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,7 +28,7 @@ using iText.Kernel.Pdf;
 
 namespace iText.Kernel.Actions.Events {
     /// <summary>
-    /// An event allows to associated some
+    /// An event allows to associate some
     /// <see cref="iText.Commons.Actions.Sequence.SequenceId"/>
     /// with
     /// <see cref="iText.Kernel.Pdf.PdfDocument"/>.

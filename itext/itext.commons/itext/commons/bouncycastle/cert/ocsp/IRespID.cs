@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -26,5 +26,12 @@ namespace iText.Commons.Bouncycastle.Cert.Ocsp {
     /// to switch between bouncy-castle and bouncy-castle FIPS implementations.
     /// </summary>
     public interface IRespID {
+        /// <summary>
+        /// Calls actual
+        /// <c>toASN1Primitive</c>
+        /// method for the wrapped BasicOCSPResp object.
+        /// </summary>
+        /// <returns>Responder ID as a ASN1 primitive.</returns>
+        IResponderID ToASN1Primitive();
     }
 }

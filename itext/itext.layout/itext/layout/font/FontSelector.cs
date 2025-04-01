@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -70,7 +70,7 @@ namespace iText.Layout.Font {
         /// </remarks>
         /// <returns>the best matched font</returns>
         public FontInfo BestMatch() {
-            // fonts is sorted best to worst, get(0) returns the best matched FontInfo
+            // Fonts are sorted best to worst, get(0) returns the best matched FontInfo
             return fonts[0];
         }
 
@@ -86,10 +86,15 @@ namespace iText.Layout.Font {
         }
 
         private class PdfFontComparator : IComparer<FontInfo> {
+//\cond DO_NOT_DOCUMENT
             internal IList<String> fontFamilies;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal IList<FontCharacteristics> fontStyles;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal PdfFontComparator(IList<String> fontFamilies, FontCharacteristics fc) {
                 this.fontFamilies = new List<String>();
                 this.fontStyles = new List<FontCharacteristics>();
@@ -104,6 +109,7 @@ namespace iText.Layout.Font {
                     this.fontStyles.Add(fc);
                 }
             }
+//\endcond
 
             public virtual int Compare(FontInfo o1, FontInfo o2) {
                 int res = 0;

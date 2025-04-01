@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -28,6 +28,7 @@ using System.Text;
 using iText.Commons.Utils.Collections;
 
 namespace iText.IO {
+    //\cond DO_NOT_DOCUMENT 
     internal static class IOExtensions {
         public static String JSubstring(this String str, int beginIndex, int endIndex) {
             return str.Substring(beginIndex, endIndex - beginIndex);
@@ -182,4 +183,5 @@ namespace iText.IO {
 #endif
         }
     }
+   //\endcond 
 }

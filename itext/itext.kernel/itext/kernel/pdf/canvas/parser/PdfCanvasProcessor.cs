@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -1077,6 +1077,7 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
                 processor.GetGraphicsState().SetFillColor(Color.MakeColor(pdfColorSpace));
             }
 
+//\cond DO_NOT_DOCUMENT
             internal static PdfColorSpace DetermineColorSpace(PdfName colorSpace, PdfCanvasProcessor processor) {
                 PdfColorSpace pdfColorSpace;
                 if (PdfColorSpace.DIRECT_COLOR_SPACES.Contains(colorSpace)) {
@@ -1089,6 +1090,7 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
                 }
                 return pdfColorSpace;
             }
+//\endcond
         }
 
         /// <summary>A handler that implements operator (cs).</summary>
@@ -1163,6 +1165,7 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
                     ()));
             }
 
+//\cond DO_NOT_DOCUMENT
             internal virtual PdfDictionary GetPropertiesDictionary(PdfObject operand1, PdfResources resources) {
                 if (operand1.IsDictionary()) {
                     return (PdfDictionary)operand1;
@@ -1184,6 +1187,7 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
                 }
                 return properties.GetAsDictionary(dictionaryName);
             }
+//\endcond
         }
 
         /// <summary>A handler that implements operator (EMC).</summary>

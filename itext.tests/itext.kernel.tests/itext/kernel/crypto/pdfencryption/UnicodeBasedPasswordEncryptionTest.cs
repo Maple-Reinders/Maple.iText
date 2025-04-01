@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -40,8 +40,10 @@ namespace iText.Kernel.Crypto.Pdfencryption {
 
         private static IDictionary<String, UnicodeBasedPasswordEncryptionTest.SaslPreparedString> nameToSaslPrepared;
 
+//\cond DO_NOT_DOCUMENT
         internal PdfEncryptionTestUtils encryptionUtil = new PdfEncryptionTestUtils(destinationFolder, sourceFolder
             );
+//\endcond
 
         static UnicodeBasedPasswordEncryptionTest() {
             // values are calculated with com.ibm.icu.text.StringPrep class in icu4j v58.2 lib
@@ -124,14 +126,20 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         
         */
         private class SaslPreparedString {
+//\cond DO_NOT_DOCUMENT
             internal String unicodeInputString;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal String preparedString;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal SaslPreparedString(String unicodeInputString, String preparedString) {
                 this.unicodeInputString = unicodeInputString;
                 this.preparedString = preparedString;
             }
+//\endcond
         }
 
         [NUnit.Framework.OneTimeSetUp]
@@ -177,7 +185,7 @@ namespace iText.Kernel.Crypto.Pdfencryption {
             document.Close();
             encryptionUtil.CheckDecryptedWithPasswordContent(destinationFolder + filename, ownerPassword, PdfEncryptionTestUtils
                 .PAGE_TEXT_CONTENT);
-            CompareTool compareTool = new CompareTool().EnableEncryptionCompare();
+            CompareTool compareTool = new CompareTool().EnableEncryptionCompare(false);
             String compareResult = compareTool.CompareByContent(destinationFolder + filename, sourceFolder + "cmp_" + 
                 filename, destinationFolder, "diff_", ownerPassword, ownerPassword);
             if (compareResult != null) {

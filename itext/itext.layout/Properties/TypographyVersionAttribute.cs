@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -23,6 +23,7 @@
 using System;
 
 namespace Versions.Attributes {
+    //\cond DO_NOT_DOCUMENT 
     [AttributeUsage(AttributeTargets.Assembly)]
     internal class TypographyVersionAttribute : Attribute {
         internal string TypographyVersion { get; private set; }
@@ -31,4 +32,5 @@ namespace Versions.Attributes {
             this.TypographyVersion = typographyVersion;
         }
     }
+    //\endcond 
 }

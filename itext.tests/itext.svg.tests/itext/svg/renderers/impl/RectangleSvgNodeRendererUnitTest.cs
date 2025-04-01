@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,7 +27,9 @@ namespace iText.Svg.Renderers.Impl {
     public class RectangleSvgNodeRendererUnitTest : ExtendedITextTest {
         private const float EPSILON = 0.00001f;
 
+//\cond DO_NOT_DOCUMENT
         internal RectangleSvgNodeRenderer renderer;
+//\endcond
 
         [NUnit.Framework.SetUp]
         public virtual void Setup() {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using iText.Kernel.Pdf;
 
 namespace iText.Kernel.Utils.Annotationsflattening {
+    /// <summary>Helper class to retrieve the annotation flatten worker for the specified annotation subtype.</summary>
     public class PdfAnnotationFlattenFactory {
         private static readonly Dictionary<PdfName, Func<IAnnotationFlattener>> map;
 

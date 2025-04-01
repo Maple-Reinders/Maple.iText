@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -34,24 +34,24 @@ namespace iText.IO.Font.Otf {
         }
 
         public override bool TransformOne(GlyphLine line) {
-            if (line.idx >= line.end) {
+            if (line.GetIdx() >= line.GetEnd()) {
                 return false;
             }
-            if (openReader.IsSkip(line.Get(line.idx).GetCode(), lookupFlag)) {
-                line.idx++;
+            if (openReader.IsSkip(line.Get(line.GetIdx()).GetCode(), lookupFlag)) {
+                line.SetIdx(line.GetIdx() + 1);
                 return false;
             }
-            int glyphCode = line.Get(line.idx).GetCode();
+            int glyphCode = line.Get(line.GetIdx()).GetCode();
             bool positionApplied = false;
             GposValueRecord valueRecord = valueRecordMap.Get(glyphCode);
             if (valueRecord != null) {
-                Glyph newGlyph = new Glyph(line.Get(line.idx));
-                newGlyph.SetXAdvance((short)(newGlyph.GetXAdvance() + valueRecord.XAdvance));
-                newGlyph.SetYAdvance((short)(newGlyph.GetYAdvance() + valueRecord.YAdvance));
-                line.Set(line.idx, newGlyph);
+                Glyph newGlyph = new Glyph(line.Get(line.GetIdx()));
+                newGlyph.SetXAdvance((short)(newGlyph.GetXAdvance() + valueRecord.GetXAdvance()));
+                newGlyph.SetYAdvance((short)(newGlyph.GetYAdvance() + valueRecord.GetYAdvance()));
+                line.Set(line.GetIdx(), newGlyph);
                 positionApplied = true;
             }
-            line.idx++;
+            line.SetIdx(line.GetIdx() + 1);
             return positionApplied;
         }
 

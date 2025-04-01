@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -52,7 +52,7 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         public virtual void CompareEncryptedPdf(String filename) {
             CheckDecryptedWithPasswordContent(destinationFolder + filename, OWNER, PAGE_TEXT_CONTENT);
             CheckDecryptedWithPasswordContent(destinationFolder + filename, USER, PAGE_TEXT_CONTENT);
-            CompareTool compareTool = new CompareTool().EnableEncryptionCompare();
+            CompareTool compareTool = new CompareTool().EnableEncryptionCompare(false);
             String compareResult = compareTool.CompareByContent(destinationFolder + filename, sourceFolder + "cmp_" + 
                 filename, destinationFolder, "diff_", USER, USER);
             if (compareResult != null) {

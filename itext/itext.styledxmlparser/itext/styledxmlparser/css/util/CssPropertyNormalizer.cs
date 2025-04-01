@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,11 +29,13 @@ using iText.Commons.Utils;
 using iText.StyledXmlParser;
 
 namespace iText.StyledXmlParser.Css.Util {
+//\cond DO_NOT_DOCUMENT
     /// <summary>Utilities class with functionality to normalize CSS properties.</summary>
     internal class CssPropertyNormalizer {
         private static readonly Regex URL_PATTERN = PortUtil.CreateRegexPatternWithDotMatchingNewlines("^[uU][rR][lL]\\("
             );
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Normalize a property.</summary>
         /// <param name="str">the property</param>
         /// <returns>the normalized property</returns>
@@ -81,6 +83,7 @@ namespace iText.StyledXmlParser.Css.Util {
             }
             return sb.ToString();
         }
+//\endcond
 
         /// <summary>Appends quoted string.</summary>
         /// <param name="buffer">the current buffer</param>
@@ -108,7 +111,7 @@ namespace iText.StyledXmlParser.Css.Util {
         /// <param name="start">where to start in the source. Should point at first symbol after "url(".</param>
         /// <returns>the new position in the source</returns>
         private static int AppendUrlContent(StringBuilder buffer, String source, int start) {
-            while (iText.IO.Util.TextUtil.IsWhiteSpace(source[start]) && start < source.Length) {
+            while (start < source.Length && iText.IO.Util.TextUtil.IsWhiteSpace(source[start])) {
                 ++start;
             }
             if (start < source.Length) {
@@ -152,4 +155,5 @@ namespace iText.StyledXmlParser.Css.Util {
             return ch == ',' || ch == ')';
         }
     }
+//\endcond
 }

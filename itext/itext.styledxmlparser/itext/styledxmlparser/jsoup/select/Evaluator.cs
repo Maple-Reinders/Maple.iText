@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -244,9 +244,13 @@ namespace iText.StyledXmlParser.Jsoup.Select {
 
         /// <summary>Evaluator for attribute name/value matching (value regex matching)</summary>
         public sealed class AttributeWithValueMatching : Evaluator {
+//\cond DO_NOT_DOCUMENT
             internal String key;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal Regex pattern;
+//\endcond
 
             public AttributeWithValueMatching(String key, Regex pattern) {
                 this.key = Normalizer.Normalize(key);
@@ -265,9 +269,13 @@ namespace iText.StyledXmlParser.Jsoup.Select {
 
         /// <summary>Abstract evaluator for attribute name/value matching</summary>
         public abstract class AttributeKeyPair : Evaluator {
+//\cond DO_NOT_DOCUMENT
             internal String key;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal String value;
+//\endcond
 
             public AttributeKeyPair(String key, String value)
                 : this(key, value, true) {
@@ -607,7 +615,9 @@ namespace iText.StyledXmlParser.Jsoup.Select {
 
         /// <summary>Abstract evaluator for sibling index matching</summary>
         public abstract class IndexEvaluator : Evaluator {
+//\cond DO_NOT_DOCUMENT
             internal int index;
+//\endcond
 
             public IndexEvaluator(int index) {
                 this.index = index;

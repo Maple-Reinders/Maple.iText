@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,11 +33,13 @@ namespace iText.Layout.Font {
 
         private IList<Range.SubRange> ranges = new List<Range.SubRange>();
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Default Range instance.</summary>
         /// <returns>Range that contains any integer</returns>
         internal static Range GetFullRange() {
             return fullRangeSingleton;
         }
+//\endcond
 
         /// <summary>Default constructor with empty range.</summary>
         public RangeBuilder() {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -303,6 +303,17 @@ namespace iText.StyledXmlParser.Css.Util {
         public virtual void ParseLengthInvalidTest() {
             float result = CssDimensionParsingUtils.ParseLength("10cmm", 10, 2, 8, 9);
             NUnit.Framework.Assert.AreEqual(2, result, 0.0001f);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void ParseFlexTest() {
+            NUnit.Framework.Assert.AreEqual(13.3f, CssDimensionParsingUtils.ParseFlex("13.3fr"), 0.0001);
+            NUnit.Framework.Assert.AreEqual(13.3f, CssDimensionParsingUtils.ParseFlex("13.3fr "), 0.0001);
+            NUnit.Framework.Assert.AreEqual(13.3f, CssDimensionParsingUtils.ParseFlex(" 13.3fr "), 0.0001);
+            NUnit.Framework.Assert.IsNull(CssDimensionParsingUtils.ParseFlex("13.3 fr"));
+            NUnit.Framework.Assert.IsNull(CssDimensionParsingUtils.ParseFlex("13.3f"));
+            NUnit.Framework.Assert.IsNull(CssDimensionParsingUtils.ParseFlex("13.3"));
+            NUnit.Framework.Assert.IsNull(CssDimensionParsingUtils.ParseFlex(null));
         }
     }
 }

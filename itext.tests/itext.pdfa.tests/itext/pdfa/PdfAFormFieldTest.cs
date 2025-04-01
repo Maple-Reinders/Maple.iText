@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.IO;
+using iText.Commons.Utils;
 using iText.Forms;
 using iText.Forms.Fields;
 using iText.Forms.Fields.Properties;
@@ -63,19 +64,18 @@ namespace iText.Pdfa {
         [NUnit.Framework.Test]
         public virtual void PdfAButtonFieldTest() {
             PdfDocument pdf;
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
             String file = "pdfAButtonField.pdf";
             String filename = DESTINATION_FOLDER + file;
-            pdf = new PdfADocument(new PdfWriter(new FileStream(filename, FileMode.Create)), PdfAConformanceLevel.PDF_A_1B
-                , new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB ICC preference", @is));
+            pdf = new PdfADocument(new PdfWriter(FileUtil.GetFileOutputStream(filename)), PdfAConformance.PDF_A_1B, new 
+                PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB ICC preference", @is));
             PageSize pageSize = PageSize.LETTER;
             Document doc = new Document(pdf, pageSize);
             PdfFontFactory.Register(SOURCE_FOLDER + "FreeSans.ttf", SOURCE_FOLDER + "FreeSans.ttf");
             PdfFont font = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", PdfFontFactory.EmbeddingStrategy.
                 PREFER_EMBEDDED);
-            PdfButtonFormField group = new RadioFormFieldBuilder(pdf, "group").SetConformanceLevel(PdfAConformanceLevel
-                .PDF_A_1B).CreateRadioGroup();
+            PdfButtonFormField group = new RadioFormFieldBuilder(pdf, "group").SetConformance(PdfConformance.PDF_A_1B)
+                .CreateRadioGroup();
             group.SetValue("");
             group.SetReadOnly(true);
             Paragraph p = new Paragraph();
@@ -111,17 +111,16 @@ namespace iText.Pdfa {
             String name = "pdfA1DocWithPdfA1ButtonField";
             String fileName = DESTINATION_FOLDER + name + ".pdf";
             String cmp = SOURCE_FOLDER + "cmp/PdfAFormFieldTest/cmp_pdfA1DocWithPdfA1ButtonField.pdf";
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_1B;
-            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformanceLevel, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
+            PdfConformance conformance = PdfConformance.PDF_A_1B;
+            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformance.GetAConformance(), new PdfOutputIntent
+                ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
-            PdfFormField emptyField = new NonTerminalFormFieldBuilder(pdfDoc, "empty").SetConformanceLevel(conformanceLevel
-                ).CreateNonTerminalFormField();
+            PdfFormField emptyField = new NonTerminalFormFieldBuilder(pdfDoc, "empty").SetConformance(conformance).CreateNonTerminalFormField
+                ();
             emptyField.AddKid(new PushButtonFormFieldBuilder(pdfDoc, "button").SetWidgetRectangle(new Rectangle(36, 756
-                , 20, 20)).SetConformanceLevel(conformanceLevel).CreatePushButton().SetFieldFlags(PdfAnnotation.PRINT)
-                .SetFieldName("button").SetValue("hello"));
+                , 20, 20)).SetConformance(conformance).CreatePushButton().SetFieldFlags(PdfAnnotation.PRINT).SetFieldName
+                ("button").SetValue("hello"));
             form.AddField(emptyField);
             pdfDoc.Close();
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(fileName, cmp, DESTINATION_FOLDER));
@@ -134,15 +133,13 @@ namespace iText.Pdfa {
             String name = "pdfA1DocWithPdfA1CheckBoxField";
             String fileName = DESTINATION_FOLDER + name + ".pdf";
             String cmp = SOURCE_FOLDER + "cmp/PdfAFormFieldTest/cmp_pdfA1DocWithPdfA1CheckBoxField.pdf";
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_1B;
-            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformanceLevel, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
+            PdfConformance conformance = PdfConformance.PDF_A_1B;
+            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformance.GetAConformance(), new PdfOutputIntent
+                ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
             form.AddField(new CheckBoxFormFieldBuilder(pdfDoc, "checkBox").SetWidgetRectangle(new Rectangle(36, 726, 20
-                , 20)).SetCheckType(CheckBoxType.STAR).SetConformanceLevel(conformanceLevel).CreateCheckBox().SetValue
-                ("1"));
+                , 20)).SetCheckType(CheckBoxType.STAR).SetConformance(conformance).CreateCheckBox().SetValue("1"));
             pdfDoc.Close();
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(fileName, cmp, DESTINATION_FOLDER));
             NUnit.Framework.Assert.IsNull(new VeraPdfValidator().Validate(fileName));
@@ -157,18 +154,16 @@ namespace iText.Pdfa {
             String cmp = SOURCE_FOLDER + "cmp/PdfAFormFieldTest/cmp_pdfA1DocWithPdfA1ChoiceField.pdf";
             PdfFont fontFreeSans = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_1B;
-            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformanceLevel, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
+            PdfConformance conformance = PdfConformance.PDF_A_1B;
+            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformance.GetAConformance(), new PdfOutputIntent
+                ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
             PdfArray options = new PdfArray();
             options.Add(new PdfString("Name"));
             options.Add(new PdfString("Surname"));
             PdfFormField choiceFormField = new ChoiceFormFieldBuilder(pdfDoc, "choice").SetWidgetRectangle(new Rectangle
-                (36, 696, 100, 70)).SetOptions(options).SetConformanceLevel(conformanceLevel).CreateList().SetValue("1"
-                , true);
+                (36, 696, 100, 70)).SetOptions(options).SetConformance(conformance).CreateList().SetValue("1", true);
             choiceFormField.SetFont(fontFreeSans);
             form.AddField(choiceFormField);
             pdfDoc.Close();
@@ -184,14 +179,13 @@ namespace iText.Pdfa {
             String cmp = SOURCE_FOLDER + "cmp/PdfAFormFieldTest/cmp_pdfA1DocWithPdfA1ComboBoxField.pdf";
             PdfFont fontCJK = PdfFontFactory.CreateFont(SOURCE_FOLDER + "NotoSansCJKtc-Light.otf", PdfEncodings.IDENTITY_H
                 , PdfFontFactory.EmbeddingStrategy.FORCE_EMBEDDED);
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_1B;
-            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformanceLevel, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
+            PdfConformance conformance = PdfConformance.PDF_A_1B;
+            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformance.GetAConformance(), new PdfOutputIntent
+                ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
             PdfFormField choiceFormField = new ChoiceFormFieldBuilder(pdfDoc, "combo").SetWidgetRectangle(new Rectangle
-                (156, 616, 70, 70)).SetOptions(new String[] { "用", "规", "表" }).SetConformanceLevel(conformanceLevel).CreateComboBox
+                (156, 616, 70, 70)).SetOptions(new String[] { "用", "规", "表" }).SetConformance(conformance).CreateComboBox
                 ().SetValue("用");
             choiceFormField.SetFont(fontCJK);
             form.AddField(choiceFormField);
@@ -202,25 +196,24 @@ namespace iText.Pdfa {
 
         // Android-Conversion-Skip-Line (TODO DEVSIX-7377 introduce pdf\a validation on Android)
         [NUnit.Framework.Test]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.MULTIPLE_VALUES_ON_A_NON_MULTISELECT_FIELD)]
         public virtual void PdfA1DocWithPdfA1ListFieldTest() {
             String name = "pdfA1DocWithPdfA1ListField";
             String fileName = DESTINATION_FOLDER + name + ".pdf";
             String cmp = SOURCE_FOLDER + "cmp/PdfAFormFieldTest/cmp_pdfA1DocWithPdfA1ListField.pdf";
             PdfFont fontFreeSans = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_1B;
-            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformanceLevel, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
+            PdfConformance conformance = PdfConformance.PDF_A_1B;
+            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformance.GetAConformance(), new PdfOutputIntent
+                ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
             PdfChoiceFormField f = new ChoiceFormFieldBuilder(pdfDoc, "list").SetWidgetRectangle(new Rectangle(86, 556
-                , 50, 200)).SetOptions(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" }).SetConformanceLevel
-                (conformanceLevel).CreateList();
+                , 50, 200)).SetOptions(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" }).SetConformance
+                (conformance).CreateList();
             f.SetValue("9").SetFont(fontFreeSans);
             f.SetValue("4");
             f.SetTopIndex(2);
+            f.SetMultiSelect(true);
             f.SetListSelected(new String[] { "3", "5" });
             form.AddField(f);
             pdfDoc.Close();
@@ -236,15 +229,13 @@ namespace iText.Pdfa {
             String cmp = SOURCE_FOLDER + "cmp/PdfAFormFieldTest/cmp_pdfA1DocWithPdfA1PushButtonField.pdf";
             PdfFont fontFreeSans = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_1B;
-            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformanceLevel, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
+            PdfConformance conformance = PdfConformance.PDF_A_1B;
+            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformance.GetAConformance(), new PdfOutputIntent
+                ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
             PdfFormField pushButtonFormField = new PushButtonFormFieldBuilder(pdfDoc, "push button").SetWidgetRectangle
-                (new Rectangle(36, 526, 100, 20)).SetCaption("Push").SetConformanceLevel(conformanceLevel).CreatePushButton
-                ();
+                (new Rectangle(36, 526, 100, 20)).SetCaption("Push").SetConformance(conformance).CreatePushButton();
             pushButtonFormField.SetFont(fontFreeSans).SetFontSize(12);
             form.AddField(pushButtonFormField);
             pdfDoc.Close();
@@ -258,16 +249,15 @@ namespace iText.Pdfa {
             String name = "pdfA1DocWithPdfA1RadioButtonField";
             String fileName = DESTINATION_FOLDER + name + ".pdf";
             String cmp = SOURCE_FOLDER + "cmp/PdfAFormFieldTest/cmp_pdfA1DocWithPdfA1RadioButtonField.pdf";
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_1B;
-            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformanceLevel, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
+            PdfConformance conformance = PdfConformance.PDF_A_1B;
+            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformance.GetAConformance(), new PdfOutputIntent
+                ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
             String pdfFormFieldName = "radio group";
-            RadioFormFieldBuilder builder = new RadioFormFieldBuilder(pdfDoc, pdfFormFieldName).SetConformanceLevel(conformanceLevel
+            RadioFormFieldBuilder builder = new RadioFormFieldBuilder(pdfDoc, pdfFormFieldName).SetConformance(conformance
                 );
-            PdfButtonFormField radioGroup = builder.SetConformanceLevel(conformanceLevel).CreateRadioGroup();
+            PdfButtonFormField radioGroup = builder.SetConformance(conformance).CreateRadioGroup();
             radioGroup.SetValue("");
             PdfFormAnnotation radio1 = builder.CreateRadioButton("1", new Rectangle(36, 496, 20, 20)).SetBorderWidth(2
                 ).SetBorderColor(ColorConstants.ORANGE);
@@ -290,15 +280,13 @@ namespace iText.Pdfa {
             PdfFont fontFreeSans = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
             fontFreeSans.SetSubset(false);
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_1B;
-            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformanceLevel, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
+            PdfConformance conformance = PdfConformance.PDF_A_1B;
+            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformance.GetAConformance(), new PdfOutputIntent
+                ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
             PdfFormField textFormField = new TextFormFieldBuilder(pdfDoc, "text").SetWidgetRectangle(new Rectangle(36, 
-                466, 90, 20)).SetConformanceLevel(conformanceLevel).CreateText().SetValue("textField").SetValue("iText"
-                );
+                466, 90, 20)).SetConformance(conformance).CreateText().SetValue("textField").SetValue("iText");
             textFormField.SetFont(fontFreeSans).SetFontSize(12);
             form.AddField(textFormField);
             pdfDoc.Close();
@@ -315,13 +303,12 @@ namespace iText.Pdfa {
             PdfFont fontFreeSans = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
             fontFreeSans.SetSubset(false);
-            Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                );
-            PdfAConformanceLevel conformanceLevel = PdfAConformanceLevel.PDF_A_1B;
-            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformanceLevel, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
+            PdfConformance conformance = PdfConformance.PDF_A_1B;
+            PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), conformance.GetAConformance(), new PdfOutputIntent
+                ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
-            PdfFormField signFormField = new SignatureFormFieldBuilder(pdfDoc, "signature").SetConformanceLevel(conformanceLevel
+            PdfFormField signFormField = new SignatureFormFieldBuilder(pdfDoc, "signature").SetConformance(conformance
                 ).CreateSignature();
             signFormField.SetFont(fontFreeSans).SetFontSize(20);
             form.AddField(signFormField);
@@ -335,17 +322,15 @@ namespace iText.Pdfa {
         public virtual void MergePdfADocWithFormTest() {
             String fileName = DESTINATION_FOLDER + "pdfADocWithTextFormField.pdf";
             String mergedDocFileName = DESTINATION_FOLDER + "mergedPdfADoc.pdf";
-            using (Stream @is = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                )) {
-                using (PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), PdfAConformanceLevel.PDF_A_1B, new 
-                    PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB ICC preference", @is))) {
+            using (Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm")) {
+                using (PdfADocument pdfDoc = new PdfADocument(new PdfWriter(fileName), PdfAConformance.PDF_A_1B, new PdfOutputIntent
+                    ("Custom", "", "http://www.color.org", "sRGB ICC preference", @is))) {
                     using (Document doc = new Document(pdfDoc)) {
                         PdfFont font = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", PdfEncodings.WINANSI);
                         doc.Add(new Paragraph(new Text("Some text").SetFont(font).SetFontSize(10)));
                         PdfAcroForm form = PdfFormCreator.GetAcroForm(pdfDoc, true);
                         PdfFormField field = new TextFormFieldBuilder(pdfDoc, "text").SetWidgetRectangle(new Rectangle(150, 100, 100
-                            , 20)).SetConformanceLevel(PdfAConformanceLevel.PDF_A_1B).CreateText().SetValue("textField").SetFieldName
-                            ("text");
+                            , 20)).SetConformance(PdfConformance.PDF_A_1B).CreateText().SetValue("textField").SetFieldName("text");
                         field.SetFont(font).SetFontSize(10);
                         field.GetFirstFormAnnotation().SetPage(1);
                         form.AddField(field, pdfDoc.GetPage(1));
@@ -355,11 +340,10 @@ namespace iText.Pdfa {
             NUnit.Framework.Assert.IsNull(new VeraPdfValidator().Validate(fileName));
             // Android-Conversion-Skip-Line (TODO DEVSIX-7377 introduce pdf\a validation on Android)
             PdfADocument pdfDocToMerge;
-            using (Stream is_1 = new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                )) {
+            using (Stream is_1 = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm")) {
                 using (PdfDocument newDoc = new PdfDocument(new PdfReader(fileName))) {
-                    pdfDocToMerge = new PdfADocument(new PdfWriter(mergedDocFileName).SetSmartMode(true), PdfAConformanceLevel
-                        .PDF_A_1B, new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB ICC preference", is_1));
+                    pdfDocToMerge = new PdfADocument(new PdfWriter(mergedDocFileName).SetSmartMode(true), PdfAConformance.PDF_A_1B
+                        , new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB ICC preference", is_1));
                     newDoc.CopyPagesTo(1, newDoc.GetNumberOfPages(), pdfDocToMerge, new PdfPageFormCopier());
                 }
             }
@@ -427,7 +411,7 @@ namespace iText.Pdfa {
                 CheckBox checkBox = new CheckBox("CheckBox");
                 checkBox.SetChecked(true);
                 checkBox.SetInteractive(true);
-                checkBox.SetPdfAConformanceLevel(PdfAConformanceLevel.PDF_A_1A);
+                checkBox.SetPdfConformance(PdfConformance.PDF_A_1A);
                 doc.Add(checkBox);
             }
             );
@@ -443,7 +427,11 @@ namespace iText.Pdfa {
                 foreach (Func<IFormField> formFieldSupplier in GenerateFormFields()) {
                     IFormField formField = formFieldSupplier();
                     formField.SetProperty(Property.FONT, font);
-                    formField.SetProperty(Property.BORDER, new SolidBorder(ColorConstants.BLACK, 1));
+                    SolidBorder border = new SolidBorder(ColorConstants.BLACK, 1);
+                    formField.SetProperty(Property.BORDER_TOP, border);
+                    formField.SetProperty(Property.BORDER_RIGHT, border);
+                    formField.SetProperty(Property.BORDER_BOTTOM, border);
+                    formField.SetProperty(Property.BORDER_LEFT, border);
                     formField.SetInteractive(true);
                     document.Add(formField);
                 }
@@ -460,7 +448,11 @@ namespace iText.Pdfa {
                 foreach (Func<IFormField> formFieldSupplier in GenerateFormFields()) {
                     IFormField formField = formFieldSupplier();
                     formField.SetProperty(Property.FONT, font);
-                    formField.SetProperty(Property.BORDER, new SolidBorder(ColorConstants.BLACK, 1));
+                    SolidBorder border = new SolidBorder(ColorConstants.BLACK, 1);
+                    formField.SetProperty(Property.BORDER_TOP, border);
+                    formField.SetProperty(Property.BORDER_RIGHT, border);
+                    formField.SetProperty(Property.BORDER_BOTTOM, border);
+                    formField.SetProperty(Property.BORDER_LEFT, border);
                     formField.SetInteractive(true);
                     document.Add(formField);
                 }
@@ -489,7 +481,11 @@ namespace iText.Pdfa {
                 document.SetFont(font);
                 foreach (Func<IFormField> formFieldSupplier in GenerateFormFields()) {
                     IFormField formField = formFieldSupplier();
-                    formField.SetProperty(Property.BORDER, new SolidBorder(ColorConstants.BLACK, 1));
+                    SolidBorder border = new SolidBorder(ColorConstants.BLACK, 1);
+                    formField.SetProperty(Property.BORDER_TOP, border);
+                    formField.SetProperty(Property.BORDER_RIGHT, border);
+                    formField.SetProperty(Property.BORDER_BOTTOM, border);
+                    formField.SetProperty(Property.BORDER_LEFT, border);
                     formField.SetProperty(Property.FONT, font);
                     formField.SetInteractive(true);
                     document.Add(formField);
@@ -508,7 +504,11 @@ namespace iText.Pdfa {
                 foreach (Func<IFormField> formFieldSupplier in GenerateFormFields()) {
                     IFormField formField = formFieldSupplier();
                     formField.SetProperty(Property.FONT, font);
-                    formField.SetProperty(Property.BORDER, new SolidBorder(ColorConstants.BLACK, 1));
+                    SolidBorder border = new SolidBorder(ColorConstants.BLACK, 1);
+                    formField.SetProperty(Property.BORDER_TOP, border);
+                    formField.SetProperty(Property.BORDER_RIGHT, border);
+                    formField.SetProperty(Property.BORDER_BOTTOM, border);
+                    formField.SetProperty(Property.BORDER_LEFT, border);
                     formField.SetInteractive(false);
                     document.Add(formField);
                 }
@@ -526,7 +526,11 @@ namespace iText.Pdfa {
                 document.SetFont(font);
                 foreach (Func<IFormField> formFieldSupplier in GenerateFormFields()) {
                     IFormField formField = formFieldSupplier();
-                    formField.SetProperty(Property.BORDER, new SolidBorder(ColorConstants.BLACK, 1));
+                    SolidBorder border = new SolidBorder(ColorConstants.BLACK, 1);
+                    formField.SetProperty(Property.BORDER_TOP, border);
+                    formField.SetProperty(Property.BORDER_RIGHT, border);
+                    formField.SetProperty(Property.BORDER_BOTTOM, border);
+                    formField.SetProperty(Property.BORDER_LEFT, border);
                     formField.SetProperty(Property.FONT, font);
                     formField.SetInteractive(false);
                     document.Add(formField);
@@ -543,17 +547,17 @@ namespace iText.Pdfa {
             PdfFont font = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
             PdfWriter writer = new PdfWriter(simplePdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4E, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm"
-                , FileMode.Open, FileAccess.Read)));
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4E, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm"))
+                );
             Document document = new Document(doc);
             document.Add(new InputField("inputfield1").SetFont(font).SetInteractive(true).SetValue("Hello there"));
             document.Add(new Paragraph("Hello there paragraph").SetFont(font));
             doc.Close();
             PdfWriter writer2 = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            PdfADocument doc2 = new PdfADocument(writer2, PdfAConformanceLevel.PDF_A_4, new PdfOutputIntent("Custom", 
-                "", "http://www.color.org", "sRGB IEC61966-2.1", new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm"
-                , FileMode.Open, FileAccess.Read)));
+            PdfADocument doc2 = new PdfADocument(writer2, PdfAConformance.PDF_A_4, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm"))
+                );
             PdfDocument docToCopy = new PdfDocument(new PdfReader(simplePdf));
             docToCopy.CopyPagesTo(1, 1, doc2, new PdfPageFormCopier());
             docToCopy.Close();
@@ -584,8 +588,7 @@ namespace iText.Pdfa {
                 signatureFieldAppearance2.SetContent(new SignedAppearanceText().SetLocationLine("Byeeee"));
                 signatureFieldAppearance2.SetInteractive(true);
                 PdfSignatureFormField signatureFormField = signatureFormFieldBuilder.SetWidgetRectangle(new Rectangle(200, 
-                    200, 40, 40)).SetFont(fontFreeSans).SetConformanceLevel(PdfAConformanceLevel.PDF_A_4).CreateSignature(
-                    );
+                    200, 40, 40)).SetFont(fontFreeSans).SetConformance(PdfConformance.PDF_A_4).CreateSignature();
                 signatureFormField.GetFirstFormAnnotation().SetFormFieldElement(signatureFieldAppearance2);
                 form.AddField(signatureFormField);
             }
@@ -594,9 +597,9 @@ namespace iText.Pdfa {
 
         private void MakePdfDocument(String outPdf, String cmp, Action<Document> consumer) {
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4E, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", new FileStream(SOURCE_FOLDER + "sRGB Color Space Profile.icm"
-                , FileMode.Open, FileAccess.Read)));
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4E, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm"))
+                );
             Document document = new Document(doc);
             consumer(document);
             doc.Close();
@@ -613,14 +616,14 @@ namespace iText.Pdfa {
             inputs.Add(() => {
                 CheckBox checkBox = new CheckBox("CheckBox");
                 checkBox.SetChecked(true);
-                checkBox.SetPdfAConformanceLevel(PdfAConformanceLevel.PDF_A_4);
+                checkBox.SetPdfConformance(PdfConformance.PDF_A_4);
                 return checkBox;
             }
             );
             inputs.Add(() => {
                 CheckBox checkBox = new CheckBox("CheckBox1");
                 checkBox.SetChecked(false);
-                checkBox.SetPdfAConformanceLevel(PdfAConformanceLevel.PDF_A_4);
+                checkBox.SetPdfConformance(PdfConformance.PDF_A_4);
                 return checkBox;
             }
             );
@@ -690,6 +693,7 @@ namespace iText.Pdfa {
             return inputs;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal class PdfAButtonFieldTestRenderer : ParagraphRenderer {
             private PdfButtonFormField _group;
 
@@ -706,8 +710,8 @@ namespace iText.Pdfa {
                 Rectangle bbox = GetInnerAreaBBox();
                 PdfDocument pdf = context.GetDocument();
                 PdfAcroForm form = PdfFormCreator.GetAcroForm(pdf, true);
-                PdfFormAnnotation chk = new RadioFormFieldBuilder(pdf, "").SetConformanceLevel(PdfAConformanceLevel.PDF_A_1B
-                    ).CreateRadioButton(_value, bbox);
+                PdfFormAnnotation chk = new RadioFormFieldBuilder(pdf, "").SetConformance(PdfConformance.PDF_A_1B).CreateRadioButton
+                    (_value, bbox);
                 _group.AddKid(chk);
                 chk.SetPage(pageNumber);
                 chk.SetVisibility(PdfFormAnnotation.VISIBLE);
@@ -728,5 +732,6 @@ namespace iText.Pdfa {
                 return new PdfAFormFieldTest.PdfAButtonFieldTestRenderer((Paragraph)modelElement, _group, _value);
             }
         }
+//\endcond
     }
 }

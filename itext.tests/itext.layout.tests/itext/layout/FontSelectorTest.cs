@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,7 +22,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
-using System.IO;
 using iText.Commons.Utils;
 using iText.IO.Font;
 using iText.IO.Font.Constants;
@@ -32,6 +31,7 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Utils;
 using iText.Layout.Element;
 using iText.Layout.Font;
+using iText.Layout.Font.Selectorstrategy;
 using iText.Layout.Properties;
 using iText.Test;
 
@@ -63,7 +63,7 @@ namespace iText.Layout {
             NUnit.Framework.Assert.IsTrue(sel.GetFontSet().AddFont(fontsFolder + "Puritan2.otf", PdfEncodings.IDENTITY_H
                 , "Puritan42"));
             String s = "Hello world! Здравствуй мир! Hello world! Здравствуй мир!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             doc.SetProperty(Property.FONT, new String[] { "Puritan42" });
@@ -85,7 +85,7 @@ namespace iText.Layout {
             NUnit.Framework.Assert.IsTrue(sel.AddFont(fontsFolder + "NotoSans-Regular.ttf"));
             NUnit.Framework.Assert.IsTrue(sel.AddFont(fontsFolder + "FreeSans.ttf"));
             String s = "Hello world! Здравствуй мир! Hello world! Здравствуй мир!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             doc.SetFontFamily("Puritan 2.0", "FreeSans");
@@ -107,7 +107,7 @@ namespace iText.Layout {
             NUnit.Framework.Assert.IsTrue(sel.AddFont(fontsFolder + "NotoSans-Regular.ttf"));
             NUnit.Framework.Assert.IsTrue(sel.AddFont(fontsFolder + "Puritan2.otf"));
             String s = "Hello world! Здравствуй мир! Hello world! Здравствуй мир!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             doc.SetFontFamily(JavaUtil.ArraysAsList("Puritan 2.0", "Noto Sans"));
@@ -129,7 +129,7 @@ namespace iText.Layout {
             NUnit.Framework.Assert.IsTrue(sel.AddFont(fontsFolder + "NotoSans-Regular.ttf"));
             NUnit.Framework.Assert.IsTrue(sel.AddFont(fontsFolder + "Puritan2.otf"));
             String s = "Hello world! Здравствуй мир! Hello world! Здравствуй мир!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             doc.SetProperty(Property.FONT, "'Puritan', \"FreeSans\"");
@@ -153,7 +153,7 @@ namespace iText.Layout {
             FontProvider sel = new FontProvider();
             NUnit.Framework.Assert.IsTrue(sel.AddFont(fontsFolder + "Puritan2.otf"));
             String s = "Hello мир!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             doc.SetFontFamily("Puritan 2.0");
@@ -176,7 +176,7 @@ namespace iText.Layout {
             sel.GetFontSet().AddFont(StandardFonts.TIMES_ROMAN);
             // The provided alias is incorrect. It'll be used as a font's family, but since the name is invalid, the font shouldn't be selected
             sel.GetFontSet().AddFont(StandardFonts.TIMES_BOLD, null, "Times-Roman Bold");
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             Div div = new Div().SetFontFamily(StandardFonts.TIMES_ROMAN);
@@ -201,7 +201,7 @@ namespace iText.Layout {
             sel.GetFontSet().AddFont(StandardFonts.HELVETICA_BOLD);
             sel.GetFontSet().AddFont(StandardFonts.TIMES_ROMAN);
             sel.GetFontSet().AddFont(StandardFonts.TIMES_BOLD);
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             Div div = new Div().SetFontFamily(StandardFontFamilies.TIMES);
@@ -225,7 +225,7 @@ namespace iText.Layout {
             sel.GetFontSet().AddFont(StandardFonts.TIMES_ROMAN);
             // correct alias
             sel.GetFontSet().AddFont(StandardFonts.TIMES_BOLD);
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             Div div = new Div().SetFontFamily(StandardFontFamilies.TIMES);
@@ -246,7 +246,7 @@ namespace iText.Layout {
             FontProvider sel = new FontProvider();
             sel.AddStandardPdfFonts();
             String s = "Hello world!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             Paragraph paragraph = new Paragraph(s);
@@ -367,7 +367,7 @@ namespace iText.Layout {
             provider.GetFontSet().AddFont(fontsFolder + "Puritan2.otf", PdfEncodings.IDENTITY_H, japaneseAlias);
             provider.AddFont(fontsFolder + "FreeSans.ttf");
             String s = "Hello world!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(provider);
             Paragraph paragraph = new Paragraph(new Text(s).SetBackgroundColor(ColorConstants.LIGHT_GRAY));
@@ -391,7 +391,7 @@ namespace iText.Layout {
                 RangeBuilder(1024, 1279).Create()));
             NUnit.Framework.Assert.IsTrue(sel.GetFontSet().Size() == 2);
             String s = "Hello world! Здравствуй мир! Hello world! Здравствуй мир!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             doc.SetProperty(Property.FONT, new String[] { "FontAlias" });
@@ -405,10 +405,11 @@ namespace iText.Layout {
 
         [NUnit.Framework.Test]
         public virtual void NotSignificantCharacterOfTheFontWithUnicodeRange() {
-            // TODO update cmp after fix DEVSIX-2052
             String outFileName = destinationFolder + "notSignificantCharacterOfTheFontWithUnicodeRange.pdf";
             String cmpFileName = sourceFolder + "cmp_notSignificantCharacterOfTheFontWithUnicodeRange.pdf";
             FontProvider sel = new FontProvider();
+            sel.SetFontSelectorStrategyFactory(new BestMatchFontSelectorStrategy.BestMatchFontSelectorStrategyFactory(
+                ));
             NUnit.Framework.Assert.IsTrue(sel.GetFontSet().AddFont(fontsFolder + "NotoSansCJKjp-Bold.otf", null, "FontAlias"
                 , new RangeBuilder(117, 117).Create()));
             // just 'u' letter
@@ -427,19 +428,20 @@ namespace iText.Layout {
 
         [NUnit.Framework.Test]
         public virtual void CheckThreeFontsInOneLineWithUnicodeRange() {
-            // TODO update cmp after fix DEVSIX-2052
             String outFileName = destinationFolder + "checkThreeFontsInOneLineWithUnicodeRange.pdf";
             String cmpFileName = sourceFolder + "cmp_checkThreeFontsInOneLineWithUnicodeRange.pdf";
             FontProvider sel = new FontProvider();
+            sel.SetFontSelectorStrategyFactory(new BestMatchFontSelectorStrategy.BestMatchFontSelectorStrategyFactory(
+                ));
+            // 'a', 'b' and 'c' are in that interval
             NUnit.Framework.Assert.IsTrue(sel.GetFontSet().AddFont(fontsFolder + "NotoSansCJKjp-Bold.otf", null, "FontAlias"
                 , new RangeBuilder(97, 99).Create()));
-            // 'a', 'b' and 'c' are in that interval
+            // 'd', 'e' and 'f' are in that interval
             NUnit.Framework.Assert.IsTrue(sel.GetFontSet().AddFont(fontsFolder + "FreeSans.ttf", null, "FontAlias", new 
                 RangeBuilder(100, 102).Create()));
-            // 'd', 'e' and 'f' are in that interval
+            // 'x', 'y' and 'z' are in that interval
             NUnit.Framework.Assert.IsTrue(sel.GetFontSet().AddFont(fontsFolder + "Puritan2.otf", null, "FontAlias", new 
                 RangeBuilder(120, 122).Create()));
-            // 'x', 'y' and 'z' are in that interval
             PdfDocument pdfDoc = new PdfDocument(new PdfWriter(outFileName));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
@@ -463,7 +465,7 @@ namespace iText.Layout {
                 , new RangeBuilder(1024, 1279).Create()));
             NUnit.Framework.Assert.IsTrue(sel.GetFontSet().Size() == 2);
             String s = "Hello world! Здравствуй мир! Hello world! Здравствуй мир!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             doc.SetProperty(Property.FONT, new String[] { "FontAlias" });
@@ -488,7 +490,7 @@ namespace iText.Layout {
                 ));
             NUnit.Framework.Assert.IsTrue(sel.GetFontSet().Size() == 1);
             String s = "Hello world! Здравствуй мир! Hello world! Здравствуй мир!";
-            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create)));
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName)));
             Document doc = new Document(pdfDoc);
             doc.SetFontProvider(sel);
             doc.SetProperty(Property.FONT, new String[] { "FontAlias" });
@@ -947,6 +949,18 @@ namespace iText.Layout {
             // Between hairline (200) and regular (400)
             NUnit.Framework.Assert.AreEqual("Lato-Hairline", new FontSelector(set.GetFonts(), fontFamilies, fc).BestMatch
                 ().GetDescriptor().GetFontName());
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void MonospaceFontsTest() {
+            FontSet set = new FontSet();
+            set.AddFont(fontsFolder + "SpaceMono-Regular.ttf");
+            IList<String> fontFamilies = new List<String>();
+            fontFamilies.Add("SpaceMono");
+            FontCharacteristics fc = new FontCharacteristics();
+            FontSelector fontSelector = new FontSelector(set.GetFonts(), fontFamilies, fc);
+            NUnit.Framework.Assert.IsTrue(fontSelector.BestMatch().GetDescriptor().IsMonospace(), "Font is not recognized as monospace."
+                );
         }
 
         private void CheckSelector(ICollection<FontInfo> fontInfoCollection, String fontFamily, String expectedNormal

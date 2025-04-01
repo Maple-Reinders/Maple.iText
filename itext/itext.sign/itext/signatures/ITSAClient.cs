@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -20,7 +20,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-using iText.Commons.Bouncycastle.Crypto;
+using iText.Commons.Digest;
 
 namespace iText.Signatures {
     /// <summary>Time Stamp Authority client (caller) interface.</summary>
@@ -47,15 +47,15 @@ namespace iText.Signatures {
 
         /// <summary>
         /// Returns the
-        /// <see cref="iText.Commons.Bouncycastle.Crypto.IDigest"/>
+        /// <see cref="iText.Commons.Digest.IMessageDigest"/>
         /// to digest the data imprint
         /// </summary>
         /// <returns>
         /// The
-        /// <see cref="iText.Commons.Bouncycastle.Crypto.IDigest"/>
+        /// <see cref="iText.Commons.Digest.IMessageDigest"/>
         /// object.
         /// </returns>
-        IDigest GetMessageDigest();
+        IMessageDigest GetMessageDigest();
 
         /// <summary>Returns RFC 3161 timeStampToken.</summary>
         /// <param name="imprint">byte[] - data imprint to be time-stamped</param>

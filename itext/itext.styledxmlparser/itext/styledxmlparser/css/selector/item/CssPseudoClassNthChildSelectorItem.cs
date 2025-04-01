@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,9 +24,13 @@ using System;
 using iText.StyledXmlParser.Css;
 
 namespace iText.StyledXmlParser.Css.Selector.Item {
+//\cond DO_NOT_DOCUMENT
     internal class CssPseudoClassNthChildSelectorItem : CssPseudoClassNthSelectorItem {
+//\cond DO_NOT_DOCUMENT
         internal CssPseudoClassNthChildSelectorItem(String arguments)
             : base(CommonCssConstants.NTH_CHILD, arguments) {
         }
+//\endcond
     }
+//\endcond
 }

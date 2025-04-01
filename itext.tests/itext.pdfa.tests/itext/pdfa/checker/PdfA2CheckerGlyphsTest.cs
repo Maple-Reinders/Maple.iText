@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -32,7 +32,7 @@ using iText.Test;
 namespace iText.Pdfa.Checker {
     [NUnit.Framework.Category("UnitTest")]
     public class PdfA2CheckerGlyphsTest : ExtendedITextTest {
-        private readonly PdfA2Checker pdfA2Checker = new PdfA2Checker(PdfAConformanceLevel.PDF_A_2B);
+        private readonly PdfA2Checker pdfA2Checker = new PdfA2Checker(PdfAConformance.PDF_A_2B);
 
         [NUnit.Framework.SetUp]
         public virtual void Before() {

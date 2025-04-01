@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
+using iText.Commons.Utils;
 using iText.Kernel.Exceptions;
 using iText.Test;
 using iText.Test.Attributes;
@@ -35,7 +36,7 @@ namespace iText.Kernel.Pdf {
         [NUnit.Framework.Test]
         public virtual void NoMemoryHandlerTest() {
             using (PdfDocument pdfDocument = new PdfDocument(new PdfWriter(new MemoryStream()))) {
-                using (FileStream @is = new FileStream(SOURCE_FOLDER + "stream", FileMode.Open, FileAccess.Read)) {
+                using (Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "stream")) {
                     byte[] b = new byte[51];
                     @is.Read(b);
                     PdfArray array = new PdfArray();
@@ -57,7 +58,7 @@ namespace iText.Kernel.Pdf {
 
         [NUnit.Framework.Test]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.INVALID_INDIRECT_REFERENCE)]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE)]
         public virtual void DefaultMemoryHandlerTest() {
             using (PdfDocument pdfDocument = new PdfDocument(new PdfReader(SOURCE_FOLDER + "timing.pdf"), new PdfWriter
                 (new MemoryStream()))) {
@@ -77,7 +78,7 @@ namespace iText.Kernel.Pdf {
 
         [NUnit.Framework.Test]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.INVALID_INDIRECT_REFERENCE)]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE)]
         public virtual void CustomMemoryHandlerSingleTest() {
             MemoryLimitsAwareHandler handler = new MemoryLimitsAwareHandler();
             handler.SetMaxSizeOfSingleDecompressedPdfStream(1000);
@@ -102,7 +103,7 @@ namespace iText.Kernel.Pdf {
 
         [NUnit.Framework.Test]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.INVALID_INDIRECT_REFERENCE)]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE)]
         public virtual void OneFilterCustomMemoryHandlerSingleTest() {
             MemoryLimitsAwareHandler handler = new MemoryLimitsAwareHandler();
             handler.SetMaxSizeOfSingleDecompressedPdfStream(20);
@@ -122,7 +123,7 @@ namespace iText.Kernel.Pdf {
 
         [NUnit.Framework.Test]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.INVALID_INDIRECT_REFERENCE)]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE)]
         public virtual void OverriddenMemoryHandlerAllStreamsAreSuspiciousTest() {
             MemoryLimitsAwareHandler handler = new _MemoryLimitsAwareHandler_174();
             handler.SetMaxSizeOfSingleDecompressedPdfStream(20);
@@ -152,7 +153,7 @@ namespace iText.Kernel.Pdf {
 
         [NUnit.Framework.Test]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.INVALID_INDIRECT_REFERENCE)]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE)]
         public virtual void OverriddenMemoryHandlerNoStreamsAreSuspiciousTest() {
             MemoryLimitsAwareHandler handler = new _MemoryLimitsAwareHandler_209();
             handler.SetMaxSizeOfSingleDecompressedPdfStream(20);
@@ -193,7 +194,7 @@ namespace iText.Kernel.Pdf {
 
         [NUnit.Framework.Test]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.INVALID_INDIRECT_REFERENCE)]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE)]
         public virtual void CustomMemoryHandlerSumTest() {
             MemoryLimitsAwareHandler handler = new MemoryLimitsAwareHandler();
             handler.SetMaxSizeOfDecompressedPdfStreamsSum(100000);
@@ -210,7 +211,7 @@ namespace iText.Kernel.Pdf {
 
         [NUnit.Framework.Test]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.INVALID_INDIRECT_REFERENCE)]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE)]
         public virtual void PageSumTest() {
             MemoryLimitsAwareHandler handler = new MemoryLimitsAwareHandler();
             handler.SetMaxSizeOfDecompressedPdfStreamsSum(1500000);
@@ -225,7 +226,7 @@ namespace iText.Kernel.Pdf {
 
         [NUnit.Framework.Test]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.INVALID_INDIRECT_REFERENCE)]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE)]
         public virtual void PageAsSingleStreamTest() {
             MemoryLimitsAwareHandler handler = new MemoryLimitsAwareHandler();
             handler.SetMaxSizeOfSingleDecompressedPdfStream(1500000);

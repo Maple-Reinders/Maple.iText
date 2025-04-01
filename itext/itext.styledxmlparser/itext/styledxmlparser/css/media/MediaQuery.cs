@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -38,6 +38,7 @@ namespace iText.StyledXmlParser.Css.Media {
         /// <summary>The expressions.</summary>
         private IList<MediaExpression> expressions;
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Creates a new
         /// <see cref="MediaQuery"/>
@@ -53,6 +54,7 @@ namespace iText.StyledXmlParser.Css.Media {
             this.only = only;
             this.not = not;
         }
+//\endcond
 
         /// <summary>Tries to match a device description with the media query.</summary>
         /// <param name="deviceDescription">the device description</param>

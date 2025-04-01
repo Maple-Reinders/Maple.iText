@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,27 +24,32 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using iText.Commons;
+using iText.Commons.Datastructures;
 using iText.Commons.Utils;
+using iText.Kernel.DI.Pagetree;
 using iText.Kernel.Exceptions;
 
 namespace iText.Kernel.Pdf {
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// Algorithm for construction
     /// <see cref="PdfPages"/>
     /// tree
     /// </summary>
     internal class PdfPagesTree {
+//\cond DO_NOT_DOCUMENT
         internal const int DEFAULT_LEAF_SIZE = 10;
+//\endcond
 
         private readonly int leafSize = DEFAULT_LEAF_SIZE;
 
-        private PdfPagesTree.NullUnlimitedList<PdfIndirectReference> pageRefs;
+        private ISimpleList<PdfIndirectReference> pageRefs;
 
         private IList<PdfPages> parents;
 
-        private PdfPagesTree.NullUnlimitedList<PdfPage> pages;
+        private ISimpleList<PdfPage> pages;
 
-        private PdfDocument document;
+        private readonly PdfDocument document;
 
         private bool generated = false;
 
@@ -60,14 +65,15 @@ namespace iText.Kernel.Pdf {
         /// </param>
         public PdfPagesTree(PdfCatalog pdfCatalog) {
             this.document = pdfCatalog.GetDocument();
-            this.pageRefs = new PdfPagesTree.NullUnlimitedList<PdfIndirectReference>();
             this.parents = new List<PdfPages>();
-            this.pages = new PdfPagesTree.NullUnlimitedList<PdfPage>();
+            IPageTreeListFactory pageTreeFactory = document.GetDiContainer().GetInstance<IPageTreeListFactory>();
             if (pdfCatalog.GetPdfObject().ContainsKey(PdfName.Pages)) {
                 PdfDictionary pages = pdfCatalog.GetPdfObject().GetAsDictionary(PdfName.Pages);
                 if (pages == null) {
                     throw new PdfException(KernelExceptionMessageConstant.INVALID_PAGE_STRUCTURE_PAGES_MUST_BE_PDF_DICTIONARY);
                 }
+                this.pages = pageTreeFactory.CreateList<PdfPage>(pages);
+                this.pageRefs = pageTreeFactory.CreateList<PdfIndirectReference>(pages);
                 this.root = new PdfPages(0, int.MaxValue, pages, null);
                 parents.Add(this.root);
                 for (int i = 0; i < this.root.GetCount(); i++) {
@@ -78,6 +84,8 @@ namespace iText.Kernel.Pdf {
             else {
                 this.root = null;
                 this.parents.Add(new PdfPages(0, this.document));
+                this.pages = pageTreeFactory.CreateList<PdfPage>(null);
+                this.pageRefs = pageTreeFactory.CreateList<PdfIndirectReference>(null);
             }
         }
 
@@ -270,6 +278,7 @@ namespace iText.Kernel.Pdf {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void ReleasePage(int pageNumber) {
             --pageNumber;
             if (pageRefs.Get(pageNumber) != null && !pageRefs.Get(pageNumber).CheckState(PdfObject.FLUSHED) && !pageRefs
@@ -278,6 +287,7 @@ namespace iText.Kernel.Pdf {
                 pages.Set(pageNumber, null);
             }
         }
+//\endcond
 
         /// <summary>Generate PdfPages tree.</summary>
         /// <returns>
@@ -518,113 +528,6 @@ namespace iText.Kernel.Pdf {
                 }
             }
         }
-
-        /// <summary>
-        /// The class represents a list which allows null elements, but doesn't allocate a memory for them, in the rest of
-        /// cases it behaves like usual
-        /// <see cref="System.Collections.ArrayList{E}"/>
-        /// and should have the same complexity (because keys are unique
-        /// integers, so collisions are impossible).
-        /// </summary>
-        /// <remarks>
-        /// The class represents a list which allows null elements, but doesn't allocate a memory for them, in the rest of
-        /// cases it behaves like usual
-        /// <see cref="System.Collections.ArrayList{E}"/>
-        /// and should have the same complexity (because keys are unique
-        /// integers, so collisions are impossible). Class doesn't implement
-        /// <c>List</c>
-        /// interface because it provides
-        /// only methods which are in use in
-        /// <see cref="PdfPagesTree"/>
-        /// class.
-        /// </remarks>
-        /// <typeparam name="T">elements of the list</typeparam>
-        internal sealed class NullUnlimitedList<T> {
-            private readonly IDictionary<int, T> map = new Dictionary<int, T>();
-
-            private int size = 0;
-
-            // O(1)
-            public void Add(T element) {
-                if (element == null) {
-                    size++;
-                    return;
-                }
-                map.Put(size++, element);
-            }
-
-            // In worth scenario O(n^2) but it is mostly impossible because keys shouldn't have
-            // collisions at all (they are integers). So in average should be O(n).
-            public void Add(int index, T element) {
-                if (index < 0 || index > size) {
-                    return;
-                }
-                size++;
-                // Shifts the element currently at that position (if any) and any
-                // subsequent elements to the right (adds one to their indices).
-                T previous = map.Get(index);
-                for (int i = index + 1; i < size; i++) {
-                    T currentToAdd = previous;
-                    previous = map.Get(i);
-                    this.Set(i, currentToAdd);
-                }
-                this.Set(index, element);
-            }
-
-            // average O(1), worth O(n) (mostly impossible in case when keys are integers)
-            public T Get(int index) {
-                return map.Get(index);
-            }
-
-            // average O(1), worth O(n) (mostly impossible in case when keys are integers)
-            public void Set(int index, T element) {
-                if (element == null) {
-                    map.JRemove(index);
-                }
-                else {
-                    map.Put(index, element);
-                }
-            }
-
-            // O(n)
-            public int IndexOf(T element) {
-                if (element == null) {
-                    for (int i = 0; i < size; i++) {
-                        if (!map.ContainsKey(i)) {
-                            return i;
-                        }
-                    }
-                    return -1;
-                }
-                foreach (KeyValuePair<int, T> entry in map) {
-                    if (element.Equals(entry.Value)) {
-                        return entry.Key;
-                    }
-                }
-                return -1;
-            }
-
-            // In worth scenario O(n^2) but it is mostly impossible because keys shouldn't have
-            // collisions at all (they are integers). So in average should be O(n).
-            public void Remove(int index) {
-                if (index < 0 || index >= size) {
-                    return;
-                }
-                map.JRemove(index);
-                // Shifts any subsequent elements to the left (subtracts one from their indices).
-                T previous = map.Get(size - 1);
-                for (int i = size - 2; i >= index; i--) {
-                    T current = previous;
-                    previous = map.Get(i);
-                    this.Set(i, current);
-                }
-                map.JRemove(--size);
-            }
-
-            // O(1)
-            public int Size() {
-                return size;
-            }
-        }
     }
+//\endcond
 }

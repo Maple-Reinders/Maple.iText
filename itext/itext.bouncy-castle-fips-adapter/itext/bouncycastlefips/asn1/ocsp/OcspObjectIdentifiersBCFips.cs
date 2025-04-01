@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -43,6 +43,9 @@ namespace iText.Bouncycastlefips.Asn1.Ocsp {
 
         private static readonly IDerObjectIdentifier ID_PKIX_OCSP_NOCHECK = new DerObjectIdentifierBCFips(OcspObjectIdentifiers
             .PkixOcspNocheck);
+
+        private static readonly IDerObjectIdentifier ID_PKIX_OCSP_ARCHIVE_CUTOFF = new DerObjectIdentifierBCFips(OcspObjectIdentifiers
+            .PkixOcspArchiveCutoff);
 
         private readonly OcspObjectIdentifiers ocspObjectIdentifiers;
 
@@ -91,6 +94,11 @@ namespace iText.Bouncycastlefips.Asn1.Ocsp {
         /// <summary><inheritDoc/></summary>
         public virtual IDerObjectIdentifier GetIdPkixOcspNoCheck() {
             return ID_PKIX_OCSP_NOCHECK;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public virtual IDerObjectIdentifier GetIdPkixOcspArchiveCutoff() {
+            return ID_PKIX_OCSP_ARCHIVE_CUTOFF;
         }
 
         /// <summary>Indicates whether some other object is "equal to" this one.</summary>

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -57,10 +57,10 @@ namespace iText.Pdfa {
             String outPdf = destinationFolder + "pdfA2b_fileSpecNonConformingTest01.pdf";
             String cmpPdf = cmpFolder + "cmp_pdfA2b_fileSpecNonConformingTest01.pdf";
             PdfWriter writer = new PdfWriter(outPdf);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_2B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_2B, outputIntent);
             PdfPage page = pdfDocument.AddNewPage();
             PdfFont font = PdfFontFactory.CreateFont(sourceFolder + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
@@ -80,17 +80,17 @@ namespace iText.Pdfa {
             String outPdf = destinationFolder + "pdfA2b_fileSpecCheckTest02.pdf";
             String cmpPdf = cmpFolder + "cmp_pdfA2b_fileSpecCheckTest02.pdf";
             PdfWriter writer = new PdfWriter(outPdf);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_2B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_2B, outputIntent);
             PdfPage page = pdfDocument.AddNewPage();
             PdfFont font = PdfFontFactory.CreateFont(sourceFolder + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
             PdfCanvas canvas = new PdfCanvas(page);
             canvas.SaveState().BeginText().MoveText(36, 700).SetFontAndSize(font, 36).ShowText("Hello World!").EndText
                 ().RestoreState();
-            FileStream fis = new FileStream(sourceFolder + "pdfs/pdfa.pdf", FileMode.Open, FileAccess.Read);
+            Stream fis = FileUtil.GetInputStreamForFile(sourceFolder + "pdfs/pdfa.pdf");
             MemoryStream os = new MemoryStream();
             byte[] buffer = new byte[1024];
             int length;
@@ -107,10 +107,10 @@ namespace iText.Pdfa {
         [LogMessage(PdfAConformanceLogMessageConstant.EMBEDDED_FILE_SHALL_BE_COMPLIANT_WITH_SPEC, Count = 1)]
         public virtual void FileSpecCheckTest03() {
             PdfWriter writer = new PdfWriter(new MemoryStream());
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
                 , @is);
-            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_2B, outputIntent);
+            PdfADocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_2B, outputIntent);
             PdfPage page = pdfDocument.AddNewPage();
             PdfFont font = PdfFontFactory.CreateFont(sourceFolder + "FreeSans.ttf", "WinAnsi", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);

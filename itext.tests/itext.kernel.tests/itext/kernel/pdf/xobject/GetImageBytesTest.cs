@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -209,13 +209,13 @@ namespace iText.Kernel.Pdf.Xobject {
             processor.ProcessPageContent(pdfDocument.GetPage(1));
             IList<byte[]> images = listener.GetImages();
             NUnit.Framework.Assert.AreEqual(1, images.Count);
-            using (FileStream fos = new FileStream(outImageFileName, FileMode.Create)) {
+            using (Stream fos = FileUtil.GetFileOutputStream(outImageFileName)) {
                 fos.Write(images[0], 0, images.Count);
             }
             // expected and actual are swapped here for simplicity
             int expectedLen = images[0].Length;
             byte[] buf = new byte[expectedLen];
-            using (FileStream @is = new FileStream(cmpImageFileName, FileMode.Open, FileAccess.Read)) {
+            using (Stream @is = FileUtil.GetInputStreamForFile(cmpImageFileName)) {
                 int read = @is.JRead(buf, 0, buf.Length);
                 NUnit.Framework.Assert.AreEqual(expectedLen, read);
                 read = @is.JRead(buf, 0, buf.Length);

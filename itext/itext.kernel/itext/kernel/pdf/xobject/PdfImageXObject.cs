@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -670,9 +670,13 @@ namespace iText.Kernel.Pdf.Xobject {
         }
 
         private class PngChromaticitiesHelper {
+//\cond DO_NOT_DOCUMENT
             internal float[] matrix = new float[9];
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal float[] wp = new float[3];
+//\endcond
 
             public virtual void ConstructMatrix(PngImageData pngImageData) {
                 PngChromaticities pngChromaticities = pngImageData.GetPngChromaticities();
