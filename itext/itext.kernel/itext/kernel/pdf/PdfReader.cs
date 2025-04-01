@@ -1595,10 +1595,11 @@ namespace iText.Kernel.Pdf {
                 if (reference.GetObjStreamNumber() > 0) {
                     PdfStream objectStream = (PdfStream)pdfDocument.GetXref().Get(reference.GetObjStreamNumber()).GetRefersTo(
                         false);
-                    if (objectStream == null) {
-                        throw new PdfException(MessageFormatUtil.Format(KernelExceptionMessageConstant.INVALID_OBJECT_STREAM_NUMBER
-                            , reference.GetObjNumber(), reference.GetObjStreamNumber(), reference.GetIndex()));
-                    }
+                    // Enforce Hacky fix implemented by Matthew K - April 1st 2025 to stop getting object indirect ref errors on mostly valid PDF's
+                    //if (objectStream == null) {
+                    //    throw new PdfException(MessageFormatUtil.Format(KernelExceptionMessageConstant.INVALID_OBJECT_STREAM_NUMBER
+                    //        , reference.GetObjNumber(), reference.GetObjStreamNumber(), reference.GetIndex()));
+                    //}
                     ReadObjectStream(objectStream);
                     return reference.refersTo;
                 }
