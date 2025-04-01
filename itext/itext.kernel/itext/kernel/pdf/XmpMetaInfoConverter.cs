@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,14 +28,15 @@ using iText.Kernel.XMP.Options;
 using iText.Kernel.XMP.Properties;
 
 namespace iText.Kernel.Pdf {
+//\cond DO_NOT_DOCUMENT
     internal class XmpMetaInfoConverter {
         private XmpMetaInfoConverter() {
         }
 
-        internal static void AppendMetadataToInfo(byte[] xmpMetadata, PdfDocumentInfo info) {
-            if (xmpMetadata != null) {
+//\cond DO_NOT_DOCUMENT
+        internal static void AppendMetadataToInfo(XMPMeta meta, PdfDocumentInfo info) {
+            if (meta != null) {
                 try {
-                    XMPMeta meta = XMPMetaFactory.ParseFromBuffer(xmpMetadata);
                     XMPProperty title = meta.GetLocalizedText(XMPConst.NS_DC, PdfConst.Title, XMPConst.X_DEFAULT, XMPConst.X_DEFAULT
                         );
                     if (title != null) {
@@ -78,7 +79,9 @@ namespace iText.Kernel.Pdf {
                 }
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static void AppendDocumentInfoToMetadata(PdfDocumentInfo info, XMPMeta xmpMeta) {
             PdfDictionary docInfo = info.GetPdfObject();
             if (docInfo != null) {
@@ -159,6 +162,7 @@ namespace iText.Kernel.Pdf {
                 }
             }
         }
+//\endcond
 
         private static void AppendArrayItemIfDoesNotExist(XMPMeta meta, String ns, String arrayName, String value, 
             int arrayOption) {
@@ -190,4 +194,5 @@ namespace iText.Kernel.Pdf {
             return sb != null ? sb.ToString() : null;
         }
     }
+//\endcond
 }

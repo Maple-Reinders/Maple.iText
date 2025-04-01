@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,16 +25,18 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using iText.Commons;
 using iText.Commons.Utils;
-using iText.Kernel.Events;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf.Action;
 using iText.Kernel.Pdf.Annot;
+using iText.Kernel.Pdf.Event;
 using iText.Kernel.Pdf.Filespec;
+using iText.Kernel.Pdf.Layer;
 using iText.Kernel.Pdf.Tagging;
 using iText.Kernel.Pdf.Tagutils;
 using iText.Kernel.Pdf.Xobject;
 using iText.Kernel.Utils;
+using iText.Kernel.Validation.Context;
 using iText.Kernel.XMP;
 using iText.Kernel.XMP.Options;
 
@@ -44,7 +46,9 @@ namespace iText.Kernel.Pdf {
 
         private int mcid = -1;
 
+//\cond DO_NOT_DOCUMENT
         internal PdfPages parentPages;
+//\endcond
 
         private static readonly IList<PdfName> PAGE_EXCLUDED_KEYS = new List<PdfName>(JavaUtil.ArraysAsList(PdfName
             .Parent, PdfName.Annots, PdfName.StructParents, PdfName.B));
@@ -295,7 +299,9 @@ namespace iText.Kernel.Pdf {
         /// <summary>
         /// Creates new
         /// <see cref="PdfStream"/>
-        /// object and puts it at the end of Contents array
+        /// object and puts it at the end of
+        /// <c>Contents</c>
+        /// array
         /// (if Contents object is
         /// <see cref="PdfStream"/>
         /// it will be replaced with one-element array).
@@ -338,13 +344,16 @@ namespace iText.Kernel.Pdf {
             return GetResources(true);
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual PdfResources GetResources(bool initResourcesField) {
             if (this.resources == null && initResourcesField) {
                 InitResources(true);
             }
             return this.resources;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual PdfDictionary InitResources(bool initResourcesField) {
             bool readOnly = false;
             PdfDictionary resources = GetPdfObject().GetAsDictionary(PdfName.Resources);
@@ -365,6 +374,7 @@ namespace iText.Kernel.Pdf {
             }
             return resources;
         }
+//\endcond
 
         /// <summary>
         /// Sets
@@ -534,6 +544,24 @@ namespace iText.Kernel.Pdf {
             return CopyTo(page, toDocument, copier);
         }
 
+        /// <summary>Get all pdf layers stored under this page's annotations/xobjects/resources.</summary>
+        /// <remarks>
+        /// Get all pdf layers stored under this page's annotations/xobjects/resources.
+        /// Note that it will include all layers, even those already stored under /OCProperties entry in catalog.
+        /// To get only unique layers, you can simply exclude ocgs, which already present in catalog.
+        /// </remarks>
+        /// <returns>set of pdf layers, associated with this page.</returns>
+        public virtual ICollection<PdfLayer> GetPdfLayers() {
+            ICollection<PdfIndirectReference> ocgs = OcgPropertiesCopier.GetOCGsFromPage(this);
+            ICollection<PdfLayer> result = new LinkedHashSet<PdfLayer>();
+            foreach (PdfIndirectReference ocg in ocgs) {
+                if (ocg.GetRefersTo() != null && ocg.GetRefersTo().IsDictionary()) {
+                    result.Add(new PdfLayer((PdfDictionary)ocg.GetRefersTo()));
+                }
+            }
+            return result;
+        }
+
         /// <summary>Copies page as FormXObject to the specified document.</summary>
         /// <param name="toDocument">a document to copy to.</param>
         /// <returns>
@@ -639,7 +667,7 @@ namespace iText.Kernel.Pdf {
                 }
             }
             if (flushResourcesContentStreams) {
-                GetDocument().CheckIsoConformance(this, IsoKey.PAGE);
+                GetDocument().CheckIsoConformance(new PdfPageValidationContext(this));
                 FlushResourcesContentStreams();
             }
             PdfArray annots = GetAnnots(false);
@@ -1089,9 +1117,13 @@ namespace iText.Kernel.Pdf {
             if (GetDocument().IsTagged()) {
                 if (tagAnnotation) {
                     TagTreePointer tagPointer = GetDocument().GetTagStructureContext().GetAutoTaggingPointer();
-                    if (annotation is PdfMarkupAnnotation && StandardRoles.DOCUMENT.Equals(tagPointer.GetRole()) && PdfVersion
-                        .PDF_1_4.CompareTo(GetDocument().GetPdfVersion()) < 0) {
-                        tagPointer.AddTag(StandardRoles.ANNOT);
+                    if (!StandardRoles.ANNOT.Equals(tagPointer.GetRole()) && PdfVersion.PDF_1_4
+                                        // "Annot" tag was added starting from PDF 1.5
+                                        .CompareTo(GetDocument().GetPdfVersion()) < 0) {
+                        if (!(annotation is PdfWidgetAnnotation) && !(annotation is PdfLinkAnnotation) && !(annotation is PdfPrinterMarkAnnotation
+                            )) {
+                            tagPointer.AddTag(StandardRoles.ANNOT);
+                        }
                     }
                     iText.Kernel.Pdf.PdfPage prevPage = tagPointer.GetCurrentPage();
                     tagPointer.SetPageForTagging(this).AddAnnotationTag(annotation);
@@ -1514,38 +1546,6 @@ namespace iText.Kernel.Pdf {
             return this;
         }
 
-        /// <summary>
-        /// This flag is meaningful for the case, when page rotation is applied and ignorePageRotationForContent
-        /// is set to true.
-        /// </summary>
-        /// <remarks>
-        /// This flag is meaningful for the case, when page rotation is applied and ignorePageRotationForContent
-        /// is set to true. NOTE: It is needed for the internal usage.
-        /// <br /><br />
-        /// This flag defines if inverse matrix (which rotates content into the opposite direction from page rotation
-        /// direction in order to give the impression of the not rotated text) is already applied to the page content stream.
-        /// See
-        /// <see cref="SetIgnorePageRotationForContent(bool)"/>
-        /// </remarks>
-        /// <returns>true, if inverse matrix is already applied, false otherwise.</returns>
-        public virtual bool IsPageRotationInverseMatrixWritten() {
-            return pageRotationInverseMatrixWritten;
-        }
-
-        /// <summary>NOTE: For internal usage! Use this method only if you know what you are doing.</summary>
-        /// <remarks>
-        /// NOTE: For internal usage! Use this method only if you know what you are doing.
-        /// <br /><br />
-        /// This method is called when inverse matrix (which rotates content into the opposite direction from page rotation
-        /// direction in order to give the impression of the not rotated text) is applied to the page content stream.
-        /// See
-        /// <see cref="SetIgnorePageRotationForContent(bool)"/>
-        /// </remarks>
-        public virtual void SetPageRotationInverseMatrixWritten() {
-            // this method specifically return void to discourage it's unintended usage
-            pageRotationInverseMatrixWritten = true;
-        }
-
         /// <summary>Adds file associated with PDF page and identifies the relationship between them.</summary>
         /// <remarks>
         /// Adds file associated with PDF page and identifies the relationship between them.
@@ -1605,6 +1605,7 @@ namespace iText.Kernel.Pdf {
             return afArray;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void TryFlushPageTags() {
             try {
                 if (!GetDocument().isClosing) {
@@ -1612,16 +1613,62 @@ namespace iText.Kernel.Pdf {
                 }
                 GetDocument().GetStructTreeRoot().SavePageStructParentIndexIfNeeded(this);
             }
-            catch (Exception ex) {
+            catch (Exception e) {
                 throw new PdfException(KernelExceptionMessageConstant.TAG_STRUCTURE_FLUSHING_FAILED_IT_MIGHT_BE_CORRUPTED, 
-                    ex);
+                    e);
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void ReleaseInstanceFields() {
             resources = null;
             parentPages = null;
         }
+//\endcond
+
+//\cond DO_NOT_DOCUMENT
+        /// <summary>
+        /// Checks if page rotation inverse matrix (which rotates content into the opposite direction from page rotation
+        /// direction in order to give the impression of the not rotated text) is already applied to the page content stream.
+        /// </summary>
+        /// <remarks>
+        /// Checks if page rotation inverse matrix (which rotates content into the opposite direction from page rotation
+        /// direction in order to give the impression of the not rotated text) is already applied to the page content stream.
+        /// See
+        /// <see cref="SetIgnorePageRotationForContent(bool)"/>
+        /// and
+        /// <see cref="PageContentRotationHelper"/>.
+        /// </remarks>
+        /// <returns>
+        /// 
+        /// <see langword="true"/>
+        /// if inverse matrix is already applied,
+        /// <see langword="false"/>
+        /// otherwise
+        /// </returns>
+        internal virtual bool IsPageRotationInverseMatrixWritten() {
+            return pageRotationInverseMatrixWritten;
+        }
+//\endcond
+
+//\cond DO_NOT_DOCUMENT
+        /// <summary>
+        /// Specifies that page rotation inverse matrix (which rotates content into the opposite direction from page rotation
+        /// direction in order to give the impression of the not rotated text) is applied to the page content stream.
+        /// </summary>
+        /// <remarks>
+        /// Specifies that page rotation inverse matrix (which rotates content into the opposite direction from page rotation
+        /// direction in order to give the impression of the not rotated text) is applied to the page content stream.
+        /// See
+        /// <see cref="SetIgnorePageRotationForContent(bool)"/>
+        /// and
+        /// <see cref="PageContentRotationHelper"/>.
+        /// </remarks>
+        internal virtual void SetPageRotationInverseMatrixWritten() {
+            pageRotationInverseMatrixWritten = true;
+        }
+//\endcond
 
         protected internal override bool IsWrappedObjectMustBeIndirect() {
             return true;
@@ -1822,9 +1869,15 @@ namespace iText.Kernel.Pdf {
         }
 
         private void RebuildFormFieldParent(PdfDictionary field, PdfDictionary newField, PdfDocument toDocument) {
+            RebuildFormFieldParent(field, newField, toDocument, new HashSet<PdfDictionary>());
+        }
+
+        private void RebuildFormFieldParent(PdfDictionary field, PdfDictionary newField, PdfDocument toDocument, ICollection
+            <PdfDictionary> visitedForms) {
             if (newField.ContainsKey(PdfName.Parent)) {
                 return;
             }
+            visitedForms.Add(field);
             PdfDictionary oldParent = field.GetAsDictionary(PdfName.Parent);
             if (oldParent != null) {
                 PdfDictionary newParent = oldParent.CopyTo(toDocument, JavaUtil.ArraysAsList(PdfName.P, PdfName.Kids, PdfName
@@ -1833,10 +1886,10 @@ namespace iText.Kernel.Pdf {
                     newParent = oldParent.CopyTo(toDocument, JavaUtil.ArraysAsList(PdfName.P, PdfName.Kids, PdfName.Parent), true
                         , NullCopyFilter.GetInstance());
                 }
-                if (oldParent == oldParent.GetAsDictionary(PdfName.Parent)) {
+                if (visitedForms.Contains(oldParent)) {
                     return;
                 }
-                RebuildFormFieldParent(oldParent, newParent, toDocument);
+                RebuildFormFieldParent(oldParent, newParent, toDocument, visitedForms);
                 PdfArray kids = newParent.GetAsArray(PdfName.Kids);
                 if (kids == null) {
                     // no kids are added here, since we do not know at this point which pages are to be copied,

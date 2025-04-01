@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,28 +22,36 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
+using iText.Pdfa.Checker;
 
 namespace iText.Pdfa {
+//\cond DO_NOT_DOCUMENT
     internal class PdfAPage : PdfPage {
-        internal PdfAPage(PdfDocument pdfDocument, PageSize pageSize)
-            : base(pdfDocument, pageSize) {
-        }
+        private readonly PdfAChecker checker;
 
-        internal PdfAPage(PdfDictionary pdfObject)
-            : base(pdfObject) {
+//\cond DO_NOT_DOCUMENT
+        internal PdfAPage(PdfDocument pdfDocument, PageSize pageSize, PdfAChecker checker)
+            : base(pdfDocument, pageSize) {
+            this.checker = checker;
         }
+//\endcond
+
+//\cond DO_NOT_DOCUMENT
+        internal PdfAPage(PdfDictionary pdfObject, PdfAChecker checker)
+            : base(pdfObject) {
+            this.checker = checker;
+        }
+//\endcond
 
         public override void Flush(bool flushResourcesContentStreams) {
             // We check in advance whether this PdfAPage can be flushed and call the flush method only if it is.
             // This avoids processing actions that are invoked during flushing (for example, sending the END_PAGE event)
             // if the page is not actually flushed.
-            if (flushResourcesContentStreams || ((PdfADocument)GetDocument()).IsClosing() || ((PdfADocument)GetDocument
-                ()).checker.ObjectIsChecked(this.GetPdfObject())) {
+            if (flushResourcesContentStreams || GetDocument().IsClosing() || checker.IsPdfObjectReadyToFlush(this.GetPdfObject
+                ())) {
                 base.Flush(flushResourcesContentStreams);
-            }
-            else {
-                ((PdfADocument)GetDocument()).LogThatPdfAPageFlushingWasNotPerformed();
             }
         }
     }
+//\endcond
 }

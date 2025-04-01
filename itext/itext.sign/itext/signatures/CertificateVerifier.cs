@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -35,6 +35,8 @@ namespace iText.Signatures {
     /// that is the next element in the chain of which the <c>verify()</c>
     /// method will be called.
     /// </remarks>
+    [System.ObsoleteAttribute(@"starting from 8.0.5.iText.Signatures.Validation.CertificateChainValidator should be used instead."
+        )]
     public class CertificateVerifier {
         /// <summary>The previous CertificateVerifier in the chain of verifiers.</summary>
         protected internal iText.Signatures.CertificateVerifier verifier;

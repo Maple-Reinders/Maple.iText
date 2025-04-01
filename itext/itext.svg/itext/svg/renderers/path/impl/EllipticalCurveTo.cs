@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -38,7 +38,9 @@ namespace iText.Svg.Renderers.Path.Impl {
     /// However, float comparison is used instead of double comparison, because close coordinates can be considered equal.
     /// </remarks>
     public class EllipticalCurveTo : AbstractPathShape {
+//\cond DO_NOT_DOCUMENT
         internal const int ARGUMENT_SIZE = 7;
+//\endcond
 
         private Point startPoint;
 
@@ -74,11 +76,11 @@ namespace iText.Svg.Renderers.Path.Impl {
             }
         }
 
-        public override void Draw(PdfCanvas canvas) {
-            Point start = new Point(startPoint.x * .75, startPoint.y * .75);
+        public override void Draw() {
+            Point start = new Point(startPoint.GetX() * .75, startPoint.GetY() * .75);
             // pixels to points
-            double rx = Math.Abs(CssDimensionParsingUtils.ParseAbsoluteLength(coordinates[0]));
-            double ry = Math.Abs(CssDimensionParsingUtils.ParseAbsoluteLength(coordinates[1]));
+            double rx = Math.Abs(ParseHorizontalLength(coordinates[0]));
+            double ry = Math.Abs(ParseVerticalLength(coordinates[1]));
             // φ is taken mod 360 degrees.
             double rotation = Double.Parse(coordinates[2], System.Globalization.CultureInfo.InvariantCulture) % 360.0;
             // rotation argument is given in degrees, but we need radians for easier trigonometric calculations
@@ -86,9 +88,8 @@ namespace iText.Svg.Renderers.Path.Impl {
             // binary flags (Value correction: any nonzero value for either of the flags fA or fS is taken to mean the value 1.)
             bool largeArc = !CssUtils.CompareFloats((float)CssDimensionParsingUtils.ParseFloat(coordinates[3]), 0);
             bool sweep = !CssUtils.CompareFloats((float)CssDimensionParsingUtils.ParseFloat(coordinates[4]), 0);
-            Point end = new Point(CssDimensionParsingUtils.ParseAbsoluteLength(coordinates[5]), CssDimensionParsingUtils
-                .ParseAbsoluteLength(coordinates[6]));
-            if (CssUtils.CompareFloats(start.x, end.x) && CssUtils.CompareFloats(start.y, end.y)) {
+            Point end = new Point(ParseHorizontalLength(coordinates[5]), ParseVerticalLength(coordinates[6]));
+            if (CssUtils.CompareFloats(start.GetX(), end.GetX()) && CssUtils.CompareFloats(start.GetY(), end.GetY())) {
                 /* edge case: If the endpoints (x1, y1) and (x2, y2) are identical,
                 * then this is equivalent to omitting the elliptical arc segment entirely.
                 */
@@ -98,7 +99,9 @@ namespace iText.Svg.Renderers.Path.Impl {
                 /* edge case: If rx = 0 or ry = 0 then this arc is treated as a straight line segment (a "lineto")
                 * joining the endpoints.
                 */
-                canvas.LineTo(end.x, end.y);
+                double[] points = new double[] { end.GetX(), end.GetY() };
+                ApplyTransform(points);
+                context.GetCurrentCanvas().LineTo(points[0], points[1]);
             }
             else {
                 /* This is the first step of calculating a rotated elliptical path.
@@ -112,28 +115,29 @@ namespace iText.Svg.Renderers.Path.Impl {
                 }
                 else {
                     AffineTransform normalizer = AffineTransform.GetRotateInstance(-rotation);
-                    normalizer.Translate(-start.x, -start.y);
+                    normalizer.Translate(-start.GetX(), -start.GetY());
                     Point newArcEnd = normalizer.Transform(end, null);
-                    newArcEnd.Translate(start.x, start.y);
+                    newArcEnd.Move(start.GetX(), start.GetY());
                     arc = EllipticalCurveTo.EllipseArc.GetEllipse(start, newArcEnd, rx, ry, sweep, largeArc);
                 }
-                Point[][] points = MakePoints(PdfCanvas.BezierArc(arc.ll.x, arc.ll.y, arc.ur.x, arc.ur.y, arc.startAng, arc
-                    .extent));
+                Point[][] points = MakePoints(PdfCanvas.BezierArc(arc.ll.GetX(), arc.ll.GetY(), arc.ur.GetX(), arc.ur.GetY
+                    (), arc.startAng, arc.extent));
                 if (sweep) {
                     points = Rotate(points, rotation, points[0][0]);
                     for (int i = 0; i < points.Length; i++) {
-                        DrawCurve(canvas, points[i][1], points[i][2], points[i][3]);
+                        DrawCurve(context.GetCurrentCanvas(), points[i][1], points[i][2], points[i][3]);
                     }
                 }
                 else {
                     points = Rotate(points, rotation, points[points.Length - 1][3]);
                     for (int i = points.Length - 1; i >= 0; i--) {
-                        DrawCurve(canvas, points[i][2], points[i][1], points[i][0]);
+                        DrawCurve(context.GetCurrentCanvas(), points[i][2], points[i][1], points[i][0]);
                     }
                 }
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>This convenience method rotates a given set of points around a given point</summary>
         /// <param name="list">the input list</param>
         /// <param name="rotation">the rotation angle, in radians</param>
@@ -142,7 +146,8 @@ namespace iText.Svg.Renderers.Path.Impl {
         internal static Point[][] Rotate(Point[][] list, double rotation, Point rotator) {
             if (!CssUtils.CompareFloats(rotation, 0)) {
                 Point[][] result = new Point[list.Length][];
-                AffineTransform transRotTrans = AffineTransform.GetRotateInstance(rotation, rotator.x, rotator.y);
+                AffineTransform transRotTrans = AffineTransform.GetRotateInstance(rotation, rotator.GetX(), rotator.GetY()
+                    );
                 for (int i = 0; i < list.Length; i++) {
                     Point[] input = list[i];
                     Point[] row = new Point[input.Length];
@@ -155,13 +160,19 @@ namespace iText.Svg.Renderers.Path.Impl {
             }
             return list;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual String[] GetCoordinates() {
             return coordinates;
         }
+//\endcond
 
-        private static void DrawCurve(PdfCanvas canvas, Point cp1, Point cp2, Point end) {
-            canvas.CurveTo(cp1.x, cp1.y, cp2.x, cp2.y, end.x, end.y);
+        private void DrawCurve(PdfCanvas canvas, Point cp1, Point cp2, Point end) {
+            double[] points = new double[] { cp1.GetX(), cp1.GetY(), cp2.GetX(), cp2.GetY(), end.GetX(), end.GetY() };
+            ApplyTransform(points);
+            int i = 0;
+            canvas.CurveTo(points[i++], points[i++], points[i++], points[i++], points[i++], points[i]);
         }
 
         private Point[][] MakePoints(IList<double[]> input) {
@@ -175,6 +186,7 @@ namespace iText.Svg.Renderers.Path.Impl {
             return result;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Converts between two types of definitions of an arc:
         /// The input is an arc defined by two points and the two semi-axes of the ellipse.
@@ -189,25 +201,36 @@ namespace iText.Svg.Renderers.Path.Impl {
         /// <see cref="iText.Kernel.Pdf.Canvas.PdfCanvas"/>.
         /// </remarks>
         internal class EllipseArc {
+//\cond DO_NOT_DOCUMENT
             internal readonly Point ll;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal readonly Point ur;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal readonly double startAng;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal readonly double extent;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal EllipseArc(Point center, double a, double b, double startAng, double extent) {
-                ll = new Point(center.x - a, center.y - b);
-                ur = new Point(center.x + a, center.y + b);
+                ll = new Point(center.GetX() - a, center.GetY() - b);
+                ur = new Point(center.GetX() + a, center.GetY() + b);
                 this.startAng = startAng;
                 this.extent = extent;
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal static EllipticalCurveTo.EllipseArc GetEllipse(Point start, Point end, double a, double b, bool sweep
                 , bool largeArc) {
-                double r1 = (start.x - end.x) / (-2.0 * a);
-                double r2 = (start.y - end.y) / (2.0 * b);
+                double r1 = (start.GetX() - end.GetX()) / (-2.0 * a);
+                double r2 = (start.GetY() - end.GetY()) / (2.0 * b);
                 double factor = Math.Sqrt(r1 * r1 + r2 * r2);
                 if (factor > 1) {
                     /* If rx, ry and φ are such that there is no solution (basically, the ellipse is not big enough
@@ -238,13 +261,16 @@ namespace iText.Svg.Renderers.Path.Impl {
                 throw new SvgProcessingException(SvgExceptionMessageConstant.COULD_NOT_DETERMINE_MIDDLE_POINT_OF_ELLIPTICAL_ARC
                     );
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal static EllipticalCurveTo.EllipseArc CalculatePossibleMiddle(Point start, Point end, double a, double
                  b, double startToCenterAngle, bool sweep, bool largeArc) {
-                double x0 = start.x - a * Math.Cos(startToCenterAngle);
-                double y0 = start.y - b * Math.Sin(startToCenterAngle);
+                double x0 = start.GetX() - a * Math.Cos(startToCenterAngle);
+                double y0 = start.GetY() - b * Math.Sin(startToCenterAngle);
                 Point center = new Point(x0, y0);
-                double check = Math.Pow(((end.x - center.x) / a), 2) + Math.Pow(((end.y - center.y) / b), 2);
+                double check = Math.Pow(((end.GetX() - center.GetX()) / a), 2) + Math.Pow(((end.GetY() - center.GetY()) / 
+                    b), 2);
                 /* If center is an actual candidate for a middle point, then the value of check will be very close to 1.0.
                 * Otherwise it is always larger than 1.
                 * Due to floating point math, we need to introduce an epsilon value.
@@ -310,11 +336,14 @@ namespace iText.Svg.Renderers.Path.Impl {
                 }
                 return null;
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal static double CalculateAngle(Point pt, Point center, double a, double b) {
-                double result = Math.Pow(((pt.x - center.x) / a), 2.0) + Math.Pow(((pt.y - center.y) / b), 2.0);
-                double cos = (pt.x - center.x) / a;
-                double sin = (pt.y - center.y) / b;
+                double result = Math.Pow(((pt.GetX() - center.GetX()) / a), 2.0) + Math.Pow(((pt.GetY() - center.GetY()) /
+                     b), 2.0);
+                double cos = (pt.GetX() - center.GetX()) / a;
+                double sin = (pt.GetY() - center.GetY()) / b;
                 // catch very small floating point errors and keep cos between [-1, 1], so we can calculate the arc cosine
                 cos = Math.Max(Math.Min(cos, 1.0), -1.0);
                 if ((cos >= 0 && sin >= 0) || (cos < 0 && sin >= 0)) {
@@ -325,11 +354,15 @@ namespace iText.Svg.Renderers.Path.Impl {
                 }
                 return result;
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal static double ToDegrees(double radians) {
                 return radians * 180.0 / Math.PI;
             }
+//\endcond
         }
+//\endcond
 
         public override Rectangle GetPathShapeRectangle(Point lastPoint) {
             double[] points = GetEllipticalArcMinMaxPoints(lastPoint.GetX(), lastPoint.GetY(), GetCoordinate(0), GetCoordinate

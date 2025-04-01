@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -60,6 +60,8 @@ namespace iText.Bouncycastlefips.Crypto {
         /// hash algorithm to create IStreamCalculator<IBlockResult>
         /// </param>
         public DigestBCFips(string hashAlgorithm) {
+            if (hashAlgorithm == null)
+                throw new ArgumentNullException(nameof(hashAlgorithm));
             if ("MD5".Equals(hashAlgorithm)) {
                 md5 = System.Security.Cryptography.MD5.Create();
                 algorithmName = "MD5";

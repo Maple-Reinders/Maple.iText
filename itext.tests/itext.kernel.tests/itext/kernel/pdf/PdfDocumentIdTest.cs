@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
-using iText.Commons.Bouncycastle.Crypto;
+using iText.Commons.Digest;
 using iText.IO.Source;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf.Canvas;
@@ -67,7 +67,7 @@ namespace iText.Kernel.Pdf {
         [NUnit.Framework.Test]
         public virtual void ChangeIdTest02() {
             MemoryStream baos = new MemoryStream();
-            IDigest md5;
+            IMessageDigest md5;
             try {
                 md5 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest("MD5");
             }
@@ -94,7 +94,7 @@ namespace iText.Kernel.Pdf {
         public virtual void ChangeIdTest03() {
             MemoryStream baosInitial = new MemoryStream();
             MemoryStream baosModified = new MemoryStream();
-            IDigest md5;
+            IMessageDigest md5;
             try {
                 md5 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest("MD5");
             }
@@ -138,7 +138,7 @@ namespace iText.Kernel.Pdf {
         [NUnit.Framework.Test]
         public virtual void FetchReaderIdTest() {
             MemoryStream baos = new MemoryStream();
-            IDigest md5;
+            IMessageDigest md5;
             try {
                 md5 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest("MD5");
             }
@@ -165,7 +165,7 @@ namespace iText.Kernel.Pdf {
         [NUnit.Framework.Test]
         public virtual void WriterPropertiesPriorityTest() {
             MemoryStream baos = new MemoryStream();
-            IDigest md5;
+            IMessageDigest md5;
             try {
                 md5 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest("MD5");
             }
@@ -326,8 +326,8 @@ namespace iText.Kernel.Pdf {
         //        PdfString originalId = new PdfString("Original ID 56789");
         //        PdfWriter initialWriter = CompareTool.createTestPdfWriter(baos, new WriterProperties().setInitialDocumentId(originalId));
         //
-        //        Assert.assertNotEquals();
-        //        Assert.assertEquals();
+        //        Assertions.assertNotEquals();
+        //        Assertions.assertEquals();
         //
         //    }
     }

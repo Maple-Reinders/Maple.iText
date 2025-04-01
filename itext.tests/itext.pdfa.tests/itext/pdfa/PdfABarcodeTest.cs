@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.IO;
 using iText.Barcodes;
+using iText.Commons.Utils;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Xobject;
@@ -32,6 +33,8 @@ using iText.Layout.Element;
 using iText.Test;
 
 namespace iText.Pdfa {
+    [iText.Commons.Utils.NoopAnnotation]
+    // java.awt is not compatible with graalvm
     [NUnit.Framework.Category("IntegrationTest")]
     public class PdfABarcodeTest : ExtendedITextTest {
         public static readonly String sourceFolder = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
@@ -169,9 +172,9 @@ namespace iText.Pdfa {
 
         private Document CreatePdfATaggedDocument(String outPdf) {
             PdfWriter writer = new PdfWriter(outPdf);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfDocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_1B, new PdfOutputIntent("Custom"
-                , "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfDocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_1B, new PdfOutputIntent("Custom", 
+                "", "http://www.color.org", "sRGB IEC61966-2.1", @is));
             Document doc = new Document(pdfDocument);
             pdfDocument.SetTagged();
             return doc;

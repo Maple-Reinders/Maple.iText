@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -289,5 +289,45 @@ namespace iText.Layout {
                 NUnit.Framework.Assert.IsTrue(events[1] is TestProductEvent);
             }
         }
+
+        [NUnit.Framework.Test]
+        public virtual void DrawingOnPageReuseCanvas() {
+            using (PdfDocument pdfDocument = new PdfDocument(new PdfWriter(new MemoryStream()))) {
+                CanvasTest.ExposedPdfCanvas canvas = new CanvasTest.ExposedPdfCanvas(pdfDocument.AddNewPage());
+                NUnit.Framework.Assert.IsTrue(canvas.GetDrawingOnPage());
+                using (iText.Layout.Canvas canvas1 = new iText.Layout.Canvas(canvas, new Rectangle(200, 200, 200, 200))) {
+                    NUnit.Framework.Assert.IsTrue(((CanvasTest.ExposedPdfCanvas)canvas1.pdfCanvas).GetDrawingOnPage());
+                }
+            }
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void NotDrawingOnPageReuseCanvas() {
+            using (PdfDocument pdfDocument = new PdfDocument(new PdfWriter(new MemoryStream()))) {
+                PdfStream stream = new PdfStream();
+                CanvasTest.ExposedPdfCanvas canvas = new CanvasTest.ExposedPdfCanvas(stream, new PdfResources(), pdfDocument
+                    );
+                NUnit.Framework.Assert.IsFalse(canvas.GetDrawingOnPage());
+                using (iText.Layout.Canvas canvas1 = new iText.Layout.Canvas(canvas, new Rectangle(200, 200, 200, 200))) {
+                    NUnit.Framework.Assert.IsFalse(((CanvasTest.ExposedPdfCanvas)canvas1.pdfCanvas).GetDrawingOnPage());
+                }
+            }
+        }
+
+//\cond DO_NOT_DOCUMENT
+        internal class ExposedPdfCanvas : PdfCanvas {
+            public ExposedPdfCanvas(PdfStream contentStream, PdfResources resources, PdfDocument document)
+                : base(contentStream, resources, document) {
+            }
+
+            public ExposedPdfCanvas(PdfPage page)
+                : base(page) {
+            }
+
+            public virtual bool GetDrawingOnPage() {
+                return this.drawingOnPage;
+            }
+        }
+//\endcond
     }
 }

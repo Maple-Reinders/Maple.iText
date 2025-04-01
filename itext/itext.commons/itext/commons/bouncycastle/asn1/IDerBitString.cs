@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -26,5 +26,12 @@ namespace iText.Commons.Bouncycastle.Asn1 {
     /// to switch between bouncy-castle and bouncy-castle FIPS implementations.
     /// </summary>
     public interface IDerBitString : IAsn1Object, IDerStringBase {
+        /// <summary>
+        /// Calls actual
+        /// <c>intValue</c>
+        /// method for the wrapped ASN1BitString object.
+        /// </summary>
+        /// <returns>int value of the wrapped ASN1BitString.</returns>
+        int IntValue();
     }
 }

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -45,13 +45,13 @@ namespace iText.Pdfa.Checker {
             (new HashSet<PdfName>(JavaUtil.ArraysAsList(PdfName.Source, PdfName.Data, PdfName.Alternative, PdfName
             .Supplement, PdfName.Unspecified)));
 
-        /// <summary>Creates a PdfA3Checker with the required conformance level</summary>
-        /// <param name="conformanceLevel">
-        /// the required conformance level, <c>a</c> or
+        /// <summary>Creates a PdfA3Checker with the required conformance</summary>
+        /// <param name="aConformance">
+        /// the required conformance, <c>a</c> or
         /// <c>u</c> or <c>b</c>
         /// </param>
-        public PdfA3Checker(PdfAConformanceLevel conformanceLevel)
-            : base(conformanceLevel) {
+        public PdfA3Checker(PdfAConformance aConformance)
+            : base(aConformance) {
         }
 
         protected internal override void CheckFileSpec(PdfDictionary fileSpec) {

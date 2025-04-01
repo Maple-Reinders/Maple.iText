@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -304,21 +304,29 @@ namespace iText.Kernel.Pdf.Canvas.Parser.Data {
         }
 
         /// <summary>
-        /// Checks if the text belongs to a marked content sequence
+        /// Checks if this
+        /// <see cref="PathRenderInfo"/>
+        /// instance belongs to a marked content sequence
         /// with a given mcid.
         /// </summary>
         /// <param name="mcid">a marked content id</param>
         /// <returns>
         /// 
         /// <see langword="true"/>
-        /// if the text is marked with this id
+        /// if this
+        /// <see cref="PathRenderInfo"/>
+        /// instance is marked with this id,
+        /// <see langword="false"/>
+        /// otherwise
         /// </returns>
         public virtual bool HasMcid(int mcid) {
             return HasMcid(mcid, false);
         }
 
         /// <summary>
-        /// Checks if the text belongs to a marked content sequence
+        /// Checks if this
+        /// <see cref="PathRenderInfo"/>
+        /// instance belongs to a marked content sequence
         /// with a given mcid.
         /// </summary>
         /// <param name="mcid">a marked content id</param>
@@ -327,7 +335,11 @@ namespace iText.Kernel.Pdf.Canvas.Parser.Data {
         /// <returns>
         /// 
         /// <see langword="true"/>
-        /// if the text is marked with this id
+        /// if this
+        /// <see cref="PathRenderInfo"/>
+        /// instance is marked with this id,
+        /// <see langword="false"/>
+        /// otherwise
         /// </returns>
         public virtual bool HasMcid(int mcid, bool checkTheTopmostLevelOnly) {
             if (checkTheTopmostLevelOnly) {

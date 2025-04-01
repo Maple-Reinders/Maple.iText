@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -41,6 +41,7 @@ namespace iText.StyledXmlParser.Css.Media {
         /// <summary>The value.</summary>
         private String value;
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Creates a new
         /// <see cref="MediaExpression"/>
@@ -64,6 +65,7 @@ namespace iText.StyledXmlParser.Css.Media {
                 this.feature = feature.Substring(maxPref.Length);
             }
         }
+//\endcond
 
         /// <summary>
         /// Tries to match a

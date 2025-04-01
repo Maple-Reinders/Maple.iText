@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -31,7 +31,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using iText.Commons.Utils;
 using iText.Commons.Utils.Collections;
-
+//\cond DO_NOT_DOCUMENT
 internal static class KernelExtensions {
     public static String JSubstring(this String str, int beginIndex, int endIndex) {
         return str.Substring(beginIndex, endIndex - beginIndex);
@@ -63,6 +63,11 @@ internal static class KernelExtensions {
     }
 
     public static int JRead(this Stream stream, byte[] buffer, int offset, int count) {
+        int result = stream.Read(buffer, offset, count);
+        return result == 0 ? -1 : result;
+    }
+
+    public static int JRead(this BinaryReader stream, byte[] buffer, int offset, int count) {
         int result = stream.Read(buffer, offset, count);
         return result == 0 ? -1 : result;
     }
@@ -423,3 +428,4 @@ internal static class KernelExtensions {
     }
 #endif
 }
+//\endcond

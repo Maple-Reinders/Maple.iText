@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -20,24 +20,35 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using System;
+using iText.Commons.Digest;
 using iText.IO.Source;
 using iText.IO.Util;
+using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf;
 
 namespace iText.Kernel.Crypto.Securityhandler {
     public abstract class StandardSecurityHandler : SecurityHandler {
         protected internal const int PERMS_MASK_1_FOR_REVISION_2 = unchecked((int)(0xffffffc0));
 
-        protected internal const int PERMS_MASK_1_FOR_REVISION_3_OR_GREATER = unchecked((int)(0xfffff0c0));
+        protected internal const int PERMS_MASK_1_FOR_REVISION_3_OR_GREATER = unchecked((int)(0xffffe0c0));
 
         protected internal const int PERMS_MASK_2 = unchecked((int)(0xfffffffc));
 
-        protected internal long permissions;
+        protected internal int permissions;
 
         protected internal bool usedOwnerPassword = true;
 
-        public virtual long GetPermissions() {
+        public virtual int GetPermissions() {
             return permissions;
+        }
+
+        /// <summary>Updates encryption dictionary with the security permissions provided.</summary>
+        /// <param name="permissions">new permissions to set</param>
+        /// <param name="encryptionDictionary">encryption dictionary to update</param>
+        public virtual void SetPermissions(int permissions, PdfDictionary encryptionDictionary) {
+            this.permissions = permissions;
+            encryptionDictionary.Put(PdfName.P, new PdfNumber(permissions));
         }
 
         public virtual bool IsUsedOwnerPassword() {
@@ -54,7 +65,14 @@ namespace iText.Kernel.Crypto.Securityhandler {
 
         protected internal virtual byte[] GenerateOwnerPasswordIfNullOrEmpty(byte[] ownerPassword) {
             if (ownerPassword == null || ownerPassword.Length == 0) {
-                ownerPassword = md5.Digest(PdfEncryption.GenerateNewDocumentId());
+                try {
+                    IMessageDigest sha256 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest(
+                        "SHA-256");
+                    ownerPassword = sha256.Digest(PdfEncryption.GenerateNewDocumentId());
+                }
+                catch (Exception e) {
+                    throw new PdfException(KernelExceptionMessageConstant.PDF_ENCRYPTION, e);
+                }
             }
             return ownerPassword;
         }

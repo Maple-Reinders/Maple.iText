@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -44,11 +44,13 @@ namespace iText.StyledXmlParser.Jsoup.Select {
 
             private readonly Evaluator eval;
 
+//\cond DO_NOT_DOCUMENT
             internal Accumulator(iText.StyledXmlParser.Jsoup.Nodes.Element root, Elements elements, Evaluator eval) {
                 this.root = root;
                 this.elements = elements;
                 this.eval = eval;
             }
+//\endcond
 
             public virtual void Head(iText.StyledXmlParser.Jsoup.Nodes.Node node, int depth) {
                 if (node is iText.StyledXmlParser.Jsoup.Nodes.Element) {
@@ -83,16 +85,20 @@ namespace iText.StyledXmlParser.Jsoup.Select {
         }
 
         private class FirstFinder : NodeFilter {
+//\cond DO_NOT_DOCUMENT
             internal iText.StyledXmlParser.Jsoup.Nodes.Element match = null;
+//\endcond
 
             private readonly iText.StyledXmlParser.Jsoup.Nodes.Element root;
 
             private readonly Evaluator eval;
 
+//\cond DO_NOT_DOCUMENT
             internal FirstFinder(iText.StyledXmlParser.Jsoup.Nodes.Element root, Evaluator eval) {
                 this.root = root;
                 this.eval = eval;
             }
+//\endcond
 
             public override NodeFilter.FilterResult Head(iText.StyledXmlParser.Jsoup.Nodes.Node node, int depth) {
                 if (node is iText.StyledXmlParser.Jsoup.Nodes.Element) {

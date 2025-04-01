@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,10 +24,46 @@ using System;
 
 namespace iText.IO.Font.Otf {
     public class ScriptRecord {
-        public String tag;
+        private String tag;
 
-        public LanguageRecord defaultLanguage;
+        private LanguageRecord defaultLanguage;
 
-        public LanguageRecord[] languages;
+        private LanguageRecord[] languages;
+
+        /// <summary>Retrieves the tag of the Script Record.</summary>
+        /// <returns>tag of record</returns>
+        public virtual String GetTag() {
+            return tag;
+        }
+
+        /// <summary>Sets the tag of the Script Record.</summary>
+        /// <param name="tag">tag of record</param>
+        public virtual void SetTag(String tag) {
+            this.tag = tag;
+        }
+
+        /// <summary>Retrieves the default language of the Script Record.</summary>
+        /// <returns>default language</returns>
+        public virtual LanguageRecord GetDefaultLanguage() {
+            return defaultLanguage;
+        }
+
+        /// <summary>Sets the default language of the Script Record.</summary>
+        /// <param name="defaultLanguage">default language</param>
+        public virtual void SetDefaultLanguage(LanguageRecord defaultLanguage) {
+            this.defaultLanguage = defaultLanguage;
+        }
+
+        /// <summary>Retrieves the languages of the Script Record.</summary>
+        /// <returns>languages</returns>
+        public virtual LanguageRecord[] GetLanguages() {
+            return languages;
+        }
+
+        /// <summary>Sets the languages of the Script Record.</summary>
+        /// <param name="languages">languages</param>
+        public virtual void SetLanguages(LanguageRecord[] languages) {
+            this.languages = languages;
+        }
     }
 }

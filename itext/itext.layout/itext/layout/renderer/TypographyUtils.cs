@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -94,30 +94,40 @@ namespace iText.Layout.Renderer {
             return applierInstance.LoadShippedFonts();
         }
 
+//\cond DO_NOT_DOCUMENT
         internal static void ApplyOtfScript(FontProgram fontProgram, GlyphLine text, UnicodeScript? script, Object
              typographyConfig, SequenceId sequenceId, IMetaInfo metaInfo) {
             applierInstance.ApplyOtfScript((TrueTypeFont)fontProgram, text, script, typographyConfig, sequenceId, metaInfo
                 );
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static void ApplyKerning(FontProgram fontProgram, GlyphLine text, SequenceId sequenceId, IMetaInfo
              metaInfo) {
             applierInstance.ApplyKerning(fontProgram, text, sequenceId, metaInfo);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static byte[] GetBidiLevels(BaseDirection? baseDirection, int[] unicodeIds, SequenceId sequenceId
             , IMetaInfo metaInfo) {
             return applierInstance.GetBidiLevels(baseDirection, unicodeIds, sequenceId, metaInfo);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static int[] ReorderLine(IList<LineRenderer.RendererGlyph> line, byte[] lineLevels, byte[] levels
             ) {
             return applierInstance.ReorderLine(line, lineLevels, levels);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static IList<int> GetPossibleBreaks(String str) {
             return applierInstance.GetPossibleBreaks(str);
         }
+//\endcond
 
         private static Type GetTypographyClass(String partialName) {
             String classFullName = null;

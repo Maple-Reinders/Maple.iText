@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -55,6 +55,16 @@ namespace iText.Bouncycastle.Asn1.X509 {
         /// <summary><inheritDoc/></summary>
         public virtual IDistributionPointName GetDistributionPoint() {
             return new DistributionPointNameBC(GetPoint().DistributionPointName);
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public virtual IGeneralNames GetCRLIssuer() {
+            return new GeneralNamesBC(GetPoint().CrlIssuer);
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public virtual IReasonFlags GetReasons() {
+            return new ReasonFlagsBC(GetPoint().Reasons);
         }
     }
 }

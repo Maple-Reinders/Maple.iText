@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -20,12 +20,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-using iText.Kernel.Pdf.Canvas;
-
 namespace iText.Svg.Renderers.Path.Impl {
     /// <summary>Implements closePath(Z) attribute of SVG's path element</summary>
     public class ClosePath : LineTo {
+//\cond DO_NOT_DOCUMENT
         internal const int ARGUMENT_SIZE = 0;
+//\endcond
 
         public ClosePath()
             : this(false) {
@@ -35,8 +35,8 @@ namespace iText.Svg.Renderers.Path.Impl {
             : base(relative) {
         }
 
-        public override void Draw(PdfCanvas canvas) {
-            canvas.ClosePath();
+        public override void Draw() {
+            context.GetCurrentCanvas().ClosePath();
         }
     }
 }

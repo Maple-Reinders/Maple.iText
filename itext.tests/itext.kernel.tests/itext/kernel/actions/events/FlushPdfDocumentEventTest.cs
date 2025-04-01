@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -139,7 +139,7 @@ namespace iText.Kernel.Actions.Events {
             using (PdfDocument pdf_1 = new PdfDocument(new PdfReader(new MemoryStream(baos.ToArray())))) {
                 String producerLine = pdf_1.GetDocumentInfo().GetProducer();
                 String modifiedByItext = "modified using iText\u00ae Core";
-                NUnit.Framework.Assert.AreNotEqual(producerLine.IndexOf(modifiedByItext, StringComparison.Ordinal), producerLine
+                NUnit.Framework.Assert.AreEqual(producerLine.IndexOf(modifiedByItext, StringComparison.Ordinal), producerLine
                     .LastIndexOf(modifiedByItext));
             }
         }

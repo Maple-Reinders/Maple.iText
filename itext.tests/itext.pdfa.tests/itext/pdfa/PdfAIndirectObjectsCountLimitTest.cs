@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,9 +22,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
+using iText.Commons.Utils;
 using iText.IO.Font;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
+using iText.Kernel.Validation;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Pdfa.Checker;
@@ -39,14 +41,15 @@ namespace iText.Pdfa {
 
         [NUnit.Framework.Test]
         public virtual void ValidAmountOfIndirectObjectsTest() {
-            PdfA1Checker testChecker = new _PdfA1Checker_58(PdfAConformanceLevel.PDF_A_1B);
-            using (Stream icm = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                )) {
+            PdfA1Checker testChecker = new _PdfA1Checker_58(PdfAConformance.PDF_A_1B);
+            using (Stream icm = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm")) {
                 using (Stream fos = new MemoryStream()) {
-                    using (Document document = new Document(new PdfADocument(new PdfWriter(fos), PdfAConformanceLevel.PDF_A_1B
-                        , GetOutputIntent(icm)))) {
+                    using (Document document = new Document(new PdfADocument(new PdfWriter(fos), PdfAConformance.PDF_A_1B, GetOutputIntent
+                        (icm)))) {
                         PdfADocument pdfa = (PdfADocument)document.GetPdfDocument();
-                        pdfa.checker = testChecker;
+                        ValidationContainer container = new ValidationContainer();
+                        container.AddChecker(testChecker);
+                        pdfa.GetDiContainer().Register(typeof(ValidationContainer), container);
                         document.Add(BuildContent());
                     }
                 }
@@ -54,7 +57,7 @@ namespace iText.Pdfa {
         }
 
         private sealed class _PdfA1Checker_58 : PdfA1Checker {
-            public _PdfA1Checker_58(PdfAConformanceLevel baseArg1)
+            public _PdfA1Checker_58(PdfAConformance baseArg1)
                 : base(baseArg1) {
             }
 
@@ -67,14 +70,15 @@ namespace iText.Pdfa {
         // limit per "mock specification" conformance exception shouldn't be thrown
         [NUnit.Framework.Test]
         public virtual void InvalidAmountOfIndirectObjectsTest() {
-            PdfA1Checker testChecker = new _PdfA1Checker_83(PdfAConformanceLevel.PDF_A_1B);
-            using (Stream icm = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read
-                )) {
+            PdfA1Checker testChecker = new _PdfA1Checker_85(PdfAConformance.PDF_A_1B);
+            using (Stream icm = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm")) {
                 using (Stream fos = new MemoryStream()) {
-                    Document document = new Document(new PdfADocument(new PdfWriter(fos), PdfAConformanceLevel.PDF_A_1B, GetOutputIntent
+                    Document document = new Document(new PdfADocument(new PdfWriter(fos), PdfAConformance.PDF_A_1B, GetOutputIntent
                         (icm)));
                     PdfADocument pdfa = (PdfADocument)document.GetPdfDocument();
-                    pdfa.checker = testChecker;
+                    ValidationContainer container = new ValidationContainer();
+                    container.AddChecker(testChecker);
+                    pdfa.GetDiContainer().Register(typeof(ValidationContainer), container);
                     document.Add(BuildContent());
                     // generated document contains exactly 10 indirect objects. Given 9 is the allowed
                     // limit per "mock specification" conformance exception should be thrown as the limit
@@ -86,8 +90,8 @@ namespace iText.Pdfa {
             }
         }
 
-        private sealed class _PdfA1Checker_83 : PdfA1Checker {
-            public _PdfA1Checker_83(PdfAConformanceLevel baseArg1)
+        private sealed class _PdfA1Checker_85 : PdfA1Checker {
+            public _PdfA1Checker_85(PdfAConformance baseArg1)
                 : base(baseArg1) {
             }
 
@@ -98,13 +102,14 @@ namespace iText.Pdfa {
 
         [NUnit.Framework.Test]
         public virtual void InvalidAmountOfIndirectObjectsAppendModeTest() {
-            PdfA1Checker testChecker = new _PdfA1Checker_111(PdfAConformanceLevel.PDF_A_1B);
-            using (Stream fis = new FileStream(sourceFolder + "pdfs/pdfa10IndirectObjects.pdf", FileMode.Open, FileAccess.Read
-                )) {
+            PdfA1Checker testChecker = new _PdfA1Checker_115(PdfAConformance.PDF_A_1B);
+            using (Stream fis = FileUtil.GetInputStreamForFile(sourceFolder + "pdfs/pdfa10IndirectObjects.pdf")) {
                 using (Stream fos = new MemoryStream()) {
                     PdfADocument pdfa = new PdfADocument(new PdfReader(fis), new PdfWriter(fos), new StampingProperties().UseAppendMode
                         ());
-                    pdfa.checker = testChecker;
+                    ValidationContainer container = new ValidationContainer();
+                    container.AddChecker(testChecker);
+                    pdfa.GetDiContainer().Register(typeof(ValidationContainer), container);
                     pdfa.AddNewPage();
                     // during closing of pdfa object exception will be thrown as new document will contain
                     // 12 indirect objects and limit per "mock specification" conformance will be exceeded
@@ -115,8 +120,8 @@ namespace iText.Pdfa {
             }
         }
 
-        private sealed class _PdfA1Checker_111 : PdfA1Checker {
-            public _PdfA1Checker_111(PdfAConformanceLevel baseArg1)
+        private sealed class _PdfA1Checker_115 : PdfA1Checker {
+            public _PdfA1Checker_115(PdfAConformance baseArg1)
                 : base(baseArg1) {
             }
 

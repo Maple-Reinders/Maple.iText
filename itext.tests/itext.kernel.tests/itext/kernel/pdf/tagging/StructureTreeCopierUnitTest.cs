@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -64,14 +64,14 @@ namespace iText.Kernel.Pdf.Tagging {
         public virtual void ShouldTableElementBeCopiedTrTdTest() {
             PdfDictionary obj = new PdfDictionary(tr);
             PdfDictionary parent = new PdfDictionary(td);
-            NUnit.Framework.Assert.IsFalse(StructureTreeCopier.ShouldTableElementBeCopied(obj, parent));
+            NUnit.Framework.Assert.IsTrue(StructureTreeCopier.ShouldTableElementBeCopied(obj, parent));
         }
 
         [NUnit.Framework.Test]
         public virtual void ShouldTableElementBeCopiedTrTrTest() {
             PdfDictionary obj = new PdfDictionary(tr);
             PdfDictionary parent = new PdfDictionary(tr);
-            NUnit.Framework.Assert.IsFalse(StructureTreeCopier.ShouldTableElementBeCopied(obj, parent));
+            NUnit.Framework.Assert.IsTrue(StructureTreeCopier.ShouldTableElementBeCopied(obj, parent));
         }
 
         [NUnit.Framework.Test]

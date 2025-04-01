@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using System;
 using iText.Bouncycastleconnector;
 using iText.Commons.Bouncycastle;
 using iText.Commons.Bouncycastle.Asn1;
+using iText.Kernel.Crypto;
 
 namespace iText.Signatures.Cms {
     /// <summary>This class represents the signed content.</summary>
@@ -31,7 +32,7 @@ namespace iText.Signatures.Cms {
         private static readonly IBouncyCastleFactory BC_FACTORY = BouncyCastleFactoryCreator.GetFactory();
 
         /// <summary>Object identifier of the content field</summary>
-        private String eContentType = "1.2.840.113549.1.7.1";
+        private String eContentType = OID.PKCS7_DATA;
 
         /// <summary>Optional.</summary>
         /// <remarks>
@@ -59,6 +60,7 @@ namespace iText.Signatures.Cms {
         public EncapsulatedContentInfo() {
         }
 
+//\cond DO_NOT_DOCUMENT
         // Empty constructor.
         internal EncapsulatedContentInfo(IAsn1Sequence lencapContentInfo) {
             IDerObjectIdentifier eContentTypeOid = BC_FACTORY.CreateASN1ObjectIdentifier(lencapContentInfo.GetObjectAt
@@ -73,6 +75,7 @@ namespace iText.Signatures.Cms {
             }
             eContentType = eContentTypeOid.GetId();
         }
+//\endcond
 
         /// <summary>Returns the contenttype oid.</summary>
         /// <returns>the contenttype oid.</returns>

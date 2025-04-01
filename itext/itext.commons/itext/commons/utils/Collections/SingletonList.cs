@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -26,6 +26,7 @@ using System.Collections.Generic;
 
 namespace iText.Commons.Utils.Collections
 {
+    //\cond DO_NOT_DOCUMENT 
     internal class SingletonList<T> : IList<T> {
         private readonly T element;
 
@@ -94,4 +95,5 @@ namespace iText.Commons.Utils.Collections
             set { throw new NotSupportedException("Collection is read-only."); }
         }
     }
+   //\endcond 
 }

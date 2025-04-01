@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -28,6 +28,7 @@ using System.Reflection;
 using System.Text;
 
 namespace iText.Forms {
+   //\cond DO_NOT_DOCUMENT  
     internal static class FormsExtensions {
         public static void AddAll<T>(this ICollection<T> t, IEnumerable<T> newItems) {
             foreach (T item in newItems) {
@@ -147,4 +148,5 @@ namespace iText.Forms {
             list.Insert(index, elem);
         }
     }
+   //\endcond 
 }

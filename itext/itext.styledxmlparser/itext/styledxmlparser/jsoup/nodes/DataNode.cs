@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -51,13 +51,17 @@ namespace iText.StyledXmlParser.Jsoup.Nodes {
             return this;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal override void OuterHtmlHead(StringBuilder accum, int depth, OutputSettings @out) {
             accum.Append(GetWholeData());
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         // data is not escaped in return from data nodes, so " in script, style is plain
         internal override void OuterHtmlTail(StringBuilder accum, int depth, OutputSettings @out) {
         }
+//\endcond
 
         public override String ToString() {
             return OuterHtml();

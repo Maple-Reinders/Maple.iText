@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -38,14 +38,16 @@ namespace iText.Kernel.Pdf.Tagutils {
     /// Waiting state could also be perceived as a temporal association of the object to some particular tag.
     /// </remarks>
     public class WaitingTagsManager {
-        private IDictionary<Object, PdfStructElem> associatedObjToWaitingTag;
+        private readonly IDictionary<Object, PdfStructElem> associatedObjToWaitingTag;
 
-        private IDictionary<PdfDictionary, Object> waitingTagToAssociatedObj;
+        private readonly IDictionary<PdfDictionary, Object> waitingTagToAssociatedObj;
 
+//\cond DO_NOT_DOCUMENT
         internal WaitingTagsManager() {
             associatedObjToWaitingTag = new Dictionary<Object, PdfStructElem>();
             waitingTagToAssociatedObj = new Dictionary<PdfDictionary, Object>();
         }
+//\endcond
 
         /// <summary>
         /// Assigns waiting state to the tag at which given
@@ -184,19 +186,26 @@ namespace iText.Kernel.Pdf.Tagutils {
             associatedObjToWaitingTag.Clear();
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual PdfStructElem GetStructForObj(Object associatedObj) {
             return associatedObjToWaitingTag.Get(associatedObj);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual Object GetObjForStructDict(PdfDictionary structDict) {
             return waitingTagToAssociatedObj.Get(structDict);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual Object SaveAssociatedObjectForWaitingTag(Object associatedObj, PdfStructElem structElem) {
             associatedObjToWaitingTag.Put(associatedObj, structElem);
             return waitingTagToAssociatedObj.Put(structElem.GetPdfObject(), associatedObj);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <returns>parent of the flushed tag</returns>
         internal virtual IStructureNode FlushTag(PdfStructElem tagStruct) {
             Object associatedObj = waitingTagToAssociatedObj.JRemove(tagStruct.GetPdfObject());
@@ -207,17 +216,15 @@ namespace iText.Kernel.Pdf.Tagutils {
             FlushStructElementAndItKids(tagStruct);
             return parent;
         }
+//\endcond
 
         private void FlushStructElementAndItKids(PdfStructElem elem) {
             if (waitingTagToAssociatedObj.ContainsKey(elem.GetPdfObject())) {
                 return;
             }
-            foreach (IStructureNode kid in elem.GetKids()) {
-                if (kid is PdfStructElem) {
-                    FlushStructElementAndItKids((PdfStructElem)kid);
-                }
-            }
-            elem.Flush();
+            TagTreeIterator iterator = new TagTreeIterator(elem, TagTreeIterator.TreeTraversalOrder.POST_ORDER);
+            iterator.AddHandler(new TagTreeIteratorFlusher().SetWaitingTags(waitingTagToAssociatedObj.Keys));
+            iterator.Traverse();
         }
 
         private void RemoveWaitingStateAndFlushIfParentFlushed(PdfStructElem structElem) {

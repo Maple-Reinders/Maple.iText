@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -67,9 +67,15 @@ namespace iText.Forms.Fields {
         }
 
         [NUnit.Framework.Test]
+        public virtual void CreatePushButtonWithIncorrectNameTest() {
+            NUnit.Framework.Assert.DoesNotThrow(() => new PushButtonFormFieldBuilder(DUMMY_DOCUMENT, "incorrect.name")
+                .SetWidgetRectangle(DUMMY_RECTANGLE).CreatePushButton());
+        }
+
+        [NUnit.Framework.Test]
         public virtual void CreatePushButtonWithConformanceLevelTest() {
             PdfButtonFormField pushButtonFormField = new PushButtonFormFieldBuilder(DUMMY_DOCUMENT, DUMMY_NAME).SetWidgetRectangle
-                (DUMMY_RECTANGLE).SetConformanceLevel(PdfAConformanceLevel.PDF_A_1A).CreatePushButton();
+                (DUMMY_RECTANGLE).SetConformance(PdfConformance.PDF_A_1A).CreatePushButton();
             ComparePushButtons(pushButtonFormField, true);
         }
 

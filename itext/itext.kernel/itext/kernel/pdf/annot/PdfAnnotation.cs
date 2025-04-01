@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -1599,6 +1599,7 @@ namespace iText.Kernel.Pdf.Annot {
             return true;
         }
 
+//\cond DO_NOT_DOCUMENT
         // Created as a private static class in order to facilitate autoport.
         internal class PdfUnknownAnnotation : PdfAnnotation {
             protected internal PdfUnknownAnnotation(PdfDictionary pdfObject)
@@ -1609,5 +1610,6 @@ namespace iText.Kernel.Pdf.Annot {
                 return GetPdfObject().GetAsName(PdfName.Subtype);
             }
         }
+//\endcond
     }
 }

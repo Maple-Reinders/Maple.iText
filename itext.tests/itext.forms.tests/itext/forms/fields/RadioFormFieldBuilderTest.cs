@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -64,6 +64,12 @@ namespace iText.Forms.Fields {
             PdfButtonFormField radioGroup = builder.CreateRadioGroup();
             PdfFormAnnotation radioAnnotation = builder.CreateRadioButton(DUMMY_APPEARANCE_NAME, DUMMY_RECTANGLE);
             CompareRadioButtons(radioAnnotation, radioGroup, false);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CreateRadioButtonWithIncorrectNameTest() {
+            NUnit.Framework.Assert.DoesNotThrow(() => new RadioFormFieldBuilder(DUMMY_DOCUMENT, "incorrect.name").SetWidgetRectangle
+                (DUMMY_RECTANGLE).CreateRadioGroup());
         }
 
         [NUnit.Framework.Test]
@@ -149,8 +155,8 @@ namespace iText.Forms.Fields {
         public virtual void CreateRadioButtonWithConformanceLevelTest() {
             RadioFormFieldBuilder builder = new RadioFormFieldBuilder(DUMMY_DOCUMENT, DUMMY_NAME);
             PdfButtonFormField radioGroup = builder.CreateRadioGroup();
-            PdfFormAnnotation radioAnnotation = builder.SetConformanceLevel(PdfAConformanceLevel.PDF_A_1A).CreateRadioButton
-                (DUMMY_APPEARANCE_NAME, DUMMY_RECTANGLE);
+            PdfFormAnnotation radioAnnotation = builder.SetConformance(PdfConformance.PDF_A_1A).CreateRadioButton(DUMMY_APPEARANCE_NAME
+                , DUMMY_RECTANGLE);
             CompareRadioButtons(radioAnnotation, radioGroup, false);
         }
 
@@ -158,8 +164,8 @@ namespace iText.Forms.Fields {
         public virtual void CreateRadioButtonWithConformanceLevelAddedToGroupTest() {
             RadioFormFieldBuilder builder = new RadioFormFieldBuilder(DUMMY_DOCUMENT, DUMMY_NAME);
             PdfButtonFormField radioGroup = builder.CreateRadioGroup();
-            PdfFormAnnotation radioAnnotation = builder.SetConformanceLevel(PdfAConformanceLevel.PDF_A_1A).CreateRadioButton
-                (DUMMY_APPEARANCE_NAME, DUMMY_RECTANGLE);
+            PdfFormAnnotation radioAnnotation = builder.SetConformance(PdfConformance.PDF_A_1A).CreateRadioButton(DUMMY_APPEARANCE_NAME
+                , DUMMY_RECTANGLE);
             radioGroup.AddKid(radioAnnotation);
             CompareRadioButtons(radioAnnotation, radioGroup, true);
         }
@@ -235,7 +241,7 @@ namespace iText.Forms.Fields {
                         ));
                 }
             }
-            if (radioButtonFormField.pdfAConformanceLevel != null) {
+            if (radioButtonFormField.pdfConformance != null && radioButtonFormField.pdfConformance.IsPdfAOrUa()) {
                 PutIfAbsent(expectedDictionary, PdfName.F, new PdfNumber(PdfAnnotation.PRINT));
             }
             // for the AS key if it's added to the group we expect it to be off or the value if the radiogroup was selected

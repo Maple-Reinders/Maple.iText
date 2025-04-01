@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -45,11 +45,17 @@ namespace iText.Layout {
 
         public const String cmpPrefix = "cmp_";
 
+//\cond DO_NOT_DOCUMENT
         internal String fileName;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal String outFileName;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal String cmpFileName;
+//\endcond
 
         [NUnit.Framework.OneTimeSetUp]
         public static void BeforeClass() {
@@ -212,8 +218,8 @@ namespace iText.Layout {
             doc.Add(new Paragraph(textBefore).SetMargins(25, 60, 70, 80));
             Paragraph p = new Paragraph(text).SetBackgroundColor(ColorConstants.GRAY);
             p.SetMargins(25, 60, 70, 80);
-            p.SetBorderLeft(new DoubleBorder(ColorConstants.RED, 25));
             p.SetBorder(new DoubleBorder(ColorConstants.BLACK, 6));
+            p.SetBorderLeft(new DoubleBorder(ColorConstants.RED, 25));
             doc.Add(p);
             doc.Add(new Paragraph(textAfter).SetBorder(new DottedBorder(ColorConstants.BLACK, 3)).SetBorderRight(new DottedBorder
                 (ColorConstants.BLACK, 12)));

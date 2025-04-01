@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
+using iText.Commons.Utils;
 using iText.Forms;
 using iText.Forms.Fields;
 using iText.Forms.Fields.Properties;
@@ -55,16 +56,16 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_1A, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_1A, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.SetTagged();
             doc.GetCatalog().SetLang(new PdfString("en-US"));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_1A).CreateCheckBox
-                ().SetValue("Off");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_1A).CreateCheckBox().SetValue
+                ("Off");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -80,16 +81,16 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_1A, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_1A, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.SetTagged();
             doc.GetCatalog().SetLang(new PdfString("en-US"));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_1A).CreateCheckBox
-                ().SetValue("On");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_1A).CreateCheckBox().SetValue
+                ("On");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -105,14 +106,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_1B, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_1B, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_1B).CreateCheckBox
-                ().SetValue("Off");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_1B).CreateCheckBox().SetValue
+                ("Off");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -128,14 +129,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_1B, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_1B, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_1B).CreateCheckBox
-                ().SetValue("On");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_1B).CreateCheckBox().SetValue
+                ("On");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -151,16 +152,16 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_2A, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_2A, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.SetTagged();
             doc.GetCatalog().SetLang(new PdfString("en-US"));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_2A).CreateCheckBox
-                ().SetValue("Off");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_2A).CreateCheckBox().SetValue
+                ("Off");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -176,16 +177,16 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_2A, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_2A, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.SetTagged();
             doc.GetCatalog().SetLang(new PdfString("en-US"));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_2A).CreateCheckBox
-                ().SetValue("On");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_2A).CreateCheckBox().SetValue
+                ("On");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -201,14 +202,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_2B, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_2B, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_2B).CreateCheckBox
-                ().SetValue("Off");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_2B).CreateCheckBox().SetValue
+                ("Off");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -224,14 +225,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_2B, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_2B, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_2B).CreateCheckBox
-                ().SetValue("On");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_2B).CreateCheckBox().SetValue
+                ("On");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -247,14 +248,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_2U, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_2U, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_2U).CreateCheckBox
-                ().SetValue("Off");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_2U).CreateCheckBox().SetValue
+                ("Off");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -270,14 +271,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_2U, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_2U, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_2U).CreateCheckBox
-                ().SetValue("On");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_2U).CreateCheckBox().SetValue
+                ("On");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -293,16 +294,16 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3A, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_3A, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.SetTagged();
             doc.GetCatalog().SetLang(new PdfString("en-US"));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_3A).CreateCheckBox
-                ().SetValue("Off");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_3A).CreateCheckBox().SetValue
+                ("Off");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -318,16 +319,16 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3A, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_3A, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.SetTagged();
             doc.GetCatalog().SetLang(new PdfString("en-US"));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_3A).CreateCheckBox
-                ().SetValue("On");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_3A).CreateCheckBox().SetValue
+                ("On");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -343,14 +344,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3B, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_3B, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_3B).CreateCheckBox
-                ().SetValue("Off");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_3B).CreateCheckBox().SetValue
+                ("Off");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -366,14 +367,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3B, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_3B, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_3B).CreateCheckBox
-                ().SetValue("On");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_3B).CreateCheckBox().SetValue
+                ("On");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -389,14 +390,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3U, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_3U, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_3U).CreateCheckBox
-                ().SetValue("Off");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_3U).CreateCheckBox().SetValue
+                ("Off");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);
@@ -412,14 +413,14 @@ namespace iText.Pdfa {
             String cmpPath = cmpFolder + "cmp_" + name + ".pdf";
             String diff = "diff_" + name + "_";
             PdfWriter writer = new PdfWriter(outPath);
-            Stream @is = new FileStream(sourceFolder + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read);
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_3U, new PdfOutputIntent("Custom", ""
-                , "http://www.color.org", "sRGB IEC61966-2.1", @is));
+            Stream @is = FileUtil.GetInputStreamForFile(sourceFolder + "sRGB Color Space Profile.icm");
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_3U, new PdfOutputIntent("Custom", "", "http://www.color.org"
+                , "sRGB IEC61966-2.1", @is));
             doc.AddNewPage();
             PdfAcroForm form = PdfFormCreator.GetAcroForm(doc, true);
             PdfFormField chk = new CheckBoxFormFieldBuilder(doc, "name").SetWidgetRectangle(new Rectangle(100, 500, 50
-                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformanceLevel(PdfAConformanceLevel.PDF_A_3U).CreateCheckBox
-                ().SetValue("On");
+                , 50)).SetCheckType(CheckBoxType.CHECK).SetConformance(PdfConformance.PDF_A_3U).CreateCheckBox().SetValue
+                ("On");
             chk.GetFirstFormAnnotation().SetBorderColor(ColorConstants.BLACK);
             chk.GetFirstFormAnnotation().SetBorderWidth(1);
             form.AddField(chk);

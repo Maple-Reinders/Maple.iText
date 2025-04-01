@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -64,6 +64,7 @@ namespace iText.StyledXmlParser.Css.Util {
             this.closeCharacter = escapeChar;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Is currently processed character in
         /// <see cref="CssUtils.SplitString(System.String, char, EscapeGroup[])"/>
@@ -73,7 +74,9 @@ namespace iText.StyledXmlParser.Css.Util {
         internal virtual bool IsEscaped() {
             return counter != 0;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Processes given character.</summary>
         /// <param name="nextCharacter">next character to process</param>
         internal virtual void ProcessCharacter(char nextCharacter) {
@@ -103,5 +106,6 @@ namespace iText.StyledXmlParser.Css.Util {
                 }
             }
         }
+//\endcond
     }
 }

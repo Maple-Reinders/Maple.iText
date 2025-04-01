@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
+using iText.Commons.Utils;
 using iText.IO.Image;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
@@ -50,11 +51,10 @@ namespace iText.Pdfa {
         [NUnit.Framework.Test]
         public virtual void CheckIfOcgForPdfA2Works() {
             String fileName = "createdOcgPdfA.pdf";
-            Stream colorStream = new FileStream(sourceFolder + "color/sRGB_CS_profile.icm", FileMode.Open, FileAccess.Read
-                );
+            Stream colorStream = FileUtil.GetInputStreamForFile(sourceFolder + "color/sRGB_CS_profile.icm");
             String outFileName = destinationFolder + fileName;
             String cmpFileName = sourceFolder + "cmp/PdfA2LayoutOcgTest/cmp_" + fileName;
-            PdfDocument pdfDoc = new PdfADocument(new PdfWriter(outFileName), PdfAConformanceLevel.PDF_A_2A, new PdfOutputIntent
+            PdfDocument pdfDoc = new PdfADocument(new PdfWriter(outFileName), PdfAConformance.PDF_A_2A, new PdfOutputIntent
                 ("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", colorStream));
             pdfDoc.SetTagged();
             pdfDoc.GetCatalog().SetLang(new PdfString("en-US"));

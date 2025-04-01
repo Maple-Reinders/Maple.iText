@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -50,6 +50,11 @@ namespace iText.Bouncycastlefips.Asn1.X500 {
         /// </returns>
         public virtual X500Name GetX500Name() {
             return (X500Name)GetEncodable();
+        }
+
+        public string GetName()
+        {
+            return GetX500Name().ToString();
         }
     }
 }

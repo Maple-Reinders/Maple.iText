@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -27,6 +27,7 @@ using System.Linq;
 
 namespace iText.Commons.Utils.Collections
 {
+    //\cond DO_NOT_DOCUMENT 
     internal static class EnumerableExtentions
     {
         public static IEnumerable<T> Sorted<T>(this  IEnumerable<T> source, Comparison<T> comp)
@@ -39,4 +40,5 @@ namespace iText.Commons.Utils.Collections
             return source.OrderBy(x => x);
         }
     }
+   //\endcond 
 }

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -516,17 +516,29 @@ namespace iText.Layout {
         }
 
         private class HtmlRoles {
+//\cond DO_NOT_DOCUMENT
             internal static String h1 = "h1";
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal static String p = "p";
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal static String img = "img";
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal static String ul = "ul";
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal static String center = "center";
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal static String span = "span";
+//\endcond
         }
 
         private void AddSimpleContentToDoc(Document document, Paragraph p2) {
@@ -580,7 +592,7 @@ namespace iText.Layout {
             if (defaultNamespace == null) {
                 Text i = new Text("italic text");
                 i.GetAccessibilityProperties().SetRole("I");
-                Paragraph pi = new Paragraph(i.SetItalic());
+                Paragraph pi = new Paragraph(i.SimulateItalic());
                 document.Add(pi);
             }
         }

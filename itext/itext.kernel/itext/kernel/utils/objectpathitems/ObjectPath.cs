@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -85,6 +85,17 @@ namespace iText.Kernel.Utils.Objectpathitems {
             indirects.Push(new IndirectPathItem(baseCmpObject, baseOutObject));
         }
 
+        /// <summary>Creates CompareObjectPath with corresponding base objects in two documents.</summary>
+        /// <param name="baseCmpObject">base object in cmp document</param>
+        /// <param name="baseOutObject">base object in out document</param>
+        /// <param name="path">
+        /// local path that denotes sequence of the path items from base object
+        /// to the comparing direct object
+        /// </param>
+        /// <param name="indirects">
+        /// indirect path which denotes sequence of the indirect references that
+        /// were passed in comparing process to get to the current base objects
+        /// </param>
         public ObjectPath(PdfIndirectReference baseCmpObject, PdfIndirectReference baseOutObject, Stack<LocalPathItem
             > path, Stack<IndirectPathItem> indirects) {
             this.baseCmpObject = baseCmpObject;

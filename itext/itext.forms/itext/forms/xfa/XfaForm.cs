@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -27,6 +27,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using iText.Commons.Utils;
 using iText.Forms.Fields;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Pdf;
@@ -369,6 +370,37 @@ namespace iText.Forms.Xfa
 			return n == null ? "" : GetNodeText(n, "");
 		}
 
+		/// <summary>
+		/// Gets all the text contained in the child nodes of the node under the provided path.
+		/// </summary>
+		/// <param name="path">path to the node to extract text in the format "some.path.to.node"</param>
+		/// <returns>text found under the provided path or <c>null</c> if node or text wasn't found</returns>
+		public virtual String GetNodeTextByPath(String path)
+		{
+            if (!xfaPresent) {
+                return null;
+            }
+			XNode domXElementRoot = domDocument.FirstNode;
+			while (!(domXElementRoot is XElement) || !((XElement)domXElementRoot).Nodes().Any())
+			{
+				domXElementRoot = domXElementRoot.NextNode;
+			}
+			
+			
+			Xml2SomDatasets nodeSom = new Xml2SomDatasets(domXElementRoot);
+			AcroFieldsSearch nodeFieldsSom = new AcroFieldsSearch(nodeSom.GetName2Node().Keys);
+
+			String foundPath = nodeFieldsSom.InverseSearchGlobal(
+				new List<string>(new Stack<string>(Xml2Som.SplitParts(path))));
+			
+			if (foundPath != null) {
+				XNode resultNode = nodeSom.GetName2Node().Get(foundPath);
+				return XfaForm.GetNodeText(resultNode);
+			}
+			
+			return null;
+		}
+
 		/// <summary>Sets the text of this node.</summary>
 		/// <remarks>
 		/// Sets the text of this node. All the child's node are deleted and a new
@@ -452,7 +484,7 @@ namespace iText.Forms.Xfa
 		/// <param name="readOnly">whether or not the resulting DOM document may be modified</param>
 		public virtual void FillXfaForm(FileInfo file, bool readOnly)
 		{
-			FillXfaForm(new FileStream(file.FullName, FileMode.Open, FileAccess.Read), readOnly);
+			FillXfaForm(FileUtil.GetInputStreamForFile(file), readOnly);
 		}
 
 		/// <summary>Replaces the XFA data under datasets/data.</summary>
@@ -594,17 +626,17 @@ namespace iText.Forms.Xfa
 		    XNode n2 = ((XElement) n).FirstNode;
 			while (n2 != null)
 			{
-				if (n2 is XElement)
-				{
+				if (n2 is XElement) {
 					name = GetNodeText(n2, name);
+				} else if (n2 is XText) {
+					name += ((XText) n2).Value;
 				}
-				else
-				{
-					if (n2 is XText) {
-					    name += ((XText) n2).Value;
-					}
+				
+				if (n2 is XElement) {
+					n2 = ((XElement)n2).NextNode;
+				} else {
+					return name;
 				}
-			    n2 = ((XElement) n2).NextNode;
 			}
 			return name;
 		}

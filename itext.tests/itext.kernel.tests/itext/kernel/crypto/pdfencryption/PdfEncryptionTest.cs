@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,6 +27,7 @@ using iText.Bouncycastleconnector;
 using iText.Commons.Bouncycastle;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
+using iText.Commons.Utils;
 using iText.Kernel.Crypto;
 using iText.Kernel.Crypto.Securityhandler;
 using iText.Kernel.Exceptions;
@@ -78,8 +79,10 @@ namespace iText.Kernel.Crypto.Pdfencryption {
 
         private IPrivateKey privateKey;
 
+//\cond DO_NOT_DOCUMENT
         internal PdfEncryptionTestUtils encryptionUtil = new PdfEncryptionTestUtils(destinationFolder, sourceFolder
             );
+//\endcond
 
         [NUnit.Framework.OneTimeSetUp]
         public static void BeforeClass() {
@@ -132,7 +135,6 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true)]
         public virtual void EncryptWithPasswordAes256() {
             String filename = "encryptWithPasswordAes256.pdf";
             int encryptionType = EncryptionConstants.ENCRYPTION_AES_256;
@@ -148,7 +150,6 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true)]
         public virtual void EncryptWithPasswordAes256NoCompression() {
             String filename = "encryptWithPasswordAes256NoCompression.pdf";
             int encryptionType = EncryptionConstants.ENCRYPTION_AES_256;
@@ -208,7 +209,7 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         public virtual void OpenEncryptedDocWithWrongCertificateAndPrivateKey() {
             using (PdfReader reader = new PdfReader(sourceFolder + "encryptedWithCertificateAes128.pdf", new ReaderProperties
                 ().SetPublicKeySecurityParams(GetPublicCertificate(sourceFolder + "wrong.cer"), PemFileHelper.ReadPrivateKeyFromPemFile
-                (new FileStream(sourceFolder + "wrong.pem", FileMode.Open, FileAccess.Read), PRIVATE_KEY_PASS)))) {
+                (FileUtil.GetInputStreamForFile(sourceFolder + "wrong.pem"), PRIVATE_KEY_PASS)))) {
                 Exception e = NUnit.Framework.Assert.Catch(typeof(PdfException), () => new PdfDocument(reader));
                 NUnit.Framework.Assert.AreEqual(KernelExceptionMessageConstant.BAD_CERTIFICATE_AND_KEY, e.Message);
             }
@@ -220,7 +221,7 @@ namespace iText.Kernel.Crypto.Pdfencryption {
             PdfReader reader = new PdfReader(sourceFolder + "encryptedWithPlainMetadata.pdf", new ReaderProperties().SetPassword
                 (PdfEncryptionTestUtils.OWNER));
             PdfDocument doc = new PdfDocument(reader);
-            XMPMeta xmpMeta = XMPMetaFactory.ParseFromBuffer(doc.GetXmpMetadata());
+            XMPMeta xmpMeta = doc.GetXmpMetadata();
             XMPProperty creatorToolXmp = xmpMeta.GetProperty(XMPConst.NS_XMP, "CreatorTool");
             doc.Close();
             NUnit.Framework.Assert.IsNotNull(creatorToolXmp);
@@ -308,7 +309,36 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true)]
+        public virtual void EncryptWithPasswordAes256EmbeddedFilesOnly() {
+            String filename = "encryptWithPasswordAes256EmbeddedFilesOnly.pdf";
+            int encryptionType = EncryptionConstants.ENCRYPTION_AES_256 | EncryptionConstants.EMBEDDED_FILES_ONLY;
+            String outFileName = destinationFolder + filename;
+            int permissions = EncryptionConstants.ALLOW_SCREENREADERS;
+            PdfWriter writer = CompareTool.CreateTestPdfWriter(outFileName, new WriterProperties().SetStandardEncryption
+                (PdfEncryptionTestUtils.USER, PdfEncryptionTestUtils.OWNER, permissions, encryptionType).AddXmpMetadata
+                ().SetPdfVersion(PdfVersion.PDF_2_0));
+            PdfDocument document = new PdfDocument(writer);
+            document.GetDocumentInfo().SetMoreInfo(PdfEncryptionTestUtils.CUSTOM_INFO_ENTRY_KEY, PdfEncryptionTestUtils
+                .CUSTOM_INFO_ENTRY_VALUE);
+            PdfPage page = document.AddNewPage();
+            String textContent = "Hello world!";
+            PdfEncryptionTestUtils.WriteTextBytesOnPageContent(page, textContent);
+            String descripton = "encryptedFile";
+            String path = sourceFolder + "pageWithContent.pdf";
+            document.AddFileAttachment(descripton, PdfFileSpec.CreateEmbeddedFileSpec(document, path, descripton, path
+                , null, null));
+            page.Flush();
+            document.Close();
+            //TODO DEVSIX-5355 Specific crypto filters for EFF StmF and StrF are not supported at the moment.
+            // However we can read embedded files only mode.
+            bool ERROR_IS_EXPECTED = false;
+            encryptionUtil.CheckDecryptedWithPasswordContent(destinationFolder + filename, PdfEncryptionTestUtils.OWNER
+                , textContent, ERROR_IS_EXPECTED);
+            encryptionUtil.CheckDecryptedWithPasswordContent(destinationFolder + filename, PdfEncryptionTestUtils.USER
+                , textContent, ERROR_IS_EXPECTED);
+        }
+
+        [NUnit.Framework.Test]
         public virtual void EncryptAes256Pdf2NotEncryptMetadata() {
             String filename = "encryptAes256Pdf2NotEncryptMetadata.pdf";
             int encryptionType = EncryptionConstants.ENCRYPTION_AES_256 | EncryptionConstants.DO_NOT_ENCRYPT_METADATA;
@@ -316,7 +346,6 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true)]
         public virtual void EncryptAes256Pdf2NotEncryptMetadata02() {
             String filename = "encryptAes256Pdf2NotEncryptMetadata02.pdf";
             int encryptionType = EncryptionConstants.ENCRYPTION_AES_256 | EncryptionConstants.DO_NOT_ENCRYPT_METADATA;
@@ -343,7 +372,6 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true)]
         public virtual void EncryptAes256FullCompression() {
             String filename = "encryptAes256FullCompression.pdf";
             int encryptionType = EncryptionConstants.ENCRYPTION_AES_256;
@@ -351,7 +379,6 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true)]
         public virtual void EncryptWithPasswordAes256Pdf2() {
             String filename = "encryptWithPasswordAes256Pdf2.pdf";
             int encryptionType = EncryptionConstants.ENCRYPTION_AES_256;
@@ -360,7 +387,7 @@ namespace iText.Kernel.Crypto.Pdfencryption {
 
         [NUnit.Framework.Test]
         [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true)]
-        [LogMessage(VersionConforming.DEPRECATED_ENCRYPTION_ALGORITHMS)]
+        [LogMessage(VersionConforming.DEPRECATED_ENCRYPTION_ALGORITHMS, Count = 2)]
         public virtual void EncryptWithPasswordAes128Pdf2() {
             String filename = "encryptWithPasswordAes128Pdf2.pdf";
             int encryptionType = EncryptionConstants.ENCRYPTION_AES_128;
@@ -368,7 +395,6 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true)]
         public virtual void StampAndUpdateVersionNewAes256() {
             String filename = "stampAndUpdateVersionNewAes256.pdf";
             PdfDocument doc = new PdfDocument(new PdfReader(sourceFolder + "encryptedWithPasswordAes256.pdf", new ReaderProperties
@@ -380,7 +406,6 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true)]
         public virtual void EncryptAes256Pdf2Permissions() {
             String filename = "encryptAes256Pdf2Permissions.pdf";
             int permissions = EncryptionConstants.ALLOW_FILL_IN | EncryptionConstants.ALLOW_SCREENREADERS | EncryptionConstants
@@ -427,7 +452,6 @@ namespace iText.Kernel.Crypto.Pdfencryption {
 
         // this test checks log message absence
         [NUnit.Framework.Test]
-        [LogMessage(KernelLogMessageConstant.MD5_IS_NOT_FIPS_COMPLIANT, Ignore = true, Count = 2)]
         public virtual void DecryptAdobeWithPasswordAes256() {
             String filename = System.IO.Path.Combine(sourceFolder + "AdobeAes256.pdf").ToString();
             DecryptWithPassword(filename, "user".GetBytes());
@@ -509,14 +533,14 @@ namespace iText.Kernel.Crypto.Pdfencryption {
         }
 
         public virtual IX509Certificate GetPublicCertificate(String path) {
-            FileStream @is = new FileStream(path, FileMode.Open, FileAccess.Read);
+            Stream @is = FileUtil.GetInputStreamForFile(path);
             return CryptoUtil.ReadPublicCertificate(@is);
         }
 
         public virtual IPrivateKey GetPrivateKey() {
             if (privateKey == null) {
-                privateKey = PemFileHelper.ReadPrivateKeyFromPemFile(new FileStream(PRIVATE_KEY, FileMode.Open, FileAccess.Read
-                    ), PRIVATE_KEY_PASS);
+                privateKey = PemFileHelper.ReadPrivateKeyFromPemFile(FileUtil.GetInputStreamForFile(PRIVATE_KEY), PRIVATE_KEY_PASS
+                    );
             }
             return privateKey;
         }
@@ -548,7 +572,7 @@ namespace iText.Kernel.Crypto.Pdfencryption {
             newPage.Put(PdfName.Default, new PdfString("Hello world string"));
             PdfEncryptionTestUtils.WriteTextBytesOnPageContent(newPage, "Hello world page_2!");
             document.Close();
-            CompareTool compareTool = new CompareTool().EnableEncryptionCompare();
+            CompareTool compareTool = new CompareTool().EnableEncryptionCompare(false);
             String compareResult = compareTool.CompareByContent(outFileName, sourceFolder + "cmp_appended_" + filename
                 , destinationFolder, "diff_", PdfEncryptionTestUtils.USER, PdfEncryptionTestUtils.USER);
             if (compareResult != null) {

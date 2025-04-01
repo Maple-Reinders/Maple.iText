@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -25,7 +25,7 @@ using System.Xml;
 namespace iText.IO.Util {
     /// <summary>
     /// This file is a helper class for internal usage only.
-    /// Be aware that its API and functionality may be changed in future.
+    /// Be aware that its API and functionality may be changed in the future.
     /// </summary>
     public class XmlUtil {
         /// <summary>

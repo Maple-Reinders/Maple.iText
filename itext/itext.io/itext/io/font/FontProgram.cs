@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -169,6 +169,7 @@ namespace iText.IO.Font {
             this.registry = registry;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Gets the name without the modifiers Bold, Italic or BoldItalic.</summary>
         /// <param name="name">the full name of the font</param>
         /// <returns>the name without the modifiers Bold, Italic or BoldItalic</returns>
@@ -193,6 +194,7 @@ namespace iText.IO.Font {
                 }
             }
         }
+//\endcond
 
         /// <summary>Sets typo ascender.</summary>
         /// <remarks>

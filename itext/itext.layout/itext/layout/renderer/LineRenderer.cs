@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -51,9 +51,13 @@ namespace iText.Layout.Renderer {
         // bidi levels
         protected internal byte[] levels;
 
+//\cond DO_NOT_DOCUMENT
         internal float maxTextAscent;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal float maxTextDescent;
+//\endcond
 
         private float maxBlockAscent;
 
@@ -659,6 +663,7 @@ namespace iText.Layout.Renderer {
             }
             if (anythingPlaced || floatsPlacedInLine) {
                 toProcess.AdjustChildrenYLine().TrimLast();
+                toProcess.AdjustChildrenXLine();
                 result.SetMinMaxWidth(minMaxWidth);
             }
             if (wasXOverflowChanged) {
@@ -725,7 +730,7 @@ namespace iText.Layout.Renderer {
             int baseCharsCount = BaseCharactersCount();
             float baseFactor = freeWidth / (ratio * numberOfSpaces + (1 - ratio) * (baseCharsCount - 1));
             //Prevent a NaN when trying to justify a single word with spacing_ratio == 1.0
-            if (float.IsInfinity(baseFactor)) {
+            if (float.IsInfinity(baseFactor) || float.IsNaN(baseFactor)) {
                 baseFactor = 0;
             }
             float wordSpacing = ratio * baseFactor;
@@ -880,6 +885,7 @@ namespace iText.Layout.Renderer {
             return result.GetMinMaxWidth();
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual bool HasChildRendererInHtmlMode() {
             foreach (IRenderer childRenderer in GetChildRenderers()) {
                 if (RenderingMode.HTML_MODE.Equals(childRenderer.GetProperty<RenderingMode?>(Property.RENDERING_MODE))) {
@@ -888,7 +894,9 @@ namespace iText.Layout.Renderer {
             }
             return false;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual float GetTopLeadingIndent(Leading leading) {
             switch (leading.GetLeadingType()) {
                 case Leading.FIXED: {
@@ -920,7 +928,9 @@ namespace iText.Layout.Renderer {
                 }
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual float GetBottomLeadingIndent(Leading leading) {
             switch (leading.GetLeadingType()) {
                 case Leading.FIXED: {
@@ -952,7 +962,9 @@ namespace iText.Layout.Renderer {
                 }
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static LineRenderer.LineSplitIntoGlyphsData SplitLineIntoGlyphs(LineRenderer toSplit) {
             LineRenderer.LineSplitIntoGlyphsData result = new LineRenderer.LineSplitIntoGlyphsData();
             bool newLineFound = false;
@@ -963,7 +975,7 @@ namespace iText.Layout.Renderer {
                 }
                 if (child is TextRenderer) {
                     GlyphLine childLine = ((TextRenderer)child).line;
-                    for (int i = childLine.start; i < childLine.end; i++) {
+                    for (int i = childLine.GetStart(); i < childLine.GetEnd(); i++) {
                         if (iText.IO.Util.TextUtil.IsNewLine(childLine.Get(i))) {
                             newLineFound = true;
                             break;
@@ -978,7 +990,9 @@ namespace iText.Layout.Renderer {
             }
             return result;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static void Reorder(LineRenderer toProcess, LineRenderer.LineSplitIntoGlyphsData splitLineIntoGlyphsResult
             , int[] newOrder) {
             // Insert non-text renderers
@@ -986,7 +1000,7 @@ namespace iText.Layout.Renderer {
             IList<LineRenderer.RendererGlyph> lineGlyphs = splitLineIntoGlyphsResult.GetLineGlyphs();
             int initialPos = 0;
             for (int offset = initialPos; offset < lineGlyphs.Count; offset = initialPos) {
-                TextRenderer renderer = lineGlyphs[offset].renderer;
+                TextRenderer renderer = lineGlyphs[offset].GetRenderer();
                 TextRenderer newRenderer = new TextRenderer(renderer).RemoveReversedRanges();
                 toProcess.AddChildRenderer(newRenderer);
                 // Insert non-text renderers
@@ -994,11 +1008,11 @@ namespace iText.Layout.Renderer {
                 newRenderer.line = new GlyphLine(newRenderer.line);
                 IList<Glyph> replacementGlyphs = new List<Glyph>();
                 bool reversed = false;
-                for (int pos = offset; pos < lineGlyphs.Count && lineGlyphs[pos].renderer == renderer; ++pos) {
-                    replacementGlyphs.Add(lineGlyphs[pos].glyph);
-                    if (pos + 1 < lineGlyphs.Count && lineGlyphs[pos + 1].renderer == renderer && newOrder[pos] == newOrder[pos
-                         + 1] + 1 && !iText.IO.Util.TextUtil.IsSpaceOrWhitespace(lineGlyphs[pos + 1].glyph) && !iText.IO.Util.TextUtil
-                        .IsSpaceOrWhitespace(lineGlyphs[pos].glyph)) {
+                for (int pos = offset; pos < lineGlyphs.Count && lineGlyphs[pos].GetRenderer() == renderer; ++pos) {
+                    replacementGlyphs.Add(lineGlyphs[pos].GetGlyph());
+                    if (pos + 1 < lineGlyphs.Count && lineGlyphs[pos + 1].GetRenderer() == renderer && newOrder[pos] == newOrder
+                        [pos + 1] + 1 && !iText.IO.Util.TextUtil.IsSpaceOrWhitespace(lineGlyphs[pos + 1].GetGlyph()) && !iText.IO.Util.TextUtil
+                        .IsSpaceOrWhitespace(lineGlyphs[pos].GetGlyph())) {
                         reversed = true;
                         continue;
                     }
@@ -1011,7 +1025,9 @@ namespace iText.Layout.Renderer {
                 newRenderer.line.SetGlyphs(replacementGlyphs);
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static void AdjustChildPositionsAfterReordering(IList<IRenderer> children, float initialXPos) {
             float currentXPos = initialXPos;
             foreach (IRenderer child in children) {
@@ -1049,6 +1065,7 @@ namespace iText.Layout.Renderer {
                 }
             }
         }
+//\endcond
 
         private LineRenderer[] SplitNotFittingFloat(int childPos, LayoutResult childResult) {
             LineRenderer[] split = Split();
@@ -1217,6 +1234,7 @@ namespace iText.Layout.Renderer {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Trim first child text renderers.</summary>
         /// <returns>total number of trimmed glyphs.</returns>
         internal virtual int TrimFirst() {
@@ -1230,9 +1248,9 @@ namespace iText.Layout.Renderer {
                     TextRenderer textRenderer = (TextRenderer)renderer;
                     GlyphLine currentText = textRenderer.GetText();
                     if (currentText != null) {
-                        int prevTextStart = currentText.start;
+                        int prevTextStart = currentText.GetStart();
                         textRenderer.TrimFirst();
-                        int numOfTrimmedGlyphs = textRenderer.GetText().start - prevTextStart;
+                        int numOfTrimmedGlyphs = textRenderer.GetText().GetStart() - prevTextStart;
                         totalNumberOfTrimmedGlyphs += numOfTrimmedGlyphs;
                     }
                     trimFinished = textRenderer.Length() > 0;
@@ -1246,6 +1264,7 @@ namespace iText.Layout.Renderer {
             }
             return totalNumberOfTrimmedGlyphs;
         }
+//\endcond
 
         /// <summary>Apply OTF features and return the last(!) base direction of child renderer</summary>
         /// <returns>the last(!) base direction of child renderer.</returns>
@@ -1262,16 +1281,21 @@ namespace iText.Layout.Renderer {
             return baseDirection;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal static bool IsChildFloating(IRenderer childRenderer) {
             FloatPropertyValue? kidFloatPropertyVal = childRenderer.GetProperty<FloatPropertyValue?>(Property.FLOAT);
             return childRenderer is AbstractRenderer && FloatingHelper.IsRendererFloating(childRenderer, kidFloatPropertyVal
                 );
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static bool IsInlineBlockChild(IRenderer child) {
             return child is BlockRenderer || child is TableRenderer;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Checks if the word that's been split when has been layouted on this line can fit the next line without splitting.
         ///     </summary>
         /// <param name="childRenderer">the childRenderer containing the split word</param>
@@ -1312,7 +1336,9 @@ namespace iText.Layout.Renderer {
             }
             return newLayoutResult is TextLayoutResult && !((TextLayoutResult)newLayoutResult).IsWordHasBeenSplit();
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Extracts ascender and descender of an already layouted
         /// <see cref="IRenderer">childRenderer</see>.
@@ -1365,7 +1391,9 @@ namespace iText.Layout.Renderer {
             }
             return new float[] { childAscent, childDescent };
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Updates
         /// <see cref="maxAscent"/>
@@ -1437,7 +1465,9 @@ namespace iText.Layout.Renderer {
             this.maxTextDescent = maxTextDescentUpdated;
             return new float[] { this.maxAscent, this.maxDescent };
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Update
         /// <see cref="maxAscent"/>
@@ -1490,6 +1520,7 @@ namespace iText.Layout.Renderer {
                 }
             }
         }
+//\endcond
 
         private void UpdateBidiLevels(int totalNumberOfTrimmedGlyphs, BaseDirection? baseDirection) {
             if (totalNumberOfTrimmedGlyphs != 0 && levels != null) {
@@ -1505,7 +1536,7 @@ namespace iText.Layout.Renderer {
                     }
                     if (child is TextRenderer) {
                         GlyphLine text = ((TextRenderer)child).GetText();
-                        for (int i = text.start; i < text.end; i++) {
+                        for (int i = text.GetStart(); i < text.GetEnd(); i++) {
                             Glyph glyph = text.Get(i);
                             if (iText.IO.Util.TextUtil.IsNewLine(glyph)) {
                                 newLineFound = true;
@@ -1597,26 +1628,121 @@ namespace iText.Layout.Renderer {
             return false;
         }
 
-        public class RendererGlyph {
-            public Glyph glyph;
+        private void AdjustChildrenXLine() {
+            RenderingMode? mode = this.GetProperty<RenderingMode?>(Property.RENDERING_MODE);
+            if (RenderingMode.SVG_MODE != mode) {
+                return;
+            }
+            // LineRenderer first child contains initial x of the occupied area, in order to identify originX we need to
+            // also add relative x position of the first text chunk in the svg which is ParagraphRenderer first child.
+            float originX = (float)GetChildRenderers()[0].GetOccupiedArea().GetBBox().GetLeft() + (float)((TextRenderer
+                )GetParent().GetChildRenderers()[0]).GetPropertyAsFloat(Property.LEFT, 0f);
+            float[] minMaxX = GetMinMaxX();
+            float leftmostX = minMaxX[0];
+            float xShift = originX - leftmostX;
+            float textAnchorCorrection = ApplyTextAnchor(minMaxX[1] - minMaxX[0]);
+            xShift += textAnchorCorrection;
+            foreach (IRenderer renderer in GetChildRenderers()) {
+                if (renderer is TextRenderer) {
+                    renderer.Move(xShift, 0);
+                }
+            }
+        }
 
-            public TextRenderer renderer;
+        private float[] GetMinMaxX() {
+            float leftmostX = float.MaxValue;
+            float rightmostX = float.Epsilon;
+            for (int i = 0; i < GetChildRenderers().Count; i++) {
+                IRenderer renderer = GetChildRenderers()[i];
+                if (renderer is TextRenderer) {
+                    TextRenderer textRenderer = (TextRenderer)renderer;
+                    float x = textRenderer.GetOccupiedArea().GetBBox().GetX();
+                    if (textRenderer.IsRelativePosition()) {
+                        x += (float)textRenderer.GetPropertyAsFloat(Property.LEFT, 0f);
+                    }
+                    if (x < leftmostX) {
+                        leftmostX = x;
+                    }
+                    float width = textRenderer.GetOccupiedArea().GetBBox().GetWidth();
+                    if (x + width > rightmostX) {
+                        rightmostX = x + width;
+                    }
+                }
+            }
+            return new float[] { leftmostX, rightmostX };
+        }
+
+        private float ApplyTextAnchor(float textWidth) {
+            TextAnchor textAnchor = (TextAnchor)this.GetProperty<TextAnchor?>(Property.TEXT_ANCHOR, TextAnchor.START);
+            switch (textAnchor) {
+                case TextAnchor.END: {
+                    return -textWidth;
+                }
+
+                case TextAnchor.MIDDLE: {
+                    return -textWidth / 2;
+                }
+
+                default: {
+                    return 0;
+                }
+            }
+        }
+
+        public class RendererGlyph {
+            private Glyph glyph;
+
+            private TextRenderer renderer;
 
             public RendererGlyph(Glyph glyph, TextRenderer textRenderer) {
                 this.glyph = glyph;
                 this.renderer = textRenderer;
             }
+
+            /// <summary>Sets the glyph of the object.</summary>
+            /// <param name="glyph">glyph</param>
+            public virtual void SetGlyph(Glyph glyph) {
+                this.glyph = glyph;
+            }
+
+            /// <summary>Retrieves the glyph of the object.</summary>
+            /// <returns>glyph</returns>
+            public virtual Glyph GetGlyph() {
+                return glyph;
+            }
+
+            /// <summary>Sets the renderer of the object.</summary>
+            /// <param name="renderer">renderer</param>
+            public virtual void SetRenderer(TextRenderer renderer) {
+                this.renderer = renderer;
+            }
+
+            /// <summary>Retrieves the renderer of the object.</summary>
+            /// <returns>renderer</returns>
+            public virtual TextRenderer GetRenderer() {
+                return renderer;
+            }
         }
 
+//\cond DO_NOT_DOCUMENT
         internal class LineAscentDescentState {
+//\cond DO_NOT_DOCUMENT
             internal float maxAscent;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal float maxDescent;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal float maxTextAscent;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal float maxTextDescent;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal LineAscentDescentState(float maxAscent, float maxDescent, float maxTextAscent, float maxTextDescent
                 ) {
                 this.maxAscent = maxAscent;
@@ -1624,8 +1750,11 @@ namespace iText.Layout.Renderer {
                 this.maxTextAscent = maxTextAscent;
                 this.maxTextDescent = maxTextDescent;
             }
+//\endcond
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal class LineSplitIntoGlyphsData {
             private readonly IList<LineRenderer.RendererGlyph> lineGlyphs;
 
@@ -1668,5 +1797,6 @@ namespace iText.Layout.Renderer {
                 }
             }
         }
+//\endcond
     }
 }

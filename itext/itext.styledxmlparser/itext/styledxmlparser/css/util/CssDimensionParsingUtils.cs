@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -310,6 +310,23 @@ namespace iText.StyledXmlParser.Css.Util {
                             return new UnitValue(UnitValue.POINT, ParseRelativeValue(value, emValue));
                         }
                     }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>Parses a flex value "xfr" to x.</summary>
+        /// <param name="value">String containing the flex value to parse</param>
+        /// <returns>the flex value as a float</returns>
+        public static float? ParseFlex(String value) {
+            if (value == null) {
+                return null;
+            }
+            value = value.Trim();
+            if (value.EndsWith(CommonCssConstants.FR)) {
+                value = value.JSubstring(0, value.Length - CommonCssConstants.FR.Length);
+                if (CssTypesValidationUtils.IsNumber(value)) {
+                    return float.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
                 }
             }
             return null;

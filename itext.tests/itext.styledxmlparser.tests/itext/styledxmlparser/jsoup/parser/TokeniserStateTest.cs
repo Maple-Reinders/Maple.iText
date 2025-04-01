@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,9 +30,13 @@ using iText.Test;
 namespace iText.StyledXmlParser.Jsoup.Parser {
     [NUnit.Framework.Category("UnitTest")]
     public class TokeniserStateTest : ExtendedITextTest {
+//\cond DO_NOT_DOCUMENT
         internal readonly char[] whiteSpace = new char[] { '\t', '\n', '\r', '\f', ' ' };
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal readonly char[] quote = new char[] { '\'', '"' };
+//\endcond
 
         [NUnit.Framework.Test]
         public virtual void EnsureSearchArraysAreSorted() {

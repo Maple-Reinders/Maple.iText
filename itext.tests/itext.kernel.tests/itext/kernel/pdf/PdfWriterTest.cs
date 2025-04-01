@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -463,7 +463,7 @@ namespace iText.Kernel.Pdf {
 
         [NUnit.Framework.Test]
         public virtual void CloseStream1() {
-            FileStream fos = new FileStream(destinationFolder + "closeStream1.pdf", FileMode.Create);
+            Stream fos = FileUtil.GetFileOutputStream(destinationFolder + "closeStream1.pdf");
             PdfWriter writer = new PdfWriter(fos);
             PdfDocument pdfDoc = new PdfDocument(writer);
             pdfDoc.AddNewPage();
@@ -476,9 +476,10 @@ namespace iText.Kernel.Pdf {
             }
         }
 
+        //ignored
         [NUnit.Framework.Test]
         public virtual void CloseStream2() {
-            FileStream fos = new FileStream(destinationFolder + "closeStream2.pdf", FileMode.Create);
+            Stream fos = FileUtil.GetFileOutputStream(destinationFolder + "closeStream2.pdf");
             PdfWriter writer = new PdfWriter(fos);
             writer.SetCloseStream(false);
             PdfDocument pdfDoc = new PdfDocument(writer);
@@ -529,13 +530,13 @@ namespace iText.Kernel.Pdf {
             int streamIndirectNumber = stream.GetIndirectReference().GetObjNumber();
             document.Close();
             //        com.itextpdf.text.pdf.PdfReader reader = new PdfReader(filename);
-            //        Assert.assertEquals("Rebuilt", false, reader.isRebuilt());
-            //        Assert.assertNotNull(reader.getPageN(1));
+            //        Assertions.assertEquals("Rebuilt", false, reader.isRebuilt());
+            //        Assertions.assertNotNull(reader.getPageN(1));
             //        String date = reader.getDocumentInfo().get("CreationDate");
             //        Calendar cl = com.itextpdf.text.pdf.PdfDate.decode(date);
             //        long diff = new GregorianCalendar().getTimeInMillis() - cl.getTimeInMillis();
             //        String message = "Unexpected creation date. Different from now is " + (float)diff/1000 + "s";
-            //        Assert.assertTrue(message, diff < 5000);
+            //        Assertions.assertTrue(diff < 5000, message);
             //        reader.close();
             PdfReader reader6 = CompareTool.CreateOutputReader(filename);
             document = new PdfDocument(reader6);

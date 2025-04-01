@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,10 +25,13 @@ using iText.Commons.Utils;
 using iText.Layout.Properties;
 
 namespace iText.Layout.Renderer {
+//\cond DO_NOT_DOCUMENT
     /// <summary>This class is responsible for right to left placement of flex items.</summary>
     internal class RtlFlexItemMainDirector : IFlexItemMainDirector {
+//\cond DO_NOT_DOCUMENT
         internal RtlFlexItemMainDirector() {
         }
+//\endcond
 
         /// <summary><inheritDoc/></summary>
         public virtual IList<IRenderer> ApplyDirection(IList<IList<FlexItemInfo>> lines) {
@@ -77,4 +80,5 @@ namespace iText.Layout.Renderer {
         }
         // We don't need to do anything in these cases
     }
+//\endcond
 }

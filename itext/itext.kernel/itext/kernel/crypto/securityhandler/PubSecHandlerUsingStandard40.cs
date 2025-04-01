@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -59,7 +59,6 @@ namespace iText.Kernel.Crypto.Securityhandler {
         protected internal override void SetPubSecSpecificHandlerDicEntries(PdfDictionary encryptionDictionary, bool
              encryptMetadata, bool embeddedFilesOnly) {
             encryptionDictionary.Put(PdfName.Filter, PdfName.Adobe_PubSec);
-            encryptionDictionary.Put(PdfName.R, new PdfNumber(2));
             PdfArray recipients = CreateRecipientsArray();
             encryptionDictionary.Put(PdfName.V, new PdfNumber(1));
             encryptionDictionary.Put(PdfName.SubFilter, PdfName.Adbe_pkcs7_s4);

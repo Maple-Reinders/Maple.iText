@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,8 +30,8 @@ using iText.IO.Util;
 namespace iText.IO.Font.Cmap {
     /// <summary>This class represents a CMap file.</summary>
     public class CMapToUnicode : AbstractCMap {
-        public static iText.IO.Font.Cmap.CMapToUnicode EmptyCMapToUnicodeMap = new iText.IO.Font.Cmap.CMapToUnicode
-            (true);
+        public static readonly iText.IO.Font.Cmap.CMapToUnicode EMPTY_CMAP = new iText.IO.Font.Cmap.CMapToUnicode(
+            true);
 
         private readonly IDictionary<int, char[]> byteMappings;
 
@@ -130,10 +130,12 @@ namespace iText.IO.Font.Cmap {
             return codeSpaceRanges;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal override void AddCodeSpaceRange(byte[] low, byte[] high) {
             codeSpaceRanges.Add(low);
             codeSpaceRanges.Add(high);
         }
+//\endcond
 
         private int ConvertToInt(char[] s) {
             int value = 0;
@@ -145,10 +147,13 @@ namespace iText.IO.Font.Cmap {
             return value;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void AddChar(int cid, char[] uni) {
             byteMappings.Put(cid, uni);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal override void AddChar(String mark, CMapObject code) {
             if (mark.Length == 1) {
                 char[] dest = CreateCharsFromDoubleBytes((byte[])code.GetValue());
@@ -165,6 +170,7 @@ namespace iText.IO.Font.Cmap {
                 }
             }
         }
+//\endcond
 
         private char[] CreateCharsFromSingleBytes(byte[] bytes) {
             if (bytes.Length == 1) {

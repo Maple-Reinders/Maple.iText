@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -27,6 +27,7 @@ using iText.Kernel;
 using iText.Kernel.Exceptions;
 
 namespace iText.Kernel.Pdf {
+    //\cond DO_NOT_DOCUMENT 
     /// <summary>This class implements an output stream which can be used for memory limits aware decompression of pdf streams.
     ///     </summary>
     internal class MemoryLimitsAwareOutputStream : MemoryStream {
@@ -111,4 +112,5 @@ namespace iText.Kernel.Pdf {
             base.Write(b, off, len);
         }
     }
+   //\endcond 
 }

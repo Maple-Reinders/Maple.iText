@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -38,7 +38,6 @@ using iText.Kernel.Pdf.Xobject;
 using iText.Kernel.Utils;
 using iText.Layout;
 using iText.Layout.Element;
-using iText.Layout.Logs;
 using iText.Layout.Properties;
 using iText.Test;
 using iText.Test.Attributes;
@@ -978,10 +977,13 @@ namespace iText.Forms {
             // list
             PdfChoiceFormField f = new ChoiceFormFieldBuilder(pdfDoc, "combo").SetWidgetRectangle(new Rectangle(36, 556
                 , 50, 100)).SetOptions(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" }).CreateList();
+            f.DisableFieldRegeneration();
             f.SetValue("9", true);
             f.SetValue("4");
             f.SetTopIndex(2);
             f.SetListSelected(new String[] { "3", "5" });
+            f.SetMultiSelect(true);
+            f.EnableFieldRegeneration();
             form.AddField(f);
             // push button
             form.AddField(new PushButtonFormFieldBuilder(pdfDoc, "push button").SetWidgetRectangle(new Rectangle(36, 526
@@ -1139,7 +1141,6 @@ namespace iText.Forms {
 
         [NUnit.Framework.Test]
         // Acrobat removes /NeedAppearances flag when document is opened and suggests to resave the document at once.
-        [LogMessage(LayoutLogMessageConstant.ELEMENT_DOES_NOT_FIT_AREA)]
         [LogMessage(FormsLogMessageConstants.INPUT_FIELD_DOES_NOT_FIT)]
         public virtual void AppendModeAppearance() {
             String inputFile = "appendModeAppearance.pdf";
@@ -1586,21 +1587,62 @@ namespace iText.Forms {
                 , destinationFolder, "diff_"));
         }
 
+        [NUnit.Framework.Test]
+        public virtual void DirtyCheckBoxAnnotationMergedTest() {
+            String outputFileName = destinationFolder + "dirtyCheckBoxAnnotationMergedTest.pdf";
+            String inputFileName = sourceFolder + "dirtyCheckBoxAnnotationMergedTest.pdf";
+            String cmpFileName = sourceFolder + "cmp_dirtyCheckBoxAnnotationMergedTest.pdf";
+            using (PdfDocument pdf = new PdfDocument(new PdfReader(inputFileName), new PdfWriter(outputFileName))) {
+                PdfFormCreator.GetAcroForm(pdf, false);
+            }
+            // Do nothing.
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outputFileName, cmpFileName, destinationFolder
+                , "diff_"));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(FormsLogMessageConstants.FORM_FIELD_HAS_CYCLED_PARENT_STRUCTURE, Ignore = true)]
+        public virtual void FormFieldCycleRefTest() {
+            String fileName = destinationFolder + "formFieldCycleRefTest.pdf";
+            PdfDocument pdfDoc = new PdfDocument(CompareTool.CreateTestPdfWriter(fileName));
+            pdfDoc.SetTagged();
+            pdfDoc.InitializeOutlines();
+            PdfAcroForm acroForm = PdfAcroForm.GetAcroForm(pdfDoc, true);
+            PdfFormField formField = new CheckBoxFormFieldBuilder(pdfDoc, "TestCheck").SetWidgetRectangle(new Rectangle
+                (36, 560, 20, 20)).CreateCheckBox().SetValue("1", true);
+            PdfFormField child1 = new TextFormFieldBuilder(pdfDoc, "child").SetWidgetRectangle(new Rectangle(100, 300, 
+                200, 20)).CreateText();
+            PdfFormField child2 = new TextFormFieldBuilder(pdfDoc, "another_name").SetWidgetRectangle(new Rectangle(100
+                , 250, 200, 20)).CreateText();
+            formField.AddKid(child1);
+            child1.AddKid(child2);
+            formField.SetParent(child2);
+            acroForm.AddField(formField);
+            pdfDoc.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(fileName, sourceFolder + "cmp_formFieldCycleRefTest.pdf"
+                , destinationFolder, "diff_"));
+        }
+
+//\cond DO_NOT_DOCUMENT
         internal class CustomButtonFormField : PdfButtonFormField {
             private int counter = 0;
 
+//\cond DO_NOT_DOCUMENT
             internal CustomButtonFormField(PdfDocument pdfDocument, String formFieldName)
                 : base(pdfDocument) {
                 SetPushButton(true);
                 SetFieldName(formFieldName);
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal CustomButtonFormField(PdfWidgetAnnotation annotation, PdfDocument pdfDocument, String formFieldName
                 )
                 : base(annotation, pdfDocument) {
                 SetPushButton(true);
                 SetFieldName(formFieldName);
             }
+//\endcond
 
             public virtual int GetCounter() {
                 return counter;
@@ -1614,5 +1656,6 @@ namespace iText.Forms {
                 return isRegenerated;
             }
         }
+//\endcond
     }
 }

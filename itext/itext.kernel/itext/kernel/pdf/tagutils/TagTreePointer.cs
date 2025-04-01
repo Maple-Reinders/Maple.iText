@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -114,10 +114,12 @@ namespace iText.Kernel.Pdf.Tagutils {
             this.currentNamespace = tagPointer.currentNamespace;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal TagTreePointer(PdfStructElem structElem, PdfDocument document) {
             tagStructureContext = document.GetTagStructureContext();
             SetCurrentStructElem(structElem);
         }
+//\endcond
 
         /// <summary>
         /// Sets a page which content will be tagged with this instance of
@@ -554,7 +556,7 @@ namespace iText.Kernel.Pdf.Tagutils {
                     }
                 }
             }
-            if (GetCurrentStructElem().GetKids()[kidIndex] == null) {
+            if (GetCurrentStructElem().IsKidFlushed(kidIndex)) {
                 throw new PdfException(KernelExceptionMessageConstant.CANNOT_RELOCATE_TAG_WHICH_IS_ALREADY_FLUSHED);
             }
             IStructureNode removedKid = GetCurrentStructElem().RemoveKid(kidIndex, true);
@@ -759,22 +761,17 @@ namespace iText.Kernel.Pdf.Tagutils {
             if (MCR_MARKER.Equals(role)) {
                 throw new PdfException(KernelExceptionMessageConstant.CANNOT_MOVE_TO_MARKED_CONTENT_REFERENCE);
             }
-            IList<IStructureNode> descendants = new List<IStructureNode>(GetCurrentStructElem().GetKids());
-            int k = 0;
-            for (int i = 0; i < descendants.Count; ++i) {
-                if (descendants[i] == null || descendants[i] is PdfMcr) {
-                    continue;
-                }
-                String descendantRole = descendants[i].GetRole().GetValue();
-                if (descendantRole.Equals(role) && k++ == n) {
-                    SetCurrentStructElem((PdfStructElem)descendants[i]);
-                    return this;
-                }
-                else {
-                    descendants.AddAll(descendants[i].GetKids());
-                }
+            TagTreePointer.RoleFinderHandler handler = new TagTreePointer.RoleFinderHandler(n, role);
+            TagTreeIterator iterator = new TagTreeIterator(GetCurrentStructElem(), TagTreeIterator.TreeTraversalOrder.
+                PRE_ORDER);
+            iterator.AddHandler(handler);
+            iterator.Traverse();
+            PdfStructElem elem = handler.GetFoundElement();
+            if (elem == null) {
+                throw new PdfException(KernelExceptionMessageConstant.NO_KID_WITH_SUCH_ROLE);
             }
-            throw new PdfException(KernelExceptionMessageConstant.NO_KID_WITH_SUCH_ROLE);
+            SetCurrentStructElem(elem);
+            return this;
         }
 
         /// <summary>Gets current tag kids roles.</summary>
@@ -977,6 +974,7 @@ namespace iText.Kernel.Pdf.Tagutils {
             return GetCurrentStructElem().GetPdfObject().Equals(otherPointer.GetCurrentStructElem().GetPdfObject());
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual int CreateNextMcidForStructElem(PdfStructElem elem, int index) {
             ThrowExceptionIfCurrentPageIsNotInited();
             PdfMcr mcr;
@@ -992,7 +990,9 @@ namespace iText.Kernel.Pdf.Tagutils {
             elem.AddKid(index, mcr);
             return mcr.GetMcid();
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual iText.Kernel.Pdf.Tagutils.TagTreePointer SetCurrentStructElem(PdfStructElem structElem) {
             if (structElem.GetParent() == null) {
                 throw new PdfException(KernelExceptionMessageConstant.STRUCTURE_ELEMENT_SHALL_CONTAIN_PARENT_OBJECT);
@@ -1000,7 +1000,9 @@ namespace iText.Kernel.Pdf.Tagutils {
             currentStructElem = structElem;
             return this;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual PdfStructElem GetCurrentStructElem() {
             if (currentStructElem.IsFlushed()) {
                 throw new PdfException(KernelExceptionMessageConstant.TAG_TREE_POINTER_IS_IN_INVALID_STATE_IT_POINTS_AT_FLUSHED_ELEMENT_USE_MOVE_TO_ROOT
@@ -1013,6 +1015,17 @@ namespace iText.Kernel.Pdf.Tagutils {
                     );
             }
             return currentStructElem;
+        }
+//\endcond
+
+        /// <summary>Applies properties to the current tag.</summary>
+        /// <remarks>
+        /// Applies properties to the current tag.
+        /// <para />
+        /// </remarks>
+        /// <param name="properties">the properties to be applied to the current tag.</param>
+        public virtual void ApplyProperties(AccessibilityProperties properties) {
+            AccessibilityPropertiesToStructElem.Apply(properties, GetCurrentStructElem());
         }
 
         private int GetNextNewKidPosition() {
@@ -1111,6 +1124,41 @@ namespace iText.Kernel.Pdf.Tagutils {
         private void ThrowExceptionIfCurrentPageIsNotInited() {
             if (currentPage == null) {
                 throw new PdfException(KernelExceptionMessageConstant.PAGE_IS_NOT_SET_FOR_THE_PDF_TAG_STRUCTURE);
+            }
+        }
+
+        private class RoleFinderHandler : AbstractAvoidDuplicatesTagTreeIteratorHandler {
+            private readonly int n;
+
+            private readonly String role;
+
+            private int foundIdx = 0;
+
+            private PdfStructElem foundElem;
+
+//\cond DO_NOT_DOCUMENT
+            internal RoleFinderHandler(int n, String role) {
+                this.n = n;
+                this.role = role;
+            }
+//\endcond
+
+            public virtual PdfStructElem GetFoundElement() {
+                return foundElem;
+            }
+
+            public override bool Accept(IStructureNode node) {
+                return GetFoundElement() == null && base.Accept(node);
+            }
+
+            public override void ProcessElement(IStructureNode elem) {
+                if (foundElem != null) {
+                    return;
+                }
+                String descendantRole = elem.GetRole().GetValue();
+                if (descendantRole.Equals(role) && foundIdx++ == n) {
+                    foundElem = (PdfStructElem)elem;
+                }
             }
         }
     }

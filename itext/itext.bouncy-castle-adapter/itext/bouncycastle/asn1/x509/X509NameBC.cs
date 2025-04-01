@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -50,6 +50,11 @@ namespace iText.Bouncycastle.Asn1.X509 {
         /// </returns>
         public virtual X509Name GetX509Name() {
             return (X509Name)GetEncodable();
+        }
+
+        public string GetName()
+        {
+            return GetX509Name().ToString();
         }
     }
 }

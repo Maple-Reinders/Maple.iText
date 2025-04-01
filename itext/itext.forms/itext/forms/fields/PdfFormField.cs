@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -270,9 +270,8 @@ namespace iText.Forms.Fields {
                 }
             }
             field.MakeIndirect(document);
-            if (document != null && document.GetReader() != null && document.GetReader().GetPdfAConformanceLevel() != 
-                null) {
-                field.pdfAConformanceLevel = document.GetReader().GetPdfAConformanceLevel();
+            if (document != null) {
+                field.pdfConformance = document.GetConformance();
             }
             return field;
         }
@@ -1190,7 +1189,7 @@ namespace iText.Forms.Fields {
                 checkType = CheckBoxType.CROSS;
             }
             this.checkType = new NullableContainer<CheckBoxType>(checkType);
-            if (GetPdfAConformanceLevel() != null) {
+            if (GetPdfConformance() != null && GetPdfConformance().IsPdfAOrUa()) {
                 return this;
             }
             try {
@@ -1346,13 +1345,16 @@ namespace iText.Forms.Fields {
             return this;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal override void UpdateFontAndFontSize(PdfFont font, float fontSize) {
             base.UpdateFontAndFontSize(font, fontSize);
             foreach (AbstractPdfFormField child in childFields) {
                 child.UpdateFontAndFontSize(font, fontSize);
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal static String OptionsArrayToString(PdfArray options) {
             if (options == null || options.IsEmpty()) {
                 return "";
@@ -1378,7 +1380,9 @@ namespace iText.Forms.Fields {
             sb.DeleteCharAt(sb.Length - 1);
             return sb.ToString();
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Adds a field to the children of the current field.</summary>
         /// <param name="kid">the field, which should become a child.</param>
         /// <returns>the kid itself.</returns>
@@ -1387,7 +1391,9 @@ namespace iText.Forms.Fields {
             this.childFields.Add(kid);
             return kid;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Replaces /Kids value with passed kids dictionaries, and keeps old flashed fields there.</summary>
         /// <remarks>
         /// Replaces /Kids value with passed kids dictionaries, and keeps old flashed fields there.
@@ -1415,11 +1421,12 @@ namespace iText.Forms.Fields {
             }
             Put(PdfName.Kids, kidsValues);
         }
+//\endcond
 
         private static PdfString GenerateDefaultAppearance(PdfName font, float fontSize, Color textColor) {
             System.Diagnostics.Debug.Assert(font != null);
             MemoryStream output = new MemoryStream();
-            PdfOutputStream pdfStream = new PdfOutputStream(new OutputStream<Stream>(output));
+            PdfOutputStream pdfStream = new PdfOutputStream(new HighPrecisionOutputStream<Stream>(output));
             byte[] g = new byte[] { (byte)'g' };
             byte[] rg = new byte[] { (byte)'r', (byte)'g' };
             byte[] k = new byte[] { (byte)'k' };

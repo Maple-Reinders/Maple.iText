@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,11 +27,25 @@ using iText.Kernel.Pdf.Colorspace;
 using iText.Kernel.Pdf.Function;
 
 namespace iText.Kernel.Colors {
+    /// <summary>Representation of a DeviceN color space.</summary>
     public class DeviceN : Color {
+        /// <summary>
+        /// Creates a DeviceN color using the given
+        /// <see cref="iText.Kernel.Pdf.Colorspace.PdfSpecialCs"/>
+        /// color space.
+        /// </summary>
+        /// <param name="cs">Color space</param>
         public DeviceN(PdfSpecialCs.DeviceN cs)
             : this(cs, GetDefaultColorants(cs.GetNumberOfComponents())) {
         }
 
+        /// <summary>
+        /// Creates a DeviceN color using the given
+        /// <see cref="iText.Kernel.Pdf.Colorspace.PdfSpecialCs"/>
+        /// color space and color values.
+        /// </summary>
+        /// <param name="cs">Color space</param>
+        /// <param name="value">Color component values</param>
         public DeviceN(PdfSpecialCs.DeviceN cs, float[] value)
             : base(cs, value) {
         }

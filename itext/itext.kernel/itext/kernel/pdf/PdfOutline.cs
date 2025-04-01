@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -35,10 +35,10 @@ namespace iText.Kernel.Pdf {
     /// </summary>
     public class PdfOutline {
         /// <summary>A flag for displaying the outline item’s text with italic font.</summary>
-        public static int FLAG_ITALIC = 1;
+        public const int FLAG_ITALIC = 1;
 
         /// <summary>A flag for displaying the outline item’s text with bold font.</summary>
-        public static int FLAG_BOLD = 2;
+        public const int FLAG_BOLD = 2;
 
         private IList<iText.Kernel.Pdf.PdfOutline> children = new List<iText.Kernel.Pdf.PdfOutline>();
 
@@ -52,6 +52,7 @@ namespace iText.Kernel.Pdf {
 
         private PdfDocument pdfDoc;
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Create instance of document outline.</summary>
         /// <param name="title">the text that shall be displayed on the screen for this item.</param>
         /// <param name="content">Outline dictionary</param>
@@ -65,7 +66,9 @@ namespace iText.Kernel.Pdf {
             this.content = content;
             this.pdfDoc = pdfDocument;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Create instance of document outline.</summary>
         /// <param name="title">the text that shall be displayed on the screen for this item.</param>
         /// <param name="content">Outline dictionary</param>
@@ -83,7 +86,9 @@ namespace iText.Kernel.Pdf {
             this.pdfDoc = parent.pdfDoc;
             content.MakeIndirect(parent.pdfDoc);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>This constructor creates root outline in the document.</summary>
         /// <param name="doc">
         /// 
@@ -96,6 +101,7 @@ namespace iText.Kernel.Pdf {
             content.MakeIndirect(doc);
             doc.GetCatalog().AddRootOutline(this);
         }
+//\endcond
 
         /// <summary>Gets title of the outline.</summary>
         /// <returns>String value.</returns>
@@ -404,11 +410,14 @@ namespace iText.Kernel.Pdf {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Clear list of children.</summary>
         internal virtual void Clear() {
             children.Clear();
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>
         /// Sets
         /// <see cref="iText.Kernel.Pdf.Navigation.PdfDestination"/>.
@@ -420,6 +429,7 @@ namespace iText.Kernel.Pdf {
         internal virtual void SetDestination(PdfDestination destination) {
             this.destination = destination;
         }
+//\endcond
 
         /// <summary>
         /// Gets the Outline root in

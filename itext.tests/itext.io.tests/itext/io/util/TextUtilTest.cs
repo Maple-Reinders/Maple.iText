@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -96,6 +96,12 @@ namespace iText.IO.Util {
         public virtual void IsMarkNegativeTest() {
             Glyph glyph = new Glyph(0, 0, '-');
             NUnit.Framework.Assert.IsFalse(iText.IO.Util.TextUtil.IsMark(glyph));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void IsDiacriticTest() {
+            NUnit.Framework.Assert.IsTrue(iText.IO.Util.TextUtil.IsDiacritic("\u0303"[0]));
+            NUnit.Framework.Assert.IsFalse(iText.IO.Util.TextUtil.IsDiacritic("\u006b"[0]));
         }
 
         private void Helper(bool expected, int currentCRPosition, params Glyph[] glyphs) {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -676,6 +676,7 @@ namespace iText.Kernel.Pdf.Canvas {
             UpdateFromExtGState(extGState, null);
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Updates current graphic state with values from extended graphic state dictionary.</summary>
         /// <param name="extGState">the wrapper around the extended graphic state dictionary</param>
         /// <param name="pdfDocument">the document to retrieve fonts from. Needed when the newly created fonts are used
@@ -797,6 +798,7 @@ namespace iText.Kernel.Pdf.Canvas {
                 textKnockout = (bool)tk;
             }
         }
+//\endcond
 
         private void CopyFrom(iText.Kernel.Pdf.Canvas.CanvasGraphicsState source) {
             this.ctm = source.ctm;

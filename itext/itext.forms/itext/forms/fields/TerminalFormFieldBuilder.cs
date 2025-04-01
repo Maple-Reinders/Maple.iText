@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -94,17 +94,21 @@ namespace iText.Forms.Fields {
             return GetThis();
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void SetPageToField(PdfFormField field) {
             if (page != 0) {
                 field.GetFirstFormAnnotation().SetPage(page);
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void SetPageToField(PdfFormAnnotation field) {
             if (page != 0) {
                 field.SetPage(page);
             }
         }
+//\endcond
 
         /// <summary>Set font to be used for form field creation.</summary>
         /// <param name="font">

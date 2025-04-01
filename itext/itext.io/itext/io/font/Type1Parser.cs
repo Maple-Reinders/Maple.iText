@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,6 +29,7 @@ using iText.IO.Source;
 using iText.IO.Util;
 
 namespace iText.IO.Font {
+//\cond DO_NOT_DOCUMENT
     internal class Type1Parser {
         private const String AFM_HEADER = "StartFontMetrics";
 
@@ -170,4 +171,5 @@ namespace iText.IO.Font {
             return AFM_HEADER.Equals(builder.ToString());
         }
     }
+//\endcond
 }

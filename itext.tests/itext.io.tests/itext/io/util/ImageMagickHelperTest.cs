@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -58,10 +58,6 @@ namespace iText.IO.Util {
         public virtual void ImageMagickEnvVarIsExplicitlySpecified() {
             String compareExec = SystemUtil.GetEnvironmentVariable(ImageMagickHelper.MAGICK_COMPARE_ENVIRONMENT_VARIABLE
                 );
-            if (compareExec == null) {
-                compareExec = SystemUtil.GetEnvironmentVariable(ImageMagickHelper.MAGICK_COMPARE_ENVIRONMENT_VARIABLE_LEGACY
-                    );
-            }
             ImageMagickHelper imageMagickHelper = new ImageMagickHelper(compareExec);
             NUnit.Framework.Assert.IsNotNull(imageMagickHelper.GetCliExecutionCommand());
         }

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,11 +24,13 @@ using System;
 using Microsoft.Extensions.Logging;
 using iText.Commons;
 using iText.Commons.Utils;
+using iText.Forms;
 using iText.Forms.Fields.Properties;
 using iText.Forms.Form;
 using iText.Forms.Form.Renderer;
 using iText.Forms.Logs;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Tagutils;
 using iText.Layout.Properties;
 using iText.Layout.Renderer;
 
@@ -65,12 +67,11 @@ namespace iText.Forms.Form.Element {
             return this;
         }
 
-        /// <summary>Sets the PDF/A conformance level for the checkbox.</summary>
-        /// <param name="conformanceLevel">the PDF/A conformance level to set</param>
+        /// <summary>Sets the conformance for the checkbox.</summary>
+        /// <param name="conformance">The PDF conformance to set.</param>
         /// <returns>this checkbox instance</returns>
-        public virtual iText.Forms.Form.Element.CheckBox SetPdfAConformanceLevel(PdfAConformanceLevel conformanceLevel
-            ) {
-            SetProperty(FormProperty.FORM_CONFORMANCE_LEVEL, conformanceLevel);
+        public virtual iText.Forms.Form.Element.CheckBox SetPdfConformance(PdfConformance conformance) {
+            SetProperty(FormProperty.FORM_CONFORMANCE_LEVEL, conformance);
             return this;
         }
 
@@ -99,6 +100,18 @@ namespace iText.Forms.Form.Element {
             SetProperty(Property.WIDTH, UnitValue.CreatePointValue(size));
             SetProperty(Property.HEIGHT, UnitValue.CreatePointValue(size));
             return this;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public override AccessibilityProperties GetAccessibilityProperties() {
+            if (tagProperties == null) {
+                tagProperties = new FormDefaultAccessibilityProperties(FormDefaultAccessibilityProperties.FORM_FIELD_CHECK
+                    );
+            }
+            if (tagProperties is FormDefaultAccessibilityProperties) {
+                ((FormDefaultAccessibilityProperties)tagProperties).UpdateCheckedValue(this);
+            }
+            return tagProperties;
         }
 
         /* (non-Javadoc)

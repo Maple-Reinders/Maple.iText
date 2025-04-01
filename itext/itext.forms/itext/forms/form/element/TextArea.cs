@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,8 +21,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
+using iText.Forms;
 using iText.Forms.Form;
 using iText.Forms.Form.Renderer;
+using iText.Kernel.Pdf.Tagutils;
 using iText.Layout.Element;
 using iText.Layout.Properties;
 using iText.Layout.Renderer;
@@ -54,27 +56,6 @@ namespace iText.Forms.Form.Element {
             SetProperties();
         }
 
-        /// <summary>Determines, whether the input field will be password.</summary>
-        /// <remarks>
-        /// Determines, whether the input field will be password.
-        /// <para />
-        /// Usually means that instead of glyphs '*' will be shown in case of flatten field.
-        /// <para />
-        /// If the field is not flatten, value will be ignored.
-        /// </remarks>
-        /// <param name="isPassword">
-        /// 
-        /// <see langword="true"/>
-        /// is this field shall be considered as password,
-        /// <see langword="false"/>
-        /// otherwise
-        /// </param>
-        /// <returns>this input field</returns>
-        public virtual iText.Forms.Form.Element.TextArea UseAsPassword(bool isPassword) {
-            SetProperty(FormProperty.FORM_FIELD_PASSWORD_FLAG, isPassword);
-            return this;
-        }
-
         /* (non-Javadoc)
         * @see FormField#getDefaultProperty(int)
         */
@@ -102,6 +83,14 @@ namespace iText.Forms.Form.Element {
         /// <summary><inheritDoc/></summary>
         public virtual void SetPlaceholder(Paragraph placeholder) {
             this.placeholder = placeholder;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public override AccessibilityProperties GetAccessibilityProperties() {
+            if (this.tagProperties == null) {
+                tagProperties = new FormDefaultAccessibilityProperties(FormDefaultAccessibilityProperties.FORM_FIELD_TEXT);
+            }
+            return tagProperties;
         }
 
         /* (non-Javadoc)

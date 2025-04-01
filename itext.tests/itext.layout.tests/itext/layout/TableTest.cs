@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -32,6 +32,7 @@ using iText.Kernel.Pdf.Xobject;
 using iText.Kernel.Utils;
 using iText.Layout.Borders;
 using iText.Layout.Element;
+using iText.Layout.Font;
 using iText.Layout.Layout;
 using iText.Layout.Logs;
 using iText.Layout.Minmaxwidth;
@@ -1696,7 +1697,6 @@ namespace iText.Layout {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.UNEXPECTED_BEHAVIOUR_DURING_TABLE_ROW_COLLAPSING)]
         public virtual void TableWithEmptyRowsBetweenFullRowsTest() {
             String testName = "tableWithEmptyRowsBetweenFullRowsTest.pdf";
             String outFileName = destinationFolder + testName;
@@ -1716,8 +1716,6 @@ namespace iText.Layout {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.UNEXPECTED_BEHAVIOUR_DURING_TABLE_ROW_COLLAPSING, Count = 2
-            )]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.LAST_ROW_IS_NOT_COMPLETE)]
         public virtual void TableWithEmptyRowAfterJustOneCellTest() {
             String testName = "tableWithEmptyRowAfterJustOneCellTest.pdf";
@@ -1739,8 +1737,6 @@ namespace iText.Layout {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.UNEXPECTED_BEHAVIOUR_DURING_TABLE_ROW_COLLAPSING, Count = 39
-            )]
         [LogMessage(iText.IO.Logs.IoLogMessageConstant.LAST_ROW_IS_NOT_COMPLETE)]
         public virtual void TableWithAlternatingRowsTest() {
             String testName = "tableWithAlternatingRowsTest.pdf";
@@ -1782,8 +1778,27 @@ namespace iText.Layout {
         }
 
         [NUnit.Framework.Test]
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.UNEXPECTED_BEHAVIOUR_DURING_TABLE_ROW_COLLAPSING, Count = 2
-            )]
+        public virtual void TableWithEmptyRowsAndSpansTest() {
+            String testName = "tableWithEmptyRowsAndSpansTest.pdf";
+            String outFileName = destinationFolder + testName;
+            String cmpFileName = sourceFolder + "cmp_" + testName;
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(outFileName));
+            Document doc = new Document(pdfDoc);
+            Table table = new Table(UnitValue.CreatePercentArray(new float[] { 30, 30, 30 }));
+            table.AddCell(new Cell().Add(new Paragraph("Hello")));
+            table.AddCell(new Cell().Add(new Paragraph("Lovely")));
+            table.AddCell(new Cell().Add(new Paragraph("World")));
+            StartSeveralEmptyRows(table);
+            table.AddCell(new Cell(2, 2).Add(new Paragraph("Hello")));
+            table.AddCell(new Cell().Add(new Paragraph("Lovely")));
+            table.AddCell(new Cell().Add(new Paragraph("World")));
+            doc.Add(table);
+            doc.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outFileName, cmpFileName, destinationFolder
+                , testName + "_diff"));
+        }
+
+        [NUnit.Framework.Test]
         public virtual void TableWithEmptyRowsAndSeparatedBordersTest() {
             String testName = "tableWithEmptyRowsAndSeparatedBordersTest.pdf";
             String outFileName = destinationFolder + testName;
@@ -1804,8 +1819,6 @@ namespace iText.Layout {
         }
 
         [NUnit.Framework.Test]
-        // TODO DEVSIX-6020:Border-collapsing doesn't work in case startNewRow has been called
-        [LogMessage(iText.IO.Logs.IoLogMessageConstant.UNEXPECTED_BEHAVIOUR_DURING_TABLE_ROW_COLLAPSING)]
         public virtual void TableWithCollapsedBordersTest() {
             String testName = "tableWithCollapsedBordersTest.pdf";
             String outFileName = destinationFolder + testName;
@@ -1867,11 +1880,11 @@ namespace iText.Layout {
             doc.Add(table);
             doc.Add(new Paragraph("A cell with bold text:"));
             table = new Table(new float[1]);
-            table.AddCell("A cell").SetBold();
+            table.AddCell("A cell").SimulateBold();
             doc.Add(table);
             doc.Add(new Paragraph("A cell with italic text:"));
             table = new Table(new float[1]);
-            table.AddCell("A cell").SetItalic();
+            table.AddCell("A cell").SimulateItalic();
             doc.Add(table);
             doc.Close();
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outFileName, cmpFileName, destinationFolder
@@ -2750,7 +2763,7 @@ namespace iText.Layout {
             table.AddCell(new Cell().Add(new Paragraph("He")));
             // If this property is not inherited while calculating min/max widths,
             // then while layouting header will request more space than the layout box's width
-            table.GetHeader().SetBold();
+            table.GetHeader().SimulateBold();
             document.Add(table);
             document.Close();
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(destinationFolder + filename, sourceFolder
@@ -2916,7 +2929,7 @@ namespace iText.Layout {
                     table.UseAllAvailableWidth();
                     table.SetFixedLayout();
                     for (int i = 0; i < numberOfColumns; i++) {
-                        table.AddCell(new Cell().Add(new Paragraph("Description").SetBold()));
+                        table.AddCell(new Cell().Add(new Paragraph("Description").SimulateBold()));
                     }
                     doc.Add(table);
                 }
@@ -2991,6 +3004,79 @@ namespace iText.Layout {
                 , testName + "_diff"));
         }
 
+        [NUnit.Framework.Test]
+        [LogMessage(LayoutLogMessageConstant.ELEMENT_DOES_NOT_FIT_AREA, LogLevel = LogLevelConstants.WARN)]
+        public virtual void KeepTogetherCaptionAndHugeCellTest() {
+            String fileName = "keepTogetherCaptionAndHugeCell.pdf";
+            PdfDocument pdfDocument = new PdfDocument(CompareTool.CreateTestPdfWriter(destinationFolder + fileName));
+            Document document = new Document(pdfDocument, PageSize.A4);
+            Table table = new Table(1).SetCaption(new Div().Add(new Paragraph("hello world")));
+            Cell dataCell = new Cell().SetKeepTogether(true).Add(new Paragraph(PlaceHolderTextUtil.GetPlaceHolderText(
+                PlaceHolderTextUtil.PlaceHolderTextBy.WORDS, 600)));
+            table.AddCell(dataCell);
+            document.Add(table);
+            document.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(destinationFolder + fileName, sourceFolder
+                 + "cmp_" + fileName, destinationFolder));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(LayoutLogMessageConstant.ELEMENT_DOES_NOT_FIT_AREA, LogLevel = LogLevelConstants.WARN)]
+        public virtual void KeepTogetherCaptionDoesntFitPageTest() {
+            String fileName = "keepTogetherCaptionDoesntFitPage.pdf";
+            PdfDocument pdfDocument = new PdfDocument(CompareTool.CreateTestPdfWriter(destinationFolder + fileName));
+            Document document = new Document(pdfDocument, PageSize.A4);
+            document.Add(new Paragraph(PlaceHolderTextUtil.GetPlaceHolderText(PlaceHolderTextUtil.PlaceHolderTextBy.WORDS
+                , 580)));
+            Table table = new Table(1).SetCaption(new Div().Add(new Paragraph("hello world")));
+            Cell dataCell = new Cell().SetKeepTogether(true).Add(new Paragraph(PlaceHolderTextUtil.GetPlaceHolderText(
+                PlaceHolderTextUtil.PlaceHolderTextBy.WORDS, 600)));
+            table.AddCell(dataCell);
+            document.Add(table);
+            document.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(destinationFolder + fileName, sourceFolder
+                 + "cmp_" + fileName, destinationFolder));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(LayoutLogMessageConstant.ELEMENT_DOES_NOT_FIT_AREA, LogLevel = LogLevelConstants.WARN)]
+        public virtual void KeepTogetherCaptionAndSplitCellTest() {
+            String fileName = "keepTogetherCaptionAndSplitCell.pdf";
+            PdfDocument pdfDocument = new PdfDocument(CompareTool.CreateTestPdfWriter(destinationFolder + fileName));
+            Document document = new Document(pdfDocument, PageSize.A4);
+            Table table = new Table(1).SetCaption(new Div().Add(new Paragraph("hello world").SetFontSize(40)), CaptionSide
+                .BOTTOM);
+            Cell dataCell = new Cell().SetKeepTogether(true).Add(new Paragraph(PlaceHolderTextUtil.GetPlaceHolderText(
+                PlaceHolderTextUtil.PlaceHolderTextBy.WORDS, 540)));
+            table.AddCell(dataCell);
+            document.Add(table);
+            document.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(destinationFolder + fileName, sourceFolder
+                 + "cmp_" + fileName, destinationFolder));
+        }
+
+        [NUnit.Framework.Test]
+        [LogMessage(LayoutLogMessageConstant.ELEMENT_DOES_NOT_FIT_AREA, Count = 2)]
+        [LogMessage(iText.IO.Logs.IoLogMessageConstant.LAST_ROW_IS_NOT_COMPLETE, Count = 4)]
+        public virtual void SplitComplexTable() {
+            // ComplexTableGenerator class was auto-generated by https://github.com/itext/document-layout-code-generator
+            // and then minimized
+            String testName = "splitComplexTable.pdf";
+            String outFileName = destinationFolder + testName;
+            String cmpFileName = sourceFolder + "cmp_" + testName;
+            ComplexTableGenerator template = new ComplexTableGenerator();
+            ComplexTableGenerator.GenerationContext context = new ComplexTableGenerator.GenerationContext();
+            FontProvider fontProvider = new FontProvider();
+            fontProvider.AddStandardPdfFonts();
+            context.fontProvider = fontProvider;
+            context.pdf = new PdfDocument(new PdfWriter(outFileName));
+            context.pdf.SetDefaultPageSize(PageSize.A5);
+            template.Generate(context);
+            context.pdf.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outFileName, cmpFileName, destinationFolder
+                , testName + "_diff"));
+        }
+
         private class RotatedDocumentRenderer : DocumentRenderer {
             private readonly PdfDocument pdfDoc;
 
@@ -3007,10 +3093,12 @@ namespace iText.Layout {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         internal class CustomRenderer : TableRenderer {
             public CustomRenderer(Table modelElement, Table.RowRange rowRange)
                 : base(modelElement, rowRange) {
             }
         }
+//\endcond
     }
 }

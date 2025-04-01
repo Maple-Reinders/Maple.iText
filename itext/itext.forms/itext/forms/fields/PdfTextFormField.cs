@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -202,7 +202,13 @@ namespace iText.Forms.Fields {
         /// If true, the field is automatically divided into as many equally spaced positions,
         /// or combs, as the value of MaxLen, and the text is laid out into those combs.
         /// </remarks>
-        /// <returns>whether or not combing is enabled</returns>
+        /// <returns>
+        /// 
+        /// <see langword="true"/>
+        /// if combing is enabled,
+        /// <see langword="false"/>
+        /// otherwise
+        /// </returns>
         public virtual bool IsComb() {
             return GetFieldFlag(FF_COMB);
         }

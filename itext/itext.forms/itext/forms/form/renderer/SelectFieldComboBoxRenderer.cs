@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -94,13 +94,16 @@ namespace iText.Forms.Form.Renderer {
             PdfPage page = doc.GetPage(occupiedArea.GetPageNumber());
             PdfFont font = GetResolvedFont(doc);
             ChoiceFormFieldBuilder builder = new ChoiceFormFieldBuilder(doc, name).SetWidgetRectangle(area).SetFont(font
-                ).SetConformanceLevel(GetConformanceLevel(doc));
+                ).SetConformance(GetConformance(doc));
+            ApplyMargins(area, false);
+            IDictionary<int, Object> properties = FormFieldRendererUtil.RemoveProperties(this.modelElement);
             modelElement.SetProperty(Property.FONT_PROVIDER, this.GetProperty<FontProvider>(Property.FONT_PROVIDER));
             modelElement.SetProperty(Property.RENDERING_MODE, this.GetProperty<RenderingMode?>(Property.RENDERING_MODE
                 ));
             SetupBuilderValues(builder, comboBoxFieldModelElement);
             PdfChoiceFormField comboBoxField = builder.CreateComboBox();
             comboBoxField.DisableFieldRegeneration();
+            ApplyAccessibilityProperties(comboBoxField, doc);
             Background background = this.modelElement.GetProperty<Background>(Property.BACKGROUND);
             if (background != null) {
                 comboBoxField.GetFirstFormAnnotation().SetBackgroundColor(background.GetColor());
@@ -131,7 +134,7 @@ namespace iText.Forms.Form.Renderer {
             comboBoxField.GetFirstFormAnnotation().SetFormFieldElement(comboBoxFieldModelElement);
             comboBoxField.EnableFieldRegeneration();
             PdfFormCreator.GetAcroForm(doc, true).AddField(comboBoxField, page);
-            WriteAcroFormFieldLangAttribute(doc);
+            FormFieldRendererUtil.ReapplyProperties(this.modelElement, properties);
         }
 
         private UnitValue GetFontSize() {
@@ -149,7 +152,7 @@ namespace iText.Forms.Form.Renderer {
 
         private IRenderer CreateFlatRenderer(bool addAllOptionsToChildren) {
             AbstractSelectField selectField = (AbstractSelectField)modelElement;
-            IList<SelectFieldItem> options = selectField.GetItems();
+            IList<SelectFieldItem> options = selectField.GetOptions();
             Div pseudoContainer = new Div();
             foreach (SelectFieldItem option in options) {
                 pseudoContainer.Add(option.GetElement());
@@ -250,7 +253,7 @@ namespace iText.Forms.Form.Renderer {
             IPropertyContainer propertyContainer = originalOptionRenderer.GetModelElement();
             if (propertyContainer is IAccessibleElement) {
                 String lang = ((IAccessibleElement)propertyContainer).GetAccessibilityProperties().GetLanguage();
-                AccessibilityProperties properties = ((IAccessibleElement)optionFlatElement).GetAccessibilityProperties();
+                AccessibilityProperties properties = optionFlatElement.GetAccessibilityProperties();
                 if (properties.GetLanguage() == null) {
                     properties.SetLanguage(lang);
                 }

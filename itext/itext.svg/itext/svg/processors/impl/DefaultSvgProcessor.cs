@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -87,6 +87,7 @@ namespace iText.Svg.Processors.Impl {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Load in configuration, set initial processorState and create/fill-in context of the processor</summary>
         /// <param name="converterProps">that contains configuration properties and operations</param>
         internal virtual void PerformSetup(INode root, ISvgConverterProperties converterProps) {
@@ -100,10 +101,11 @@ namespace iText.Svg.Processors.Impl {
             context = new SvgProcessorContext(converterProps);
             cssResolver = new SvgStyleResolver(root, context);
             new SvgFontProcessor(context).AddFontFaceFonts(cssResolver);
-            //TODO DEVSIX-2264
             namedObjects = new Dictionary<String, ISvgNodeRenderer>();
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Start the depth-first traversal of the INode tree, pushing the results on the stack</summary>
         /// <param name="startingNode">node to start on</param>
         internal virtual void ExecuteDepthFirstTraversal(INode startingNode) {
@@ -123,6 +125,7 @@ namespace iText.Svg.Processors.Impl {
                 }
             }
         }
+//\endcond
 
         /// <summary>Extract result from internal processorState and clean up afterwards</summary>
         /// <returns>Root renderer of the processed SVG</returns>
@@ -221,6 +224,7 @@ namespace iText.Svg.Processors.Impl {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Find the first element in the node-tree that corresponds with the passed tag-name.</summary>
         /// <remarks>Find the first element in the node-tree that corresponds with the passed tag-name. Search is performed depth-first
         ///     </remarks>
@@ -248,5 +252,6 @@ namespace iText.Svg.Processors.Impl {
             }
             return null;
         }
+//\endcond
     }
 }

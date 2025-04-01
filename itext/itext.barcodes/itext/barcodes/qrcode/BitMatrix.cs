@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using System;
 using System.Text;
 
 namespace iText.Barcodes.Qrcode {
+//\cond DO_NOT_DOCUMENT
     /// <summary>Represents a 2D matrix of bits.</summary>
     /// <remarks>
     /// Represents a 2D matrix of bits. In function arguments below, and throughout the common
@@ -175,4 +176,5 @@ namespace iText.Barcodes.Qrcode {
             return result.ToString();
         }
     }
+//\endcond
 }

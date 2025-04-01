@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -71,12 +71,13 @@ namespace iText.IO.Font.Otf {
                 (this, new OtfReadCommonTest.RandomAccesArrayTest(this, null), 0, null, null, 1);
             // at 15 we fill up all values
             GposValueRecord valueRecord = OtfReadCommon.ReadGposValueRecord(gposTableReader, 15);
-            NUnit.Framework.Assert.AreEqual(2000, valueRecord.XAdvance);
-            NUnit.Framework.Assert.AreEqual(2000, valueRecord.XPlacement);
-            NUnit.Framework.Assert.AreEqual(2000, valueRecord.YAdvance);
-            NUnit.Framework.Assert.AreEqual(2000, valueRecord.YPlacement);
+            NUnit.Framework.Assert.AreEqual(2000, valueRecord.GetXAdvance());
+            NUnit.Framework.Assert.AreEqual(2000, valueRecord.GetXPlacement());
+            NUnit.Framework.Assert.AreEqual(2000, valueRecord.GetYAdvance());
+            NUnit.Framework.Assert.AreEqual(2000, valueRecord.GetYPlacement());
         }
 
+//\cond DO_NOT_DOCUMENT
         internal class OpenTypeFontTableReaderTest : OpenTypeFontTableReader {
             protected internal OpenTypeFontTableReaderTest(OtfReadCommonTest _enclosing, RandomAccessFileOrArray rf, int
                  tableLocation, OpenTypeGdefTableReader gdef, IDictionary<int, Glyph> indexGlyphMap, int unitsPerEm)
@@ -91,7 +92,9 @@ namespace iText.IO.Font.Otf {
 
             private readonly OtfReadCommonTest _enclosing;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal class RandomAccesArrayTest : RandomAccessFileOrArray {
             /// <summary>Creates a RandomAccessFileOrArray that wraps the specified byte source.</summary>
             /// <remarks>
@@ -114,5 +117,6 @@ namespace iText.IO.Font.Otf {
 
             private readonly OtfReadCommonTest _enclosing;
         }
+//\endcond
     }
 }

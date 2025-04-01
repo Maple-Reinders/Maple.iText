@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -31,28 +31,50 @@ namespace iText.Kernel.Pdf.Tagutils {
     /// <remarks>
     /// This class is used to traverse the tag tree.
     /// <para />
-    /// There is a possibility to add a handler that will be called for specific events during the traversal.
+    /// There is a possibility to add a handler that will be called for the elements during the traversal.
     /// </remarks>
     public class TagTreeIterator {
         private readonly IStructureNode pointer;
 
         private readonly ICollection<ITagTreeIteratorHandler> handlerList;
 
+        private readonly TagTreeIterator.TreeTraversalOrder traversalOrder;
+
         /// <summary>
         /// Creates a new instance of
         /// <see cref="TagTreeIterator"/>.
         /// </summary>
+        /// <remarks>
+        /// Creates a new instance of
+        /// <see cref="TagTreeIterator"/>
+        /// . It will use TreeTraversalOrder.PRE_ORDER for tree traversal.
+        /// </remarks>
         /// <param name="tagTreePointer">the tag tree pointer.</param>
-        public TagTreeIterator(IStructureNode tagTreePointer) {
+        public TagTreeIterator(IStructureNode tagTreePointer)
+            : this(tagTreePointer, TagTreeIterator.TreeTraversalOrder.PRE_ORDER) {
+        }
+
+        /// <summary>
+        /// Creates a new instance of
+        /// <see cref="TagTreeIterator"/>.
+        /// </summary>
+        /// <param name="tagTreePointer">the tag tree pointer</param>
+        /// <param name="traversalOrder">an order in which the tree will be traversed.</param>
+        public TagTreeIterator(IStructureNode tagTreePointer, TagTreeIterator.TreeTraversalOrder traversalOrder) {
             if (tagTreePointer == null) {
                 throw new ArgumentException(MessageFormatUtil.Format(KernelExceptionMessageConstant.ARG_SHOULD_NOT_BE_NULL
                     , "tagTreepointer"));
             }
+            if (traversalOrder == null) {
+                throw new ArgumentException(MessageFormatUtil.Format(KernelExceptionMessageConstant.ARG_SHOULD_NOT_BE_NULL
+                    , "traversalOrder"));
+            }
             this.pointer = tagTreePointer;
+            this.traversalOrder = traversalOrder;
             handlerList = new HashSet<ITagTreeIteratorHandler>();
         }
 
-        /// <summary>Adds a handler that will be called for specific events during the traversal.</summary>
+        /// <summary>Adds a handler that will be called for the elements during the traversal.</summary>
         /// <param name="handler">the handler.</param>
         /// <returns>
         /// this
@@ -60,6 +82,10 @@ namespace iText.Kernel.Pdf.Tagutils {
         /// instance.
         /// </returns>
         public virtual iText.Kernel.Pdf.Tagutils.TagTreeIterator AddHandler(ITagTreeIteratorHandler handler) {
+            if (handler == null) {
+                throw new ArgumentException(MessageFormatUtil.Format(KernelExceptionMessageConstant.ARG_SHOULD_NOT_BE_NULL
+                    , "handler"));
+            }
             this.handlerList.Add(handler);
             return this;
         }
@@ -71,19 +97,39 @@ namespace iText.Kernel.Pdf.Tagutils {
         /// Make sure the correct handlers are added before calling this method.
         /// </remarks>
         public virtual void Traverse() {
-            Traverse(this.pointer, this.handlerList);
+            Traverse(this.pointer);
         }
 
-        private static void Traverse(IStructureNode elem, ICollection<ITagTreeIteratorHandler> handlerList) {
+        private void Traverse(IStructureNode elem) {
             foreach (ITagTreeIteratorHandler handler in handlerList) {
-                handler.NextElement(elem);
+                if (!handler.Accept(elem)) {
+                    return;
+                }
+            }
+            if (traversalOrder == TagTreeIterator.TreeTraversalOrder.PRE_ORDER) {
+                foreach (ITagTreeIteratorHandler handler in handlerList) {
+                    handler.ProcessElement(elem);
+                }
             }
             IList<IStructureNode> kids = elem.GetKids();
             if (kids != null) {
                 foreach (IStructureNode kid in kids) {
-                    Traverse(kid, handlerList);
+                    Traverse(kid);
                 }
             }
+            if (traversalOrder == TagTreeIterator.TreeTraversalOrder.POST_ORDER) {
+                foreach (ITagTreeIteratorHandler handler in handlerList) {
+                    handler.ProcessElement(elem);
+                }
+            }
+        }
+
+        /// <summary>Tree traversal order enum.</summary>
+        public enum TreeTraversalOrder {
+            /// <summary>Preorder traversal.</summary>
+            PRE_ORDER,
+            /// <summary>Postorder traversal.</summary>
+            POST_ORDER
         }
     }
 }

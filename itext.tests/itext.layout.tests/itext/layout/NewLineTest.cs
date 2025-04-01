@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,7 +21,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
-using System.IO;
+using iText.Commons.Utils;
 using iText.Kernel.Pdf;
 using iText.Kernel.Utils;
 using iText.Layout.Element;
@@ -80,7 +80,7 @@ namespace iText.Layout {
             String outFileName = destinationFolder + fileName;
             String cmpFileName = sourceFolder + "cmp_" + fileName;
             String diffPrefix = "diff_" + fileName + "_";
-            PdfDocument pdf = new PdfDocument(new PdfWriter(new FileStream(outFileName, FileMode.Create), new WriterProperties
+            PdfDocument pdf = new PdfDocument(new PdfWriter(FileUtil.GetFileOutputStream(outFileName), new WriterProperties
                 ().SetCompressionLevel(0)));
             Document document = new Document(pdf);
             Paragraph paragraph = new Paragraph().Add("This line is before." + newlineCharacters + "This line is after."

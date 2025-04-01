@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -43,11 +43,17 @@ namespace iText.Layout {
 
         public const String cmpPrefix = "cmp_";
 
+//\cond DO_NOT_DOCUMENT
         internal String fileName;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal String outFileName;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal String cmpFileName;
+//\endcond
 
         [NUnit.Framework.OneTimeSetUp]
         public static void BeforeClass() {
@@ -690,7 +696,10 @@ namespace iText.Layout {
             table.SetBorder(new SolidBorder(ColorConstants.YELLOW, 3));
             doc.Add(table);
             doc.Add(new AreaBreak());
-            table.DeleteOwnProperty(Property.BORDER);
+            table.DeleteOwnProperty(Property.BORDER_LEFT);
+            table.DeleteOwnProperty(Property.BORDER_BOTTOM);
+            table.DeleteOwnProperty(Property.BORDER_RIGHT);
+            table.DeleteOwnProperty(Property.BORDER_TOP);
             table.SetBorderCollapse(BorderCollapsePropertyValue.SEPARATE);
             table.SetHorizontalBorderSpacing(20);
             table.SetVerticalBorderSpacing(20);
@@ -1178,7 +1187,10 @@ namespace iText.Layout {
             doc.Add(table);
             doc.Add(new Table(UnitValue.CreatePercentArray(1)).UseAllAvailableWidth().AddCell("Hello").SetBorder(new SolidBorder
                 (ColorConstants.ORANGE, 5)));
-            table.DeleteOwnProperty(Property.BORDER);
+            table.DeleteOwnProperty(Property.BORDER_LEFT);
+            table.DeleteOwnProperty(Property.BORDER_BOTTOM);
+            table.DeleteOwnProperty(Property.BORDER_RIGHT);
+            table.DeleteOwnProperty(Property.BORDER_TOP);
             doc.Add(table);
             doc.Add(new Table(UnitValue.CreatePercentArray(1)).UseAllAvailableWidth().AddCell("Hello").SetBorder(new SolidBorder
                 (ColorConstants.ORANGE, 5)));
@@ -1190,7 +1202,10 @@ namespace iText.Layout {
             doc.Add(table);
             doc.Add(new Table(UnitValue.CreatePercentArray(1)).UseAllAvailableWidth().AddCell("Hello").SetBorder(new SolidBorder
                 (ColorConstants.ORANGE, 5)));
-            table.DeleteOwnProperty(Property.BORDER);
+            table.DeleteOwnProperty(Property.BORDER_LEFT);
+            table.DeleteOwnProperty(Property.BORDER_BOTTOM);
+            table.DeleteOwnProperty(Property.BORDER_RIGHT);
+            table.DeleteOwnProperty(Property.BORDER_TOP);
             doc.Add(table);
             doc.Add(new Table(UnitValue.CreatePercentArray(1)).UseAllAvailableWidth().AddCell("Hello").SetBorder(new SolidBorder
                 (ColorConstants.ORANGE, 5)));
@@ -1584,7 +1599,7 @@ namespace iText.Layout {
                 }
             }
             table.GetHeader().SetBorderTop(new SolidBorder(2)).SetBorderBottom(new SolidBorder(1));
-            table.GetFooter().SetBold().SetBorderTop(new SolidBorder(10)).SetBorderBottom(new SolidBorder(1)).SetBackgroundColor
+            table.GetFooter().SimulateBold().SetBorderTop(new SolidBorder(10)).SetBorderBottom(new SolidBorder(1)).SetBackgroundColor
                 (ColorConstants.LIGHT_GRAY);
             doc.Add(table);
             doc.Add(new AreaBreak());

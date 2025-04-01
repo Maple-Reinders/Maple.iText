@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,7 +23,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 namespace iText.Svg.Renderers.Path.Impl {
     /// <summary>Implements shorthand/smooth quadraticCurveTo (T) attribute of SVG's path element</summary>
     public class QuadraticSmoothCurveTo : QuadraticCurveTo {
+//\cond DO_NOT_DOCUMENT
         internal const int ARGUMENT_SIZE = 2;
+//\endcond
 
         public QuadraticSmoothCurveTo()
             : this(false) {

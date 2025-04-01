@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,6 +30,8 @@ namespace iText.Signatures {
     /// Verifies a certificate against a <c>KeyStore</c>
     /// containing trusted anchors.
     /// </summary>
+    [System.ObsoleteAttribute(@"starting from 8.0.5.iText.Signatures.Validation.CertificateChainValidator should be used instead."
+        )]
     public class RootStoreVerifier : CertificateVerifier {
         /// <summary>A key store against which certificates can be verified.</summary>
         protected internal List<IX509Certificate> rootStore = null;

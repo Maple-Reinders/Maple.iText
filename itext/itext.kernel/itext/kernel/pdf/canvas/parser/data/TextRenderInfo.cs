@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -100,11 +100,11 @@ namespace iText.Kernel.Pdf.Canvas.Parser.Data {
             if (text == null) {
                 GlyphLine gl = gs.GetFont().DecodeIntoGlyphLine(@string);
                 if (!IsReversedChars()) {
-                    text = gl.ToUnicodeString(gl.start, gl.end);
+                    text = gl.ToUnicodeString(gl.GetStart(), gl.GetEnd());
                 }
                 else {
-                    StringBuilder sb = new StringBuilder(gl.end - gl.start);
-                    for (int i = gl.end - 1; i >= gl.start; i--) {
+                    StringBuilder sb = new StringBuilder(gl.GetEnd() - gl.GetStart());
+                    for (int i = gl.GetEnd() - 1; i >= gl.GetStart(); i--) {
                         sb.Append(gl.Get(i).GetUnicodeChars());
                     }
                     text = sb.ToString();
@@ -125,23 +125,43 @@ namespace iText.Kernel.Pdf.Canvas.Parser.Data {
         }
 
         /// <summary>
-        /// Checks if the text belongs to a marked content sequence
+        /// Checks if this
+        /// <see cref="TextRenderInfo"/>
+        /// instance belongs to a marked content sequence
         /// with a given mcid.
         /// </summary>
         /// <param name="mcid">a marked content id</param>
-        /// <returns>true if the text is marked with this id</returns>
+        /// <returns>
+        /// 
+        /// <see langword="true"/>
+        /// if this
+        /// <see cref="TextRenderInfo"/>
+        /// instance is marked with this id,
+        /// <see langword="false"/>
+        /// otherwise
+        /// </returns>
         public virtual bool HasMcid(int mcid) {
             return HasMcid(mcid, false);
         }
 
         /// <summary>
-        /// Checks if the text belongs to a marked content sequence
+        /// Checks if this
+        /// <see cref="TextRenderInfo"/>
+        /// instance belongs to a marked content sequence
         /// with a given mcid.
         /// </summary>
         /// <param name="mcid">a marked content id</param>
         /// <param name="checkTheTopmostLevelOnly">indicates whether to check the topmost level of marked content stack only
         ///     </param>
-        /// <returns>true if the text is marked with this id</returns>
+        /// <returns>
+        /// 
+        /// <see langword="true"/>
+        /// if this
+        /// <see cref="TextRenderInfo"/>
+        /// instance is marked with this id,
+        /// <see langword="false"/>
+        /// otherwise
+        /// </returns>
         public virtual bool HasMcid(int mcid, bool checkTheTopmostLevelOnly) {
             if (checkTheTopmostLevelOnly) {
                 if (canvasTagHierarchy != null) {
@@ -508,7 +528,7 @@ namespace iText.Kernel.Pdf.Canvas.Parser.Data {
                 // Number of bytes forming one glyph can be arbitrary from [1; 4] range
                 IList<PdfString> strings = new List<PdfString>();
                 GlyphLine glyphLine = gs.GetFont().DecodeIntoGlyphLine(@string);
-                for (int i = glyphLine.start; i < glyphLine.end; i++) {
+                for (int i = glyphLine.GetStart(); i < glyphLine.GetEnd(); i++) {
                     strings.Add(new PdfString(gs.GetFont().ConvertToBytes(glyphLine.Get(i))));
                 }
                 return strings.ToArray(new PdfString[strings.Count]);

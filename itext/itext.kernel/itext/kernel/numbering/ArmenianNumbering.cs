@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -69,14 +69,20 @@ namespace iText.Kernel.Numbering {
         }
 
         private class ArmenianDigit {
+//\cond DO_NOT_DOCUMENT
             internal char digit;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal int value;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal ArmenianDigit(char digit, int value) {
                 this.digit = digit;
                 this.value = value;
             }
+//\endcond
         }
     }
 }

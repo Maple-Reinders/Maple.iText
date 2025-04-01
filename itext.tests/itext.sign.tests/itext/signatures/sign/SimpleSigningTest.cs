@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,10 +22,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
-using System.IO;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Utils;
+using iText.Forms.Fields.Properties;
+using iText.Forms.Form.Element;
+using iText.Kernel.Crypto;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Kernel.Utils;
@@ -70,7 +72,7 @@ namespace iText.Signatures.Sign {
             Rectangle rect = new Rectangle(36, 648, 200, 100);
             String fieldName = "Signature1";
             Sign(srcFile, fieldName, outPdf, chain, pk, DigestAlgorithms.SHA256, PdfSigner.CryptoStandard.CADES, "Test 1"
-                , "TestCity", rect, false, false, PdfSigner.NOT_CERTIFIED, 12f);
+                , "TestCity", rect, false, false, AccessPermissions.UNSPECIFIED, 12f);
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareVisually(outPdf, cmpPdf, DESTINATION_FOLDER, "diff_"
                 , GetTestMap(rect)));
             NUnit.Framework.Assert.IsNull(SignaturesCompareTool.CompareSignatures(outPdf, cmpPdf));
@@ -84,7 +86,7 @@ namespace iText.Signatures.Sign {
             Rectangle rect = new Rectangle(36, 648, 200, 100);
             String fieldName = "Signature1";
             Sign(srcFile, fieldName, outPdf, chain, pk, DigestAlgorithms.SHA256, PdfSigner.CryptoStandard.CADES, "Test 1"
-                , "TestCity", rect, false, false, PdfSigner.NOT_CERTIFIED, 12f);
+                , "TestCity", rect, false, false, AccessPermissions.UNSPECIFIED, 12f);
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareVisually(outPdf, cmpPdf, DESTINATION_FOLDER, "diff_"
                 , GetTestMap(rect)));
             NUnit.Framework.Assert.IsNull(SignaturesCompareTool.CompareSignatures(outPdf, cmpPdf));
@@ -98,7 +100,7 @@ namespace iText.Signatures.Sign {
             Rectangle randomRect = new Rectangle(1, 1, 100, 100);
             String fieldName = "Signature1.1";
             Sign(srcFile, fieldName, outPdf, chain, pk, DigestAlgorithms.SHA256, PdfSigner.CryptoStandard.CADES, "Test 1"
-                , "TestCity", randomRect, false, false, PdfSigner.NOT_CERTIFIED, 12f);
+                , "TestCity", randomRect, false, false, AccessPermissions.UNSPECIFIED, 12f);
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareVisually(outPdf, cmpPdf, DESTINATION_FOLDER, "diff_"
                 , GetTestMap(new Rectangle(163, 128, 430, 202))));
             NUnit.Framework.Assert.IsNull(SignaturesCompareTool.CompareSignatures(outPdf, cmpPdf));
@@ -113,13 +115,15 @@ namespace iText.Signatures.Sign {
             PdfSigner signer = new PdfSigner(new PdfReader(srcFile), new PdfWriter(outPdf), DESTINATION_FOLDER + tempFileName
                 , new StampingProperties());
             Rectangle rect = new Rectangle(36, 648, 200, 100);
-            signer.SetCertificationLevel(PdfSigner.NOT_CERTIFIED);
-            signer.SetFieldName("Signature1");
+            SignerProperties signerProperties = new SignerProperties().SetCertificationLevel(AccessPermissions.UNSPECIFIED
+                ).SetFieldName("Signature1");
+            signer.SetSignerProperties(signerProperties);
             // Creating the appearance
             CreateAppearance(signer, "Test 1", "TestCity", false, rect, 12f);
             // Creating the signature
             IExternalSignature pks = new PrivateKeySignature(pk, DigestAlgorithms.SHA256);
-            signer.SignDetached(pks, chain, null, null, null, 0, PdfSigner.CryptoStandard.CADES);
+            signer.SignDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, PdfSigner.CryptoStandard.CADES
+                );
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareVisually(outPdf, cmpPdf, DESTINATION_FOLDER, "diff_"
                 , GetTestMap(rect)));
             NUnit.Framework.Assert.IsNull(SignaturesCompareTool.CompareSignatures(outPdf, cmpPdf));
@@ -127,21 +131,22 @@ namespace iText.Signatures.Sign {
 
         protected internal virtual void Sign(String src, String name, String dest, IX509Certificate[] chain, IPrivateKey
              pk, String digestAlgorithm, PdfSigner.CryptoStandard subfilter, String reason, String location, Rectangle
-             rectangleForNewField, bool setReuseAppearance, bool isAppendMode, int certificationLevel, float? fontSize
-            ) {
+             rectangleForNewField, bool setReuseAppearance, bool isAppendMode, AccessPermissions certificationLevel
+            , float? fontSize) {
             PdfReader reader = new PdfReader(src);
             StampingProperties properties = new StampingProperties();
             if (isAppendMode) {
                 properties.UseAppendMode();
             }
-            PdfSigner signer = new PdfSigner(reader, new FileStream(dest, FileMode.Create), properties);
-            signer.SetCertificationLevel(certificationLevel);
-            signer.SetFieldName(name);
+            PdfSigner signer = new PdfSigner(reader, FileUtil.GetFileOutputStream(dest), properties);
+            SignerProperties signerProperties = new SignerProperties().SetCertificationLevel(certificationLevel).SetFieldName
+                (name);
+            signer.SetSignerProperties(signerProperties);
             // Creating the appearance
             CreateAppearance(signer, reason, location, setReuseAppearance, rectangleForNewField, fontSize);
             // Creating the signature
             IExternalSignature pks = new PrivateKeySignature(pk, digestAlgorithm);
-            signer.SignDetached(pks, chain, null, null, null, 0, subfilter);
+            signer.SignDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, subfilter);
         }
 
         private static IDictionary<int, IList<Rectangle>> GetTestMap(Rectangle ignoredArea) {
@@ -152,14 +157,16 @@ namespace iText.Signatures.Sign {
 
         private static void CreateAppearance(PdfSigner signer, String reason, String location, bool setReuseAppearance
             , Rectangle rectangleForNewField, float? fontSize) {
-            PdfSignatureAppearance appearance = signer.GetSignatureAppearance().SetReason(reason).SetLocation(location
-                ).SetReuseAppearance(setReuseAppearance);
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID).SetContent
+                (new SignedAppearanceText());
+            signer.GetSignerProperties().SetReason(reason).SetLocation(location).SetSignatureAppearance(appearance);
             if (rectangleForNewField != null) {
-                signer.SetPageRect(rectangleForNewField);
+                signer.GetSignerProperties().SetPageRect(rectangleForNewField);
             }
             if (fontSize != null) {
-                appearance.SetLayer2FontSize((float)fontSize);
+                appearance.SetFontSize((float)fontSize);
             }
+            signer.GetSignatureField().SetReuseAppearance(setReuseAppearance);
         }
     }
 }

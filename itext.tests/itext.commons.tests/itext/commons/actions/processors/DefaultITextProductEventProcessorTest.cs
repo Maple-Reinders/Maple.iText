@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -71,6 +71,7 @@ namespace iText.Commons.Actions.Processors {
                 : base("test product") {
             }
 
+//\cond DO_NOT_DOCUMENT
             internal override long AcquireRepeatLevel(int lvl) {
                 switch (lvl) {
                     case 0: {
@@ -87,6 +88,7 @@ namespace iText.Commons.Actions.Processors {
                 }
                 return 0;
             }
+//\endcond
         }
     }
 }

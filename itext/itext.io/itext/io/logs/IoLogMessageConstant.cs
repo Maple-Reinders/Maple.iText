@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -367,10 +367,10 @@ namespace iText.IO.Logs {
 
         public const String XFDF_UNSUPPORTED_ANNOTATION_ATTRIBUTE = "Xfdf unsupported attribute type";
 
-        public const String XOBJECT_HAS_NO_STRUCT_PARENTS = "XObject has no StructParents entry in its stream, no "
-             + "entry in ParentTree will be created for the corresponding structure elements";
+        public const String XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT = "Error occurred while " + "reading cross reference table. Cross reference table will be rebuilt. No additional information available";
 
-        public const String XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT = "Error occurred while reading cross reference table. Cross reference table will be rebuilt.";
+        public const String XREF_ERROR_WHILE_READING_TABLE_WILL_BE_REBUILT_WITH_CAUSE = "Error occurred while " + 
+            "reading cross reference table. Cross reference table will be rebuilt. Reason: {0}";
 
         private IoLogMessageConstant() {
         }

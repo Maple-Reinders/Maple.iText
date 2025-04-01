@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using iText.Commons.Utils;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Geom;
 using iText.Kernel.Utils;
@@ -313,6 +314,20 @@ namespace iText.Kernel.Pdf {
             return list.SubList(fromIndex, toIndex);
         }
 
+        /// <summary>
+        /// Returns unmodifiable
+        /// <see cref="System.Collections.IList{E}"/>
+        /// representation of this PdfArray.
+        /// </summary>
+        /// <returns>
+        /// unmodifiable
+        /// <see cref="System.Collections.IList{E}"/>
+        /// representation of this PdfArray
+        /// </returns>
+        public virtual IList<PdfObject> ToList() {
+            return JavaCollectionsUtil.UnmodifiableList(list);
+        }
+
         public override byte GetObjectType() {
             return ARRAY;
         }
@@ -336,7 +351,7 @@ namespace iText.Kernel.Pdf {
             }
             else {
                 PdfObject obj = list[index];
-                if (obj.GetObjectType() == INDIRECT_REFERENCE) {
+                if (obj != null && obj.GetObjectType() == INDIRECT_REFERENCE) {
                     return ((PdfIndirectReference)obj).GetRefersTo(true);
                 }
                 else {

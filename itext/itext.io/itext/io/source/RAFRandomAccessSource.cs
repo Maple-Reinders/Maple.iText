@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System.IO;
 
 namespace iText.IO.Source {
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// A RandomAccessSource that uses a
     /// <see cref="System.IO.FileStream"/>
@@ -95,4 +96,5 @@ namespace iText.IO.Source {
             raf.Dispose();
         }
     }
+//\endcond
 }

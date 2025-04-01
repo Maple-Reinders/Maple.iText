@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -65,6 +65,38 @@ namespace iText.StyledXmlParser.Css.Resolve {
             RunTest("a('x'), b('x')", JavaUtil.ArraysAsList("a('x')", ",", "b('x')"), JavaUtil.ArraysAsList(CssDeclarationValueTokenizer.TokenType
                 .FUNCTION, CssDeclarationValueTokenizer.TokenType.COMMA, CssDeclarationValueTokenizer.TokenType.FUNCTION
                 ));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void StringTest01() {
+            RunTest("'a b c'", JavaUtil.ArraysAsList("a b c"), JavaUtil.ArraysAsList(CssDeclarationValueTokenizer.TokenType
+                .STRING));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void StringTest02() {
+            RunTest("\"a b c\"", JavaUtil.ArraysAsList("a b c"), JavaUtil.ArraysAsList(CssDeclarationValueTokenizer.TokenType
+                .STRING));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void StringTest03() {
+            RunTest("[ aa  bb  cc ]", JavaUtil.ArraysAsList("[ aa  bb  cc ]"), JavaUtil.ArraysAsList(CssDeclarationValueTokenizer.TokenType
+                .STRING));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void StringTest04() {
+            RunTest("[aa bb cc] [dd ee] 'ff ff'", JavaUtil.ArraysAsList("[aa bb cc]", "[dd ee]", "ff ff"), JavaUtil.ArraysAsList
+                (CssDeclarationValueTokenizer.TokenType.STRING, CssDeclarationValueTokenizer.TokenType.STRING, CssDeclarationValueTokenizer.TokenType
+                .STRING));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void FunctionWithSquareBracketsTest04() {
+            RunTest("'prefix' repeat(3, [aa bb cc] 2 [dd ee] 3) 'ff ff'", JavaUtil.ArraysAsList("prefix", "repeat(3, [aa bb cc] 2 [dd ee] 3)"
+                , "ff ff"), JavaUtil.ArraysAsList(CssDeclarationValueTokenizer.TokenType.STRING, CssDeclarationValueTokenizer.TokenType
+                .FUNCTION, CssDeclarationValueTokenizer.TokenType.STRING));
         }
 
         private void RunTest(String src, IList<String> tokenValues, IList<CssDeclarationValueTokenizer.TokenType> 

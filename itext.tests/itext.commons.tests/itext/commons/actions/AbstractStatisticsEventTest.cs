@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -50,14 +50,18 @@ namespace iText.Commons.Actions {
             NUnit.Framework.Assert.IsNull(dummyEvent.CreateStatisticsAggregatorFromName("statisticsName"));
         }
 
+//\cond DO_NOT_DOCUMENT
         internal class DummyStatisticsEvent : AbstractStatisticsEvent {
+//\cond DO_NOT_DOCUMENT
             internal DummyStatisticsEvent(ProductData data)
                 : base(data) {
             }
+//\endcond
 
             public override IList<String> GetStatisticsNames() {
                 return null;
             }
         }
+//\endcond
     }
 }

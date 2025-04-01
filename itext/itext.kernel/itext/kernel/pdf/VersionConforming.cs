@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,6 +33,8 @@ namespace iText.Kernel.Pdf {
         public const String DEPRECATED_NEED_APPEARANCES_IN_ACROFORM = "NeedAppearances has been deprecated in PDF 2.0. Appearance streams are required in PDF 2.0.";
 
         public const String DEPRECATED_XFA_FORMS = "XFA is deprecated in PDF 2.0. The XFA form will not be written to the document";
+
+        public const String NOT_SUPPORTED_AES_GCM = "Advanced Encryption Standard-Galois/Counter Mode " + "(AES-GCM) encryption algorithm is supported starting from PDF 2.0.";
 
         private static readonly ILogger logger = ITextLogManager.GetLogger(typeof(VersionConforming));
 
@@ -68,6 +70,27 @@ namespace iText.Kernel.Pdf {
             else {
                 return false;
             }
+        }
+
+        /// <summary>Logs error message in case provided PDF document version is earlier than specified expected starting version.
+        ///     </summary>
+        /// <param name="document">PDF document to check version for</param>
+        /// <param name="expectedStartVersion">starting version since which new feature is supported</param>
+        /// <param name="notSupportedFeatureLogMessage">error message to log</param>
+        /// <returns>
+        /// boolean value specifying whether validation passed (
+        /// <see langword="true"/>
+        /// ) or failed (
+        /// <see langword="false"/>
+        /// )
+        /// </returns>
+        public static bool ValidatePdfVersionForNotSupportedFeatureLogError(PdfDocument document, PdfVersion expectedStartVersion
+            , String notSupportedFeatureLogMessage) {
+            if (document.GetPdfVersion().CompareTo(expectedStartVersion) >= 0) {
+                return true;
+            }
+            logger.LogError(notSupportedFeatureLogMessage);
+            return false;
         }
     }
 }

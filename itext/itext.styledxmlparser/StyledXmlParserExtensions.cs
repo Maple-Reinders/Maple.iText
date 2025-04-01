@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -29,7 +29,7 @@ using iText.IO.Util;
 using iText.StyledXmlParser.Jsoup.Helper;
 using System.Reflection;
 using iText.Commons.Utils;
-
+//\cond DO_NOT_DOCUMENT
 internal static class StyledXmlParserExtensions {
     public static String Name(this Encoding e) {
         return e.WebName.ToUpperInvariant();
@@ -488,3 +488,4 @@ internal static class StyledXmlParserExtensions {
     }
 #endif
 }
+//\endcond

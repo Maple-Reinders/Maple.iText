@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -29,6 +29,9 @@ namespace iText.Commons.Actions {
     public sealed class ProductNameConstant {
         /// <summary>itext-core constant.</summary>
         public const String ITEXT_CORE = "itext-core";
+
+        /// <summary>itext-core sign module constant.</summary>
+        public const String ITEXT_CORE_SIGN = "itext-core-sign";
 
         /// <summary>pdfhtml constant.</summary>
         public const String PDF_HTML = "pdfHtml";

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -26,7 +26,9 @@ using iText.Test;
 namespace iText.Layout.Properties {
     [NUnit.Framework.Category("UnitTest")]
     public class BackgroundUnitTest : ExtendedITextTest {
+//\cond DO_NOT_DOCUMENT
         internal const float EPS = 0.00001f;
+//\endcond
 
         [NUnit.Framework.Test]
         public virtual void BackgroundConstructorWithClipTest() {

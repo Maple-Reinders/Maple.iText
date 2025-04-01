@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -49,18 +49,28 @@ namespace iText.IO.Font.Otf {
         // true, if this Glyph is Mark
         private readonly bool isMark;
 
+//\cond DO_NOT_DOCUMENT
         // placement offset
         internal short xPlacement = 0;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal short yPlacement = 0;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         // advance offset
         internal short xAdvance = 0;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal short yAdvance = 0;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         // Index delta to base glyph. If after a glyph there are several anchored glyphs we should know we to find base glyph.
         internal short anchorDelta = 0;
+//\endcond
 
         /// <summary>Construct a non-mark Glyph, retrieving characters from unicode.</summary>
         /// <param name="code">code representation of the glyph in the font file</param>

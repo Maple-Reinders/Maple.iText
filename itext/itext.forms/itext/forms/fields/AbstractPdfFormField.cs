@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using iText.Commons;
+using iText.Forms.Logs;
 using iText.IO.Font;
 using iText.IO.Source;
 using iText.Kernel.Colors;
@@ -53,6 +56,9 @@ namespace iText.Forms.Fields {
         private static readonly PdfName[] TERMINAL_FIELDS = new PdfName[] { PdfName.Btn, PdfName.Tx, PdfName.Ch, PdfName
             .Sig };
 
+        private static readonly ILogger LOGGER = ITextLogManager.GetLogger(typeof(iText.Forms.Fields.AbstractPdfFormField
+            ));
+
         /// <summary>Index of font value in default appearance element.</summary>
         private const int DA_FONT = 0;
 
@@ -68,7 +74,7 @@ namespace iText.Forms.Fields {
 
         protected internal Color color;
 
-        protected internal PdfAConformanceLevel pdfAConformanceLevel;
+        protected internal PdfConformance pdfConformance;
 
         /// <summary>Parent form field.</summary>
         protected internal PdfFormField parent;
@@ -136,26 +142,7 @@ namespace iText.Forms.Fields {
         /// <see cref="iText.Kernel.Pdf.PdfString"/>.
         /// </returns>
         public virtual PdfString GetFieldName() {
-            String parentName = "";
-            PdfDictionary parentDict = GetParent();
-            if (parentDict != null) {
-                PdfFormField parentField = GetParentField();
-                if (parentField == null) {
-                    parentField = PdfFormField.MakeFormField(GetParent(), GetDocument());
-                }
-                PdfString pName = parentField.GetFieldName();
-                if (pName != null) {
-                    parentName = pName.ToUnicodeString() + ".";
-                }
-            }
-            PdfString name = GetPdfObject().GetAsString(PdfName.T);
-            if (name != null) {
-                return new PdfString(parentName + name.ToUnicodeString(), PdfEncodings.UNICODE_BIG);
-            }
-            if (IsTerminalFormField()) {
-                return new PdfString(parentName, PdfEncodings.UNICODE_BIG);
-            }
-            return null;
+            return GetFieldName(new HashSet<PdfFormField>());
         }
 
         /// <summary>
@@ -200,13 +187,13 @@ namespace iText.Forms.Fields {
             return color == null && parent != null ? parent.GetColor() : color;
         }
 
-        /// <summary>Gets the declared PDF/A conformance level.</summary>
+        /// <summary>Gets the declared conformance.</summary>
         /// <returns>
         /// the
-        /// <see cref="iText.Kernel.Pdf.PdfAConformanceLevel"/>
+        /// <see cref="iText.Kernel.Pdf.PdfConformance"/>
         /// </returns>
-        public virtual PdfAConformanceLevel GetPdfAConformanceLevel() {
-            return pdfAConformanceLevel == null && parent != null ? parent.GetPdfAConformanceLevel() : pdfAConformanceLevel;
+        public virtual PdfConformance GetPdfConformance() {
+            return pdfConformance == null && parent != null ? parent.GetPdfConformance() : pdfConformance;
         }
 
         /// <summary>This method regenerates appearance stream of the field.</summary>
@@ -273,12 +260,14 @@ namespace iText.Forms.Fields {
             return this.enableFieldRegeneration;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Sets the text color and does not regenerate appearance stream.</summary>
         /// <param name="color">the new value for the Color.</param>
         /// <returns>the edited field.</returns>
         internal virtual void SetColorNoRegenerate(Color color) {
             this.color = color;
         }
+//\endcond
 
         /// <summary>Gets the appearance state names.</summary>
         /// <returns>an array of Strings containing the names of the appearance states.</returns>
@@ -461,11 +450,53 @@ namespace iText.Forms.Fields {
             return false;
         }
 
+//\cond DO_NOT_DOCUMENT
+        /// <summary>Gets the current field name.</summary>
+        /// <param name="visited">list of visited parents which is used to determine cycle references</param>
+        /// <returns>
+        /// the current field name, as a
+        /// <see cref="iText.Kernel.Pdf.PdfString"/>.
+        /// </returns>
+        internal virtual PdfString GetFieldName(ICollection<PdfFormField> visited) {
+            String parentName = "";
+            PdfDictionary parentDict = GetParent();
+            if (parentDict != null) {
+                PdfFormField parentField = GetParentField();
+                if (!visited.Contains(parentField)) {
+                    if (parentField == null) {
+                        parentField = PdfFormField.MakeFormField(GetParent(), GetDocument());
+                    }
+                    visited.Add(parentField);
+                    PdfString pName = parentField.GetFieldName(visited);
+                    if (pName != null) {
+                        parentName = pName.ToUnicodeString() + ".";
+                    }
+                }
+                else {
+                    LOGGER.LogWarning(FormsLogMessageConstants.FORM_FIELD_HAS_CYCLED_PARENT_STRUCTURE);
+                    Remove(PdfName.Parent);
+                    this.parent = null;
+                }
+            }
+            PdfString name = GetPdfObject().GetAsString(PdfName.T);
+            if (name != null) {
+                return new PdfString(parentName + name.ToUnicodeString(), PdfEncodings.UNICODE_BIG);
+            }
+            if (IsTerminalFormField()) {
+                return new PdfString(parentName, PdfEncodings.UNICODE_BIG);
+            }
+            return null;
+        }
+//\endcond
+
+//\cond DO_NOT_DOCUMENT
         internal virtual void UpdateFontAndFontSize(PdfFont font, float fontSize) {
             this.font = font;
             this.fontSize = fontSize;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual void RetrieveStyles() {
             PdfString defaultAppearance = GetDefaultAppearance();
             if (defaultAppearance != null) {
@@ -477,7 +508,9 @@ namespace iText.Forms.Fields {
                 }
             }
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual PdfObject GetAcroFormObject(PdfName key, int type) {
             PdfObject acroFormObject = null;
             PdfDictionary acroFormDictionary = GetDocument().GetCatalog().GetPdfObject().GetAsDictionary(PdfName.AcroForm
@@ -487,6 +520,7 @@ namespace iText.Forms.Fields {
             }
             return (acroFormObject != null && acroFormObject.GetObjectType() == type) ? acroFormObject : null;
         }
+//\endcond
 
         private static Object[] SplitDAelements(String da) {
             PdfTokenizer tk = new PdfTokenizer(new RandomAccessFileOrArray(new RandomAccessSourceFactory().CreateSource

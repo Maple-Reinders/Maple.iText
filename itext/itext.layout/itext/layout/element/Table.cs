@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -870,11 +870,6 @@ namespace iText.Layout.Element {
             }
         }
 
-        /// <summary>Flushes the content which has just been added to the document.</summary>
-        /// <remarks>
-        /// Flushes the content which has just been added to the document.
-        /// This is a method for internal usage and is called automatically by the document.
-        /// </remarks>
         public virtual void FlushContent() {
             if (lastAddedRowGroups == null || lastAddedRowGroups.IsEmpty()) {
                 return;
@@ -909,20 +904,14 @@ namespace iText.Layout.Element {
         public virtual IList<Border> GetLastRowBottomBorder() {
             IList<Border> horizontalBorder = new List<Border>();
             if (lastAddedRow != null) {
-                for (int i = 0; i < lastAddedRow.Length; i++) {
-                    Cell cell = lastAddedRow[i];
+                foreach (Cell cell in lastAddedRow) {
                     Border border = null;
                     if (cell != null) {
                         if (cell.HasProperty(Property.BORDER_BOTTOM)) {
                             border = cell.GetProperty<Border>(Property.BORDER_BOTTOM);
                         }
                         else {
-                            if (cell.HasProperty(Property.BORDER)) {
-                                border = cell.GetProperty<Border>(Property.BORDER);
-                            }
-                            else {
-                                border = cell.GetDefaultProperty<Border>(Property.BORDER);
-                            }
+                            border = cell.GetDefaultProperty<Border>(Property.BORDER_BOTTOM);
                         }
                     }
                     horizontalBorder.Add(border);
@@ -1189,11 +1178,15 @@ namespace iText.Layout.Element {
 
         /// <summary>A simple object which holds the row numbers of a section of a table.</summary>
         public class RowRange {
+//\cond DO_NOT_DOCUMENT
             // The start number of the row group, inclusive
             internal int startRow;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             // The finish number of the row group, inclusive
             internal int finishRow;
+//\endcond
 
             /// <summary>
             /// Creates a

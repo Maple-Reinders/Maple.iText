@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 
 namespace iText.Barcodes.Qrcode {
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// Encapsulates a Character Set ECI, according to "Extended Channel Interpretations" 5.3.1.1
     /// of ISO 18004.
@@ -104,4 +105,5 @@ namespace iText.Barcodes.Qrcode {
             return NAME_TO_ECI.Get(name);
         }
     }
+//\endcond
 }

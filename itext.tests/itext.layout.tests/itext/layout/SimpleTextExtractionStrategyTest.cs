@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -39,9 +39,13 @@ namespace iText.Layout {
         private static readonly String sourceFolder = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
             .CurrentContext.TestDirectory) + "/resources/itext/layout/SimpleTextExtractionStrategyTest/";
 
+//\cond DO_NOT_DOCUMENT
         internal String TEXT1 = "TEXT1 TEXT1";
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal String TEXT2 = "TEXT2 TEXT2";
+//\endcond
 
         public virtual ITextExtractionStrategy CreateRenderListenerForTest() {
             return new SimpleTextExtractionStrategy();
@@ -193,6 +197,7 @@ namespace iText.Layout {
             NUnit.Framework.Assert.AreEqual(text1, text2);
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual byte[] CreatePdfWithXObject(String xobjectText) {
             MemoryStream byteStream = new MemoryStream();
             PdfDocument pdfDocument = new PdfDocument(new PdfWriter(byteStream).SetCompressionLevel(0));
@@ -207,6 +212,7 @@ namespace iText.Layout {
             document.Close();
             return byteStream.ToArray();
         }
+//\endcond
 
         private static byte[] CreatePdfWithArrayText(PdfTextArray textArray) {
             MemoryStream byteStream = new MemoryStream();

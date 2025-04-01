@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Esf;
 using Org.BouncyCastle.Asn1.Ess;
@@ -49,6 +50,7 @@ using iText.Bouncycastle.Cert.Ocsp;
 using iText.Bouncycastle.Cms;
 using iText.Bouncycastle.Crypto;
 using iText.Bouncycastle.Crypto.Generators;
+using iText.Bouncycastle.Crypto.Modes;
 using iText.Bouncycastle.Math;
 using iText.Bouncycastle.Openssl;
 using iText.Bouncycastle.Operator;
@@ -71,6 +73,7 @@ using iText.Commons.Bouncycastle.Cert.Ocsp;
 using iText.Commons.Bouncycastle.Cms;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Bouncycastle.Crypto.Generators;
+using iText.Commons.Bouncycastle.Crypto.Modes;
 using iText.Commons.Bouncycastle.Math;
 using iText.Commons.Bouncycastle.Openssl;
 using iText.Commons.Bouncycastle.Operator;
@@ -79,7 +82,13 @@ using iText.Commons.Bouncycastle.Tsp;
 using iText.Commons.Bouncycastle.X509;
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.Tsp;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Operators;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Security.Certificates;
@@ -641,8 +650,34 @@ namespace iText.Bouncycastle {
         }
 
         /// <summary><inheritDoc/></summary>
+        public virtual IIssuingDistributionPoint CreateIssuingDistributionPoint(Object point) {
+            return new IssuingDistributionPointBC(IssuingDistributionPoint.GetInstance(point is Asn1EncodableBC ?
+                ((Asn1EncodableBC) point).GetEncodable() : point));
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public IIssuingDistributionPoint CreateIssuingDistributionPoint(IDistributionPointName distributionPoint,
+            bool onlyContainsUserCerts, bool onlyContainsCACerts, IReasonFlags onlySomeReasons, bool indirectCRL,
+            bool onlyContainsAttributeCerts) {
+            return new IssuingDistributionPointBC(new IssuingDistributionPoint(distributionPoint == null ? null :
+                    ((DistributionPointNameBC) distributionPoint).GetDistributionPointName(), onlyContainsUserCerts,
+                onlyContainsCACerts, onlySomeReasons == null ? null :
+                    ((ReasonFlagsBC) onlySomeReasons).GetReasonFlags(), indirectCRL, onlyContainsAttributeCerts));
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public IReasonFlags CreateReasonFlags(int reasons) {
+            return new ReasonFlagsBC(new ReasonFlags(reasons));
+        }
+
+        /// <summary><inheritDoc/></summary>
         public virtual IDistributionPointName CreateDistributionPointName() {
             return DistributionPointNameBC.GetInstance();
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public IDistributionPointName CreateDistributionPointName(IGeneralNames generalNames) {
+            return new DistributionPointNameBC(new DistributionPointName(((GeneralNamesBC)generalNames).GetGeneralNames()));
         }
 
         /// <summary><inheritDoc/></summary>
@@ -787,10 +822,15 @@ namespace iText.Bouncycastle {
         /// <summary><inheritDoc/></summary>
         public virtual IDerGeneralizedTime CreateASN1GeneralizedTime(IAsn1Encodable encodable) {
             Asn1EncodableBC encodableBC = (Asn1EncodableBC)encodable;
-            if (encodableBC.GetEncodable() is DerGeneralizedTime) {
-                return new DerGeneralizedTimeBC((DerGeneralizedTime)encodableBC.GetEncodable());
+            if (encodableBC.GetEncodable() is Asn1GeneralizedTime) {
+                return new IAsn1GeneralizedTimeBC((Asn1GeneralizedTime)encodableBC.GetEncodable());
             }
             return null;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public virtual IDerGeneralizedTime CreateASN1GeneralizedTime(DateTime date) {
+            return new IAsn1GeneralizedTimeBC(new Asn1GeneralizedTime(date));
         }
 
         /// <summary><inheritDoc/></summary>
@@ -816,7 +856,8 @@ namespace iText.Bouncycastle {
         /// <summary><inheritDoc/></summary>
         public ITimeStampTokenGenerator CreateTimeStampTokenGenerator(IPrivateKey pk, IX509Certificate certificate, 
             string allowedDigest, string policyOid) {
-            return new TimeStampTokenGeneratorBC(pk, certificate, allowedDigest, policyOid);
+            String digestOid = GetDigestAlgorithmOid(allowedDigest.ToUpperInvariant());
+            return new TimeStampTokenGeneratorBC(pk, certificate, digestOid, policyOid);
         }
 
         /// <summary><inheritDoc/></summary>
@@ -832,6 +873,11 @@ namespace iText.Bouncycastle {
         /// <summary><inheritDoc/></summary>
         public virtual IX500Name CreateX500Name(String s) {
             return new X509NameBC(new X509Name(s));
+        }
+
+        public IX500Name CreateX500Name(IAsn1Sequence s)
+        {
+            return new X509NameBC(X509Name.GetInstance(((Asn1SequenceBC) s).GetAsn1Sequence()));
         }
 
         /// <summary><inheritDoc/></summary>
@@ -864,6 +910,11 @@ namespace iText.Bouncycastle {
         public virtual IBasicConstraints CreateBasicConstraints(bool b) {
             return new BasicConstraintsBC(new BasicConstraints(b));
         }
+        
+        /// <summary><inheritDoc/></summary>
+        public virtual IBasicConstraints CreateBasicConstraints(int pathLength) {
+            return new BasicConstraintsBC(new BasicConstraints(pathLength));
+        }
 
         /// <summary><inheritDoc/></summary>
         public virtual IKeyUsage CreateKeyUsage() {
@@ -886,6 +937,15 @@ namespace iText.Bouncycastle {
         }
         
         /// <summary><inheritDoc/></summary>
+        public virtual IExtendedKeyUsage CreateExtendedKeyUsage(IDerObjectIdentifier[] purposeId) {
+            DerObjectIdentifier[] unwrappedPurposeIds = new DerObjectIdentifier[purposeId.Length];
+            for (int i = 0; i < purposeId.Length; ++i) {
+                unwrappedPurposeIds[i] = ((DerObjectIdentifierBC)purposeId[i]).GetDerObjectIdentifier();
+            }
+            return new ExtendedKeyUsageBC(new ExtendedKeyUsage(unwrappedPurposeIds));
+        }
+        
+        /// <summary><inheritDoc/></summary>
         public virtual ISubjectPublicKeyInfo CreateSubjectPublicKeyInfo(IPublicKey publicKey) {
             return new SubjectPublicKeyInfoBC(SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(
                 ((PublicKeyBC)publicKey).GetPublicKey()));
@@ -902,6 +962,11 @@ namespace iText.Bouncycastle {
             MemoryStream bOut = new MemoryStream();
             content.Write(bOut);
             return new TstInfoBC(TstInfo.GetInstance(Asn1Object.FromByteArray(bOut.ToArray())));
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public virtual ITstInfo CreateTSTInfo(IAsn1Object contentInfo) {
+            return new TstInfoBC(TstInfo.GetInstance(((Asn1ObjectBC) contentInfo).GetPrimitive()));
         }
 
         /// <summary><inheritDoc/></summary>
@@ -925,12 +990,21 @@ namespace iText.Bouncycastle {
         
         /// <summary><inheritDoc/></summary>
         public virtual IX509Certificate CreateX509Certificate(Stream s) {
-            return new X509CertificateBC(new X509CertificateParser().ReadCertificate(s));
+            try {
+                return new X509CertificateBC(new X509CertificateParser().ReadCertificate(s));
+            }
+            catch (GeneralSecurityException e) {
+                throw new GeneralSecurityExceptionBC(e);
+            }
         }
         
         /// <summary><inheritDoc/></summary>
         public IX509Crl CreateX509Crl(Stream input) {
-            return new X509CrlBC(new X509CrlParser().ReadCrl(input));
+            X509Crl crl = new X509CrlParser().ReadCrl(input);
+            if (crl != null) {
+                return new X509CrlBC(crl);
+            }
+            return null;
         }
 
         /// <summary><inheritDoc/></summary>
@@ -948,12 +1022,16 @@ namespace iText.Bouncycastle {
 
         /// <summary><inheritDoc/></summary>
         public IDigest CreateIDigest(string hashAlgorithm) {
-            return new DigestBC(DigestUtilities.GetDigest(hashAlgorithm));
+            try {
+                return new DigestBC(DigestUtilities.GetDigest(hashAlgorithm));
+            } catch (SecurityUtilityException e) {
+                throw new SecurityUtilityExceptionBC(e);
+            }
         }
 
         /// <summary><inheritDoc/></summary>
         public ICertID CreateCertificateID(string hashAlgorithm, IX509Certificate issuerCert, IBigInteger serialNumber) {
-            return new CertIDBC(hashAlgorithm, issuerCert, serialNumber);
+            return new CertIDBC(new AlgorithmIdentifier(new DerObjectIdentifier(hashAlgorithm), DerNull.Instance), issuerCert, serialNumber);
         }
         
         /// <summary><inheritDoc/></summary>
@@ -1069,6 +1147,11 @@ namespace iText.Bouncycastle {
         public bool IsNull(IAsn1Encodable encodable) {
             return ((Asn1EncodableBC)encodable).GetEncodable() == null;
         }
+
+        /// <summary><inheritDoc/></summary>
+        public RNGCryptoServiceProvider GetSecureRandom() {
+            return new RNGCryptoServiceProvider();
+        }
         
         /// <summary><inheritDoc/></summary>
         public IX509Extension CreateExtension(bool b, IDerOctetString octetString) {
@@ -1105,8 +1188,50 @@ namespace iText.Bouncycastle {
         /// <summary><inheritDoc/></summary>
         public IBouncyCastleUtil GetBouncyCastleUtil() {
             return BOUNCY_CASTLE_UTIL;
-        } 
+        }
 
+        /// <summary><inheritDoc/></summary>
+        public string CreateEndDate(IX509Certificate certificate) {
+            return certificate.GetEndDateTime();
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public byte[] GenerateHKDF(byte[] inputKey, byte[] salt, byte[] info) {
+            HkdfBytesGenerator hkdfBytesGenerator = new HkdfBytesGenerator(new Sha256Digest());
+            HkdfParameters hkdfParameters = new HkdfParameters(inputKey, salt, info);
+            hkdfBytesGenerator.Init(hkdfParameters);
+            byte[] hkdf = new byte[32];
+            hkdfBytesGenerator.GenerateBytes(hkdf, 0, 32);
+
+            return hkdf;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public byte[] GenerateHMACSHA256Token(byte[] key, byte[] data) {
+            HMACSHA256 mac = new HMACSHA256(key);
+            return mac.ComputeHash(data);
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public byte[] GenerateEncryptedKeyWithAES256NoPad(byte[] key, byte[] kek) {
+            IWrapper wrapper = new AesWrapEngine();
+            wrapper.Init(true, new KeyParameter(kek));
+            return wrapper.Wrap(key, 0, key.Length);
+        }
+        
+        /// <summary><inheritDoc/></summary>
+        public byte[] GenerateDecryptedKeyWithAES256NoPad(byte[] key, byte[] kek) {
+            IWrapper wrapper = new AesWrapEngine();
+            wrapper.Init(false, new KeyParameter(kek));
+            return wrapper.Unwrap(key, 0, key.Length);
+        }
+
+        public IGCMBlockCipher CreateGCMBlockCipher() {
+            GcmBlockCipher cipher = new GcmBlockCipher(new AesEngine());
+            return new GCMBlockCipherBC(cipher);
+        }
+
+        //\cond DO_NOT_DOCUMENT
         internal class BouncyCastlePasswordFinder : IPasswordFinder {
             private readonly char[] password;
 
@@ -1118,5 +1243,6 @@ namespace iText.Bouncycastle {
                 return password;
             }
         }
+        //\endcond
     }
 }

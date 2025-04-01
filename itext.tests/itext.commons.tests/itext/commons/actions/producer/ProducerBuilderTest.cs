@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -162,6 +162,39 @@ namespace iText.Commons.Actions.Producer {
                 , 1, 2, 3);
             String newProducerLine = ProducerBuilder.ModifyProducer(events, null);
             NUnit.Framework.Assert.AreEqual("||", newProducerLine);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void ModifiedUsingEqualsCurrentProducerTest() {
+            IList<ConfirmedEventWrapper> events = GetEvents("some Author", 1, 2, 3);
+            String newProducerLine = ProducerBuilder.ModifyProducer(events, "Old producer; modified using some Author"
+                );
+            NUnit.Framework.Assert.AreEqual("Old producer; modified using some Author", newProducerLine);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void PrevModifiedUsingEqualsCurrentProducerTest() {
+            IList<ConfirmedEventWrapper> events = GetEvents("some Author", 1, 2, 3);
+            String newProducerLine = ProducerBuilder.ModifyProducer(events, "Old producer; modified using some Author; modified using another tool"
+                );
+            NUnit.Framework.Assert.AreEqual("Old producer; modified using some Author; modified using another tool; " 
+                + "modified using some Author", newProducerLine);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void SeveralModifiedUsingEqualsCurrentProducerTest() {
+            IList<ConfirmedEventWrapper> events = GetEvents("some Author", 1, 2, 3);
+            String newProducerLine = ProducerBuilder.ModifyProducer(events, "Old producer; modified using some Author; modified using some Author"
+                );
+            NUnit.Framework.Assert.AreEqual("Old producer; modified using some Author; modified using some Author", newProducerLine
+                );
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void OldProducerEqualsCurrentProducerTest() {
+            IList<ConfirmedEventWrapper> events = GetEvents("some Author", 1, 2, 3);
+            String newProducerLine = ProducerBuilder.ModifyProducer(events, "some Author");
+            NUnit.Framework.Assert.AreEqual("some Author", newProducerLine);
         }
 
         private IList<ConfirmedEventWrapper> GetEvents(String initialProducerLine, params int[] indexes) {

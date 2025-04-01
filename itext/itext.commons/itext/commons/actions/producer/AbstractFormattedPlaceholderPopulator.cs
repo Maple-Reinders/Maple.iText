@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -27,6 +27,7 @@ using iText.Commons.Actions.Confirmations;
 using iText.Commons.Exceptions;
 
 namespace iText.Commons.Actions.Producer {
+//\cond DO_NOT_DOCUMENT
     /// <summary>Abstract populator for placeholders consuming a parameter which is a pattern string.</summary>
     /// <remarks>
     /// Abstract populator for placeholders consuming a parameter which is a pattern string. Any latin
@@ -90,4 +91,5 @@ namespace iText.Commons.Actions.Producer {
 
         public abstract String Populate(IList<ConfirmedEventWrapper> arg1, String arg2);
     }
+//\endcond
 }

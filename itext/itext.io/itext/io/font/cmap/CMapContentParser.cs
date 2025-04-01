@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -202,18 +202,6 @@ namespace iText.IO.Font.Cmap {
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Use
-        /// <see cref="iText.IO.Util.PdfNameUtil.DecodeName(byte[])"/>
-        /// instead.
-        /// </summary>
-        /// <param name="content">to decode</param>
-        /// <returns>decoded content</returns>
-        [System.ObsoleteAttribute]
-        protected internal static String DecodeName(byte[] content) {
-            return PdfNameUtil.DecodeName(content);
         }
 
         private static String ToHex4(int n) {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -50,11 +50,17 @@ namespace iText.Kernel.Pdf.Canvas.Wmf {
 
         public const int HS_DIAGCROSS = 5;
 
+//\cond DO_NOT_DOCUMENT
         internal int style = BS_SOLID;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal int hatch;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal Color color = ColorConstants.WHITE;
+//\endcond
 
         /// <summary>Creates a MetaBrush object.</summary>
         public MetaBrush()

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,6 +33,13 @@ namespace iText.Kernel.Geom {
             NUnit.Framework.Assert.AreEqual(rectangle.y, pageSize.y, 1e-5);
             NUnit.Framework.Assert.AreEqual(rectangle.width, pageSize.width, 1e-5);
             NUnit.Framework.Assert.AreEqual(rectangle.height, pageSize.height, 1e-5);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void A9pageSizeTest() {
+            PageSize size = new PageSize(PageSize.A9);
+            NUnit.Framework.Assert.AreEqual(148, size.height, 1e-5);
+            NUnit.Framework.Assert.AreEqual(105, size.width, 1e-5);
         }
     }
 }

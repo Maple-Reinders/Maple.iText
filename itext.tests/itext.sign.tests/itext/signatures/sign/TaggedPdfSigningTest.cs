@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,10 +22,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.Collections.Generic;
-using System.IO;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Utils;
+using iText.Forms.Fields.Properties;
+using iText.Forms.Form.Element;
+using iText.Kernel.Crypto;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Kernel.Utils;
@@ -96,33 +98,36 @@ namespace iText.Signatures.Sign {
              pk, String digestAlgorithm, PdfSigner.CryptoStandard subfilter, String reason, String location, Rectangle
              rectangleForNewField, bool setReuseAppearance, bool isAppendMode) {
             Sign(src, name, dest, chain, pk, digestAlgorithm, subfilter, reason, location, rectangleForNewField, setReuseAppearance
-                , isAppendMode, PdfSigner.NOT_CERTIFIED, null);
+                , isAppendMode, AccessPermissions.UNSPECIFIED, null);
         }
 
         protected internal virtual void Sign(String src, String name, String dest, IX509Certificate[] chain, IPrivateKey
              pk, String digestAlgorithm, PdfSigner.CryptoStandard subfilter, String reason, String location, Rectangle
-             rectangleForNewField, bool setReuseAppearance, bool isAppendMode, int certificationLevel, float? fontSize
-            ) {
+             rectangleForNewField, bool setReuseAppearance, bool isAppendMode, AccessPermissions certificationLevel
+            , float? fontSize) {
             PdfReader reader = new PdfReader(src);
             StampingProperties properties = new StampingProperties();
             if (isAppendMode) {
                 properties.UseAppendMode();
             }
-            PdfSigner signer = new PdfSigner(reader, new FileStream(dest, FileMode.Create), properties);
-            signer.SetCertificationLevel(certificationLevel);
+            PdfSigner signer = new PdfSigner(reader, FileUtil.GetFileOutputStream(dest), properties);
+            SignerProperties signerProperties = new SignerProperties().SetCertificationLevel(certificationLevel).SetFieldName
+                (name);
+            signer.SetSignerProperties(signerProperties);
             // Creating the appearance
-            PdfSignatureAppearance appearance = signer.GetSignatureAppearance().SetReason(reason).SetLocation(location
-                ).SetReuseAppearance(setReuseAppearance);
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID).SetContent
+                (new SignedAppearanceText());
             if (rectangleForNewField != null) {
-                appearance.SetPageRect(rectangleForNewField);
+                signerProperties.SetPageRect(rectangleForNewField);
             }
             if (fontSize != null) {
-                appearance.SetLayer2FontSize((float)fontSize);
+                appearance.SetFontSize((float)fontSize);
             }
-            signer.SetFieldName(name);
+            signerProperties.SetReason(reason).SetLocation(location).SetSignatureAppearance(appearance);
+            signer.GetSignatureField().SetReuseAppearance(setReuseAppearance);
             // Creating the signature
             IExternalSignature pks = new PrivateKeySignature(pk, digestAlgorithm);
-            signer.SignDetached(pks, chain, null, null, null, 0, subfilter);
+            signer.SignDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, subfilter);
         }
 
         private static IDictionary<int, IList<Rectangle>> GetTestMap(Rectangle ignoredArea) {

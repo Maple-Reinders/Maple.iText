@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using iText.Layout.Properties;
 
 namespace iText.Layout.Renderer {
+//\cond DO_NOT_DOCUMENT
     /// <summary>Base interface to customize placing flex items on main flex direction.</summary>
     internal interface IFlexItemMainDirector {
         /// <summary>Apply the direction for placement the items in flex container.</summary>
@@ -48,4 +49,5 @@ namespace iText.Layout.Renderer {
         void ApplyJustifyContent(IList<FlexUtil.FlexItemCalculationInfo> line, JustifyContent justifyContent, float
              freeSpace);
     }
+//\endcond
 }

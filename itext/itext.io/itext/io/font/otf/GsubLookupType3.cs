@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -34,10 +34,10 @@ namespace iText.IO.Font.Otf {
         }
 
         public override bool TransformOne(GlyphLine line) {
-            if (line.idx >= line.end) {
+            if (line.GetIdx() >= line.GetEnd()) {
                 return false;
             }
-            Glyph g = line.Get(line.idx);
+            Glyph g = line.Get(line.GetIdx());
             bool changed = false;
             if (!openReader.IsSkip(g.GetCode(), lookupFlag)) {
                 int[] substCode = substMap.Get(g.GetCode());
@@ -47,7 +47,7 @@ namespace iText.IO.Font.Otf {
                     changed = true;
                 }
             }
-            line.idx++;
+            line.SetIdx(line.GetIdx() + 1);
             return changed;
         }
 

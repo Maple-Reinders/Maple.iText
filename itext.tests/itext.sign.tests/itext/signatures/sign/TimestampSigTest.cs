@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -65,19 +65,12 @@ namespace iText.Signatures.Sign {
             String outFileName = destinationFolder + "timestampTest01.pdf";
             IX509Certificate[] tsaChain = PemFileHelper.ReadFirstChain(tsaCertFileName);
             IPrivateKey tsaPrivateKey = PemFileHelper.ReadFirstKey(tsaCertFileName, password);
-            PdfSigner signer = new PdfSigner(new PdfReader(srcFileName), new FileStream(outFileName, FileMode.Create), 
+            PdfSigner signer = new PdfSigner(new PdfReader(srcFileName), FileUtil.GetFileOutputStream(outFileName), 
                 new StampingProperties());
             TestTsaClient testTsa = new TestTsaClient(JavaUtil.ArraysAsList(tsaChain), tsaPrivateKey);
             signer.Timestamp(testTsa, "timestampSig1");
             TestSignUtils.BasicCheckSignedDoc(destinationFolder + "timestampTest01.pdf", "timestampSig1");
             NUnit.Framework.Assert.IsNull(SignaturesCompareTool.CompareSignatures(outFileName, compareFile));
         }
-        //        TimeStampToken tsWrong = new TimeStampResponse(Files.readAllBytes(Paths.get("c:\\Users\\yulian\\Desktop\\myTs"))).getTimeStampToken();
-        //
-        //        JcaSimpleSignerInfoVerifierBuilder sigVerifBuilder = new JcaSimpleSignerInfoVerifierBuilder();
-        //        X509Certificate caCert = (X509Certificate)Pkcs12FileHelper.readFirstChain(p12FileName, password)[0];
-        //        SignerInformationVerifier signerInfoVerif = sigVerifBuilder.setProvider(BouncyCastleProvider.PROVIDER_NAME).build(caCert.getPublicKey());
-        //        boolean signatureValid = tsWrong.isSignatureValid(signerInfoVerif);
-        //
     }
 }

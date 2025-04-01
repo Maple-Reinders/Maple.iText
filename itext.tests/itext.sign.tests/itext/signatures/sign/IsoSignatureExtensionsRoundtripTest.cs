@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -26,12 +26,13 @@ using System.IO;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.X9;
 using iText.Bouncycastleconnector;
-using iText.Bouncycastlefips.Security;
 using iText.Commons.Bouncycastle;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Bouncycastle.Security;
 using iText.Commons.Utils;
+using iText.Forms.Form.Element;
+using iText.Kernel.Crypto;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
@@ -138,11 +139,16 @@ namespace iText.Signatures.Sign {
         public virtual void TestRsaWithSha3_512() {
             // For now we use a generic OID, but NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512 would
             // be more appropriate
-            DoRoundTrip("rsa", DigestAlgorithms.SHA3_512, new DerObjectIdentifier(SecurityIDs.ID_RSA_WITH_SHA3_512));
+            DoRoundTrip("rsa", DigestAlgorithms.SHA3_512, new DerObjectIdentifier(OID.RSA_WITH_SHA3_512));
         }
 
         [NUnit.Framework.Test]
-        public virtual void TestRsaWithSha3_256() {
+        public virtual void TestRsaSsaPssWithSha3_256() {
+            DoRoundTrip("rsa", DigestAlgorithms.SHA3_256, "RSASSA-PSS", new DerObjectIdentifier(OID.RSASSA_PSS));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void TestDsaWithSha3_256() {
             if ("BCFIPS".Equals(BOUNCY_CASTLE_FACTORY.GetProviderName())) {
                 DoRoundTrip("dsa", DigestAlgorithms.SHA3_256, NistObjectIdentifiers.IdDsaWithSha3_256);
             } else {
@@ -231,19 +237,22 @@ namespace iText.Signatures.Sign {
             IX509Certificate signerCert2 = ReadCertificate(System.IO.Path.Combine(SOURCE_FOLDER, keySample2 + ".crt"));
             IX509Certificate[] signChain1 = new IX509Certificate[] { signerCert1, root };
             IX509Certificate[] signChain2 = new IX509Certificate[] { signerCert2, root };
-            using (Stream in1 = new FileStream(SOURCE_FILE, FileMode.Open, FileAccess.Read)) {
+            using (Stream in1 = FileUtil.GetInputStreamForFile(SOURCE_FILE)) {
                 IPrivateKey signPrivateKey = ReadUnencryptedPrivateKey(System.IO.Path.Combine(SOURCE_FOLDER, keySample1 + ".key.pem"));
                 IExternalSignature pks = new PrivateKeySignature(signPrivateKey, DigestAlgorithms.SHA3_256);
                 PdfSigner signer = new PdfSigner(new PdfReader(in1), baos1, new StampingProperties());
-                signer.SetFieldName("Signature1");
-                signer.SignDetached(pks, signChain1, null, null, null, 0, PdfSigner.CryptoStandard.CMS);
+                SignerProperties signerProperties = new SignerProperties().SetFieldName("Signature1");
+                signer.SetSignerProperties(signerProperties);
+
+                signer.SignDetached(new BouncyCastleDigest(), pks, signChain1, null, null, null, 0, PdfSigner.CryptoStandard.CMS);
             }
             using (Stream in2 = new MemoryStream(baos1.ToArray())) {
                 IPrivateKey signPrivateKey = ReadUnencryptedPrivateKey(System.IO.Path.Combine(SOURCE_FOLDER, keySample2 + ".key.pem"));
                 IExternalSignature pks = new PrivateKeySignature(signPrivateKey, DigestAlgorithms.SHA512);
                 PdfSigner signer = new PdfSigner(new PdfReader(in2), baos2, new StampingProperties());
-                signer.SetFieldName("Signature2");
-                signer.SignDetached(pks, signChain2, null, null, null, 0, PdfSigner.CryptoStandard.CMS);
+                SignerProperties signerProperties = new SignerProperties().SetFieldName("Signature2");
+                signer.SetSignerProperties(signerProperties);
+                signer.SignDetached(new BouncyCastleDigest(), pks, signChain2, null, null, null, 0, PdfSigner.CryptoStandard.CMS);
             }
             CheckIsoExtensions(baos2.ToArray(), JavaUtil.ArraysAsList(32001, 32002));
         }
@@ -263,7 +272,7 @@ namespace iText.Signatures.Sign {
 
         private void DoSign(String keySampleName, String digestAlgo, String signatureAlgo, String outFile) {
             // write to a file for easier inspection when debugging
-            using (FileStream fos = new FileStream(outFile, FileMode.Create)) {
+            using (FileStream fos = FileUtil.GetFileOutputStream(outFile)) {
                 DoSign(keySampleName, digestAlgo, signatureAlgo, fos);
             }
         }
@@ -283,10 +292,14 @@ namespace iText.Signatures.Sign {
             // and accessing that information requires APIs that are not available in older JDKs we still support.
             IExternalSignature pks = new PrivateKeySignature(signPrivateKey, digestAlgo, signatureAlgo, null);
             PdfSigner signer = new PdfSigner(new PdfReader(SOURCE_FILE), os, new StampingProperties());
-            signer.SetFieldName(SIGNATURE_FIELD);
-            signer.GetSignatureAppearance().SetPageRect(new Rectangle(50, 650, 200, 100)).SetReason("Test").SetLocation
-                ("TestCity").SetLayer2Text("Approval test signature.\nCreated by iText.");
-            signer.SignDetached(pks, signChain, null, null, null, 0, PdfSigner.CryptoStandard.CMS);
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID)
+                .SetContent("Approval test signature.\nCreated by iText.");
+            SignerProperties signerProperties = new SignerProperties()
+                .SetFieldName(SIGNATURE_FIELD)
+                .SetPageRect(new Rectangle(50, 650, 200, 100))
+                .SetReason("Test").SetLocation("TestCity").SetSignatureAppearance(appearance);
+            signer.SetSignerProperties(signerProperties);
+            signer.SignDetached(new BouncyCastleDigest(), pks, signChain, null, null, null, 0, PdfSigner.CryptoStandard.CMS);
         }
         
         private void DoVerify(String fileName, DerObjectIdentifier expectedSigAlgoIdentifier) {

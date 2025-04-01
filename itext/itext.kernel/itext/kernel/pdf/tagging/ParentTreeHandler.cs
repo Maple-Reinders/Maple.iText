@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -26,14 +26,20 @@ using Microsoft.Extensions.Logging;
 using iText.Commons;
 using iText.Commons.Utils;
 using iText.Kernel.Exceptions;
+using iText.Kernel.Logs;
 using iText.Kernel.Pdf;
+using iText.Kernel.Validation.Context;
 
 namespace iText.Kernel.Pdf.Tagging {
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// Internal helper class which is used to effectively build parent tree and also find marked content references:
     /// for specified page, by MCID or by struct parent index.
     /// </summary>
     internal class ParentTreeHandler {
+        private static readonly ILogger LOGGER = ITextLogManager.GetLogger(typeof(iText.Kernel.Pdf.Tagging.ParentTreeHandler
+            ));
+
         private PdfStructTreeRoot structTreeRoot;
 
         /// <summary>Represents parentTree in structTreeRoot.</summary>
@@ -47,6 +53,9 @@ namespace iText.Kernel.Pdf.Tagging {
 
         private IDictionary<PdfIndirectReference, int?> xObjectToStructParentsInd;
 
+        private int maxStructParentIndex = -1;
+
+//\cond DO_NOT_DOCUMENT
         /// <summary>Init ParentTreeHandler.</summary>
         /// <remarks>Init ParentTreeHandler. On init the parent tree is read and stored in this instance.</remarks>
         internal ParentTreeHandler(PdfStructTreeRoot structTreeRoot) {
@@ -56,6 +65,7 @@ namespace iText.Kernel.Pdf.Tagging {
             RegisterAllMcrs();
             pageToStructParentsInd = new Dictionary<PdfIndirectReference, int?>();
         }
+//\endcond
 
         /// <summary>Gets a list of all marked content references on the page.</summary>
         public virtual ParentTreeHandler.PageMcrsContainer GetPageMarkedContentReferences(PdfPage page) {
@@ -110,7 +120,6 @@ namespace iText.Kernel.Pdf.Tagging {
             if (page.IsFlushed() || pageToPageMcrs.Get(indRef) == null) {
                 return;
             }
-            // TODO checking for XObject-related mcrs is here to keep up the same behaviour that should be fixed in the scope of DEVSIX-3351
             bool hasNonObjRefMcr = pageToPageMcrs.Get(indRef).GetPageContentStreamsMcrs().Count > 0 || pageToPageMcrs.
                 Get(indRef).GetPageResourceXObjects().Count > 0;
             if (hasNonObjRefMcr) {
@@ -129,8 +138,7 @@ namespace iText.Kernel.Pdf.Tagging {
         private void RegisterMcr(PdfMcr mcr, bool registeringOnInit) {
             PdfIndirectReference mcrPageIndRef = mcr.GetPageIndirectReference();
             if (mcrPageIndRef == null || (!(mcr is PdfObjRef) && mcr.GetMcid() < 0)) {
-                ILogger logger = ITextLogManager.GetLogger(typeof(iText.Kernel.Pdf.Tagging.ParentTreeHandler));
-                logger.LogError(iText.IO.Logs.IoLogMessageConstant.ENCOUNTERED_INVALID_MCR);
+                LOGGER.LogError(iText.IO.Logs.IoLogMessageConstant.ENCOUNTERED_INVALID_MCR);
                 return;
             }
             ParentTreeHandler.PageMcrsContainer pageMcrs = pageToPageMcrs.Get(mcrPageIndRef);
@@ -156,21 +164,32 @@ namespace iText.Kernel.Pdf.Tagging {
                 int? structParent = xObjectStream.GetAsInt(PdfName.StructParents);
                 if (structParent != null) {
                     xObjectToStructParentsInd.Put(stmIndRef, structParent);
+                    if (registeringOnInit) {
+                        xObjectStream.Release();
+                    }
                 }
                 else {
-                    // TODO DEVSIX-3351 an error is thrown here because right now no /StructParents will be created.
-                    ILogger logger = ITextLogManager.GetLogger(typeof(iText.Kernel.Pdf.Tagging.ParentTreeHandler));
-                    logger.LogError(iText.IO.Logs.IoLogMessageConstant.XOBJECT_HAS_NO_STRUCT_PARENTS);
+                    if (IsModificationAllowed()) {
+                        maxStructParentIndex++;
+                        xObjectToStructParentsInd.Put(stmIndRef, maxStructParentIndex);
+                        xObjectStream.Put(PdfName.StructParents, new PdfNumber(maxStructParentIndex));
+                        structTreeRoot.GetPdfObject().Put(PdfName.ParentTreeNextKey, new PdfNumber(maxStructParentIndex + 1));
+                        LOGGER.LogWarning(KernelLogMessageConstant.XOBJECT_STRUCT_PARENT_INDEX_MISSED_AND_RECREATED);
+                    }
+                    else {
+                        throw new PdfException(KernelExceptionMessageConstant.XOBJECT_STRUCT_PARENT_INDEX_MISSED);
+                    }
                 }
                 pageMcrs.PutXObjectMcr(stmIndRef, mcr);
-                if (registeringOnInit) {
-                    xObjectStream.Release();
-                }
             }
             else {
                 if (mcr is PdfObjRef) {
-                    PdfDictionary obj = ((PdfDictionary)mcr.GetPdfObject()).GetAsDictionary(PdfName.Obj);
-                    if (obj == null || obj.IsFlushed()) {
+                    PdfObject mcrObj = ((PdfDictionary)mcr.GetPdfObject()).Get(PdfName.Obj);
+                    if (!(mcrObj is PdfDictionary)) {
+                        throw new PdfException(KernelExceptionMessageConstant.INVALID_OBJECT_REFERENCE_TYPE);
+                    }
+                    PdfDictionary obj = (PdfDictionary)mcrObj;
+                    if (obj.IsFlushed()) {
                         throw new PdfException(KernelExceptionMessageConstant.WHEN_ADDING_OBJECT_REFERENCE_TO_THE_TAG_TREE_IT_MUST_BE_CONNECTED_TO_NOT_FLUSHED_OBJECT
                             );
                     }
@@ -179,7 +198,16 @@ namespace iText.Kernel.Pdf.Tagging {
                         pageMcrs.PutObjectReferenceMcr(n.IntValue(), mcr);
                     }
                     else {
-                        throw new PdfException(KernelExceptionMessageConstant.STRUCT_PARENT_INDEX_NOT_FOUND_IN_TAGGED_OBJECT);
+                        if (IsModificationAllowed()) {
+                            maxStructParentIndex++;
+                            pageMcrs.PutObjectReferenceMcr(maxStructParentIndex, mcr);
+                            obj.Put(PdfName.StructParent, new PdfNumber(maxStructParentIndex));
+                            structTreeRoot.GetPdfObject().Put(PdfName.ParentTreeNextKey, new PdfNumber(maxStructParentIndex + 1));
+                            LOGGER.LogWarning(KernelLogMessageConstant.STRUCT_PARENT_INDEX_MISSED_AND_RECREATED);
+                        }
+                        else {
+                            throw new PdfException(KernelExceptionMessageConstant.STRUCT_PARENT_INDEX_NOT_FOUND_IN_TAGGED_OBJECT);
+                        }
                     }
                 }
                 else {
@@ -216,15 +244,6 @@ namespace iText.Kernel.Pdf.Tagging {
                 }
                 else {
                     if (mcrToUnregister is PdfObjRef) {
-                        PdfDictionary obj = ((PdfDictionary)mcrToUnregister.GetPdfObject()).GetAsDictionary(PdfName.Obj);
-                        if (obj != null && !obj.IsFlushed()) {
-                            PdfNumber n = obj.GetAsNumber(PdfName.StructParent);
-                            if (n != null) {
-                                pageMcrs.GetObjRefs().JRemove(n.IntValue());
-                                structTreeRoot.SetModified();
-                                return;
-                            }
-                        }
                         foreach (KeyValuePair<int, PdfMcr> entry in pageMcrs.GetObjRefs()) {
                             if (entry.Value.GetPdfObject() == mcrToUnregister.GetPdfObject()) {
                                 pageMcrs.GetObjRefs().JRemove(entry.Key);
@@ -241,13 +260,22 @@ namespace iText.Kernel.Pdf.Tagging {
             }
         }
 
+        private bool IsModificationAllowed() {
+            PdfReader reader = this.structTreeRoot.GetDocument().GetReader();
+            if (reader != null) {
+                return PdfReader.StrictnessLevel.CONSERVATIVE.IsStricter(reader.GetStrictnessLevel());
+            }
+            else {
+                return true;
+            }
+        }
+
         private void RegisterAllMcrs() {
             pageToPageMcrs = new Dictionary<PdfIndirectReference, ParentTreeHandler.PageMcrsContainer>();
             // we create new number tree and not using parentTree, because we want parentTree to be empty
             IDictionary<int?, PdfObject> parentTreeEntries = new PdfNumTree(structTreeRoot.GetDocument().GetCatalog(), 
                 PdfName.ParentTree).GetNumbers();
             ICollection<PdfDictionary> mcrParents = new LinkedHashSet<PdfDictionary>();
-            int maxStructParentIndex = -1;
             foreach (KeyValuePair<int?, PdfObject> entry in parentTreeEntries) {
                 if (entry.Key > maxStructParentIndex) {
                     maxStructParentIndex = (int)entry.Key;
@@ -341,7 +369,7 @@ namespace iText.Kernel.Pdf.Tagging {
             if (!parentsOfMcrs.IsEmpty()) {
                 parentsOfMcrs.MakeIndirect(structTreeRoot.GetDocument());
                 parentTree.AddEntry(pageStructParentIndex, parentsOfMcrs);
-                structTreeRoot.GetDocument().CheckIsoConformance(parentsOfMcrs, IsoKey.TAG_STRUCTURE_ELEMENT);
+                structTreeRoot.GetDocument().CheckIsoConformance(new TagStructElementValidationContext(parentsOfMcrs));
                 parentsOfMcrs.Flush();
                 return true;
             }
@@ -368,31 +396,45 @@ namespace iText.Kernel.Pdf.Tagging {
             return null;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal class PageMcrsContainer {
+//\cond DO_NOT_DOCUMENT
             internal IDictionary<int, PdfMcr> objRefs;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal SortedDictionary<int, PdfMcr> pageContentStreams;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             /*
             * Keys of this map are indirect references to XObjects contained in page's resources,
             * values are the mcrs contained in the corresponding XObject streams, stored as mappings "MCID-number to PdfMcr".
             */
             internal IDictionary<PdfIndirectReference, SortedDictionary<int, PdfMcr>> pageResourceXObjects;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal PageMcrsContainer() {
                 objRefs = new LinkedDictionary<int, PdfMcr>();
                 pageContentStreams = new SortedDictionary<int, PdfMcr>();
                 pageResourceXObjects = new LinkedDictionary<PdfIndirectReference, SortedDictionary<int, PdfMcr>>();
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal virtual void PutObjectReferenceMcr(int structParentIndex, PdfMcr mcr) {
                 objRefs.Put(structParentIndex, mcr);
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal virtual void PutPageContentStreamMcr(int mcid, PdfMcr mcr) {
                 pageContentStreams.Put(mcid, mcr);
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal virtual void PutXObjectMcr(PdfIndirectReference xObjectIndRef, PdfMcr mcr) {
                 SortedDictionary<int, PdfMcr> xObjectMcrs = pageResourceXObjects.Get(xObjectIndRef);
                 if (xObjectMcrs == null) {
@@ -401,20 +443,28 @@ namespace iText.Kernel.Pdf.Tagging {
                 }
                 pageResourceXObjects.Get(xObjectIndRef).Put(mcr.GetMcid(), mcr);
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal virtual SortedDictionary<int, PdfMcr> GetPageContentStreamsMcrs() {
                 return pageContentStreams;
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal virtual IDictionary<int, PdfMcr> GetObjRefs() {
                 return objRefs;
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal virtual IDictionary<PdfIndirectReference, SortedDictionary<int, PdfMcr>> GetPageResourceXObjects(
                 ) {
                 return pageResourceXObjects;
             }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal virtual ICollection<PdfMcr> GetAllMcrsAsCollection() {
                 ICollection<PdfMcr> collection = new List<PdfMcr>();
                 collection.AddAll(objRefs.Values);
@@ -424,6 +474,9 @@ namespace iText.Kernel.Pdf.Tagging {
                 }
                 return collection;
             }
+//\endcond
         }
+//\endcond
     }
+//\endcond
 }

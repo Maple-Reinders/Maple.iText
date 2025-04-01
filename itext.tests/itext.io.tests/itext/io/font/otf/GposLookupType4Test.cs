@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -41,7 +41,7 @@ namespace iText.IO.Font.Otf {
             IList<Glyph> glyphs = JavaUtil.ArraysAsList(new Glyph(fontProgram.GetGlyphByCode(163)), new Glyph(fontProgram
                 .GetGlyphByCode(207)), new Glyph(fontProgram.GetGlyphByCode(213)));
             GlyphLine gl = new GlyphLine(glyphs);
-            gl.idx = 2;
+            gl.SetIdx(2);
             NUnit.Framework.Assert.AreEqual(0, gl.Get(2).GetXPlacement());
             NUnit.Framework.Assert.AreEqual(0, gl.Get(2).GetAnchorDelta());
             lookup.TransformOne(gl);

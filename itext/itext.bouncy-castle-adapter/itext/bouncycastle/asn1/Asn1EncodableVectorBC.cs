@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -105,6 +105,11 @@ namespace iText.Bouncycastle.Asn1 {
             if (element != null) {
                 Add(element);
             }
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public virtual int Size() {
+            return encodableVector.Count;
         }
 
         /// <summary>Indicates whether some other object is "equal to" this one.</summary>

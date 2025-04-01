@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,6 +33,7 @@ using iText.Layout.Properties;
 using iText.Layout.Renderer;
 using iText.Layout.Splitting;
 using iText.Layout.Tagging;
+using iText.Layout.Validation.Context;
 
 namespace iText.Layout {
     /// <summary>A generic abstract root element for a PDF layout object hierarchy.</summary>
@@ -367,7 +368,7 @@ namespace iText.Layout {
             if (renderer == null) {
                 return;
             }
-            pdfDocument.CheckIsoConformance(renderer.GetModelElement(), IsoKey.LAYOUT);
+            pdfDocument.CheckIsoConformance(new LayoutValidationContext(renderer));
             IList<IRenderer> renderers = renderer.GetChildRenderers();
             if (renderers == null) {
                 return;

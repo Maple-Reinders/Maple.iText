@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -150,6 +150,7 @@ namespace iText.Barcodes {
             return @out.ToString();
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Calculates the checksum.</summary>
         /// <param name="text">the text</param>
         /// <returns>the checksum</returns>
@@ -168,6 +169,7 @@ namespace iText.Barcodes {
             }
             return CHARS[chk % 43];
         }
+//\endcond
 
         /// <summary>
         /// Gets the maximum area that the barcode and the text, if

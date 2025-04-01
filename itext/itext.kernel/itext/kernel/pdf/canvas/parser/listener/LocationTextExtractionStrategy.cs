@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -309,9 +309,13 @@ namespace iText.Kernel.Pdf.Canvas.Parser.Listener {
         }
 
         private class TextChunkMarks {
+//\cond DO_NOT_DOCUMENT
             internal IList<TextChunk> preceding = new List<TextChunk>();
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             internal IList<TextChunk> succeeding = new List<TextChunk>();
+//\endcond
         }
 
         private sealed class ITextChunkLocationStrategyImpl : LocationTextExtractionStrategy.ITextChunkLocationStrategy {

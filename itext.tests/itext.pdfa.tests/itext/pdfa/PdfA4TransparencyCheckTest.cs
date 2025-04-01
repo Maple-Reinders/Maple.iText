@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -61,12 +61,12 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "textTransparencyPageOutputIntent.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_textTransparencyPageOutputIntent.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            PdfDocument pdfDocument = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, null);
+            PdfDocument pdfDocument = new PdfADocument(writer, PdfAConformance.PDF_A_4, null);
             PdfFont font = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", "Identity-H", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
             PdfPage page1 = pdfDocument.AddNewPage();
             page1.AddOutputIntent(CreateOutputIntent());
-            FileStream streamGray = new FileStream(SOURCE_FOLDER + "BlackWhite.icc", FileMode.Open, FileAccess.Read);
+            Stream streamGray = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "BlackWhite.icc");
             IccBased gray = new IccBased(streamGray, new float[] { 0.2f });
             PdfCanvas canvas = new PdfCanvas(page1);
             canvas.SaveState();
@@ -84,7 +84,7 @@ namespace iText.Pdfa {
         public virtual void TextTransparencyPageWrongOutputIntentTest() {
             String outPdf = DESTINATION_FOLDER + "textTransparencyPageWrongOutputIntent.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            PdfDocument pdfDoc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, null);
+            PdfDocument pdfDoc = new PdfADocument(writer, PdfAConformance.PDF_A_4, null);
             PdfFont font = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", "Identity-H", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
             PdfOutputIntent outputIntent = CreateOutputIntent();
@@ -108,10 +108,10 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "transparencyAndCS.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_transparencyAndCS.pdf";
             PdfDocument pdfDocument = new PdfADocument(new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion
-                .PDF_2_0)), PdfAConformanceLevel.PDF_A_4, null);
+                .PDF_2_0)), PdfAConformance.PDF_A_4, null);
             PdfFont font = PdfFontFactory.CreateFont(SOURCE_FOLDER + "FreeSans.ttf", "Identity-H", PdfFontFactory.EmbeddingStrategy
                 .FORCE_EMBEDDED);
-            FileStream streamGray = new FileStream(SOURCE_FOLDER + "BlackWhite.icc", FileMode.Open, FileAccess.Read);
+            Stream streamGray = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "BlackWhite.icc");
             IccBased gray = new IccBased(streamGray, new float[] { 0.2f });
             PdfPage page = pdfDocument.AddNewPage();
             PdfCanvas canvas = new PdfCanvas(page);
@@ -139,7 +139,7 @@ namespace iText.Pdfa {
         public virtual void BlendModeTest() {
             PdfWriter writer = new PdfWriter(new MemoryStream(), new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0
                 ));
-            using (PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent())) {
+            using (PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent())) {
                 PdfCanvas canvas = new PdfCanvas(doc.AddNewPage());
                 canvas.SaveState();
                 canvas.SetExtGState(new PdfExtGState().SetBlendMode(PdfName.Darken));
@@ -150,7 +150,7 @@ namespace iText.Pdfa {
                 // Verapdf doesn't assert on PdfName.Compatible apparently but let's be strict here
                 Exception e = NUnit.Framework.Assert.Catch(typeof(PdfAConformanceException), () => canvas.SetExtGState(new 
                     PdfExtGState().SetBlendMode(PdfName.Compatible)));
-                NUnit.Framework.Assert.AreEqual(PdfAConformanceException.ONLY_STANDARD_BLEND_MODES_SHALL_BE_USED_FOR_THE_VALUE_OF_THE_BM_KEY_IN_AN_EXTENDED_GRAPHIC_STATE_DICTIONARY
+                NUnit.Framework.Assert.AreEqual(PdfaExceptionMessageConstant.ONLY_STANDARD_BLEND_MODES_SHALL_BE_USED_FOR_THE_VALUE_OF_THE_BM_KEY_IN_AN_EXTENDED_GRAPHIC_STATE_DICTIONARY
                     , e.Message);
             }
         }
@@ -159,7 +159,7 @@ namespace iText.Pdfa {
         public virtual void BlendModeAnnotationTest() {
             PdfWriter writer = new PdfWriter(new MemoryStream(), new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0
                 ));
-            PdfDocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, null);
+            PdfDocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, null);
             PdfFormXObject formXObject = new PdfFormXObject(new Rectangle(100f, 100f));
             iText.Layout.Canvas canvas = new iText.Layout.Canvas(formXObject, doc);
             canvas.GetPdfCanvas().Circle(50f, 50f, 40f);
@@ -180,7 +180,7 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "blendModeAnnotationOutputIntent.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_blendModeAnnotationOutputIntent.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            using (PdfDocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, null)) {
+            using (PdfDocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, null)) {
                 PdfFormXObject formXObject = new PdfFormXObject(new Rectangle(100f, 100f));
                 iText.Layout.Canvas canvas = new iText.Layout.Canvas(formXObject, doc);
                 canvas.GetPdfCanvas().Circle(50f, 50f, 40f);
@@ -200,7 +200,7 @@ namespace iText.Pdfa {
         public virtual void ForbiddenBlendModeAnnotationTest() {
             PdfWriter writer = new PdfWriter(new ByteArrayOutputStream(), new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0));
-            PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent());
+            PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent());
             PdfFormXObject formXObject = new PdfFormXObject(new Rectangle(0f, 0f));
             PdfAnnotation annotation = new PdfPopupAnnotation(new Rectangle(0f, 0f));
             annotation.SetNormalAppearance(formXObject.GetPdfObject());
@@ -236,8 +236,8 @@ namespace iText.Pdfa {
         }
 
         private PdfOutputIntent CreateOutputIntent() {
-            return new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", new FileStream(SOURCE_FOLDER
-                 + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read));
+            return new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", FileUtil.GetInputStreamForFile
+                (SOURCE_FOLDER + "sRGB Color Space Profile.icm"));
         }
     }
 }

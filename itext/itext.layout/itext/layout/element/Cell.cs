@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -189,7 +189,10 @@ namespace iText.Layout.Element {
 
         public override T1 GetDefaultProperty<T1>(int property) {
             switch (property) {
-                case Property.BORDER: {
+                case Property.BORDER_TOP:
+                case Property.BORDER_RIGHT:
+                case Property.BORDER_BOTTOM:
+                case Property.BORDER_LEFT: {
                     return (T1)(Object)DEFAULT_BORDER;
                 }
 

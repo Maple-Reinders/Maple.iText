@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -62,6 +62,9 @@ namespace iText.Forms.Exceptions {
              + "not allowed are null,empty string, or . ";
 
         public const String FIELD_NAME_ALREADY_EXISTS_IN_FORM = "Field name {0} already exists in the form.";
+
+        public const String ROLE_NAME_INVALID_FOR_FORM = "Invalid formfield type: {0}, only following values are "
+             + "allowed {1}.";
 
         private FormsExceptionMessageConstant() {
         }

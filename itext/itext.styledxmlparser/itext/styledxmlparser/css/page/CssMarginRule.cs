@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -55,10 +55,12 @@ namespace iText.StyledXmlParser.Css.Page {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Sets the page selectors.</summary>
         /// <param name="pageSelectors">the new page selectors</param>
         internal virtual void SetPageSelectors(IList<ICssSelector> pageSelectors) {
             this.pageSelectors = new List<ICssSelector>(pageSelectors);
         }
+//\endcond
     }
 }

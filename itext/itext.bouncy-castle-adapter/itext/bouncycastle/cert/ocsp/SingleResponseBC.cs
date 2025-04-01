@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -84,12 +84,12 @@ namespace iText.Bouncycastle.Cert.Ocsp {
 
         /// <summary><inheritDoc/></summary>
         public virtual DateTime GetNextUpdate() {
-            return singleResp.NextUpdate.ToDateTime();
+            return singleResp.NextUpdate == null ? DateTime.MaxValue : singleResp.NextUpdate.ToDateTime();
         }
 
         /// <summary><inheritDoc/></summary>
         public virtual DateTime GetThisUpdate() {
-            return singleResp.ThisUpdate.ToDateTime();
+            return singleResp.ThisUpdate == null ? DateTime.MaxValue : singleResp.ThisUpdate.ToDateTime();
         }
 
         /// <summary>Indicates whether some other object is "equal to" this one. Compares wrapped objects.</summary>

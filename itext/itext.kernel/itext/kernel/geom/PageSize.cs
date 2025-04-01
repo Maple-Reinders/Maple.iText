@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -40,7 +40,7 @@ namespace iText.Kernel.Geom {
 
         public static readonly iText.Kernel.Geom.PageSize A8 = new iText.Kernel.Geom.PageSize(148, 210);
 
-        public static readonly iText.Kernel.Geom.PageSize A9 = new iText.Kernel.Geom.PageSize(105, 547);
+        public static readonly iText.Kernel.Geom.PageSize A9 = new iText.Kernel.Geom.PageSize(105, 148);
 
         public static readonly iText.Kernel.Geom.PageSize A10 = new iText.Kernel.Geom.PageSize(74, 105);
 

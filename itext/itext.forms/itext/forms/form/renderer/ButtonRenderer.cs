@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,6 +30,7 @@ using iText.Forms.Fields;
 using iText.Forms.Form;
 using iText.Forms.Form.Element;
 using iText.Forms.Logs;
+using iText.Forms.Util;
 using iText.Kernel.Colors;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
@@ -226,7 +227,7 @@ namespace iText.Forms.Form.Renderer {
             PdfDocument doc = drawContext.GetDocument();
             Rectangle area = GetOccupiedArea().GetBBox().Clone();
             ApplyMargins(area, false);
-            IDictionary<int, Object> margins = DeleteMargins();
+            IDictionary<int, Object> properties = FormFieldRendererUtil.RemoveProperties(modelElement);
             PdfPage page = doc.GetPage(occupiedArea.GetPageNumber());
             Background background = this.GetProperty<Background>(Property.BACKGROUND);
             // Background is light gray by default, but can be set to null by user.
@@ -242,21 +243,22 @@ namespace iText.Forms.Form.Renderer {
             modelElement.SetProperty(Property.RENDERING_MODE, this.GetProperty<RenderingMode?>(Property.RENDERING_MODE
                 ));
             PdfButtonFormField button = new PushButtonFormFieldBuilder(doc, name).SetWidgetRectangle(area).SetFont(font
-                ).SetConformanceLevel(GetConformanceLevel(doc)).CreatePushButton();
+                ).SetConformance(GetConformance(doc)).CreatePushButton();
             button.DisableFieldRegeneration();
             button.SetFontSize(fontSizeValue);
             button.GetFirstFormAnnotation().SetBackgroundColor(backgroundColor);
             ApplyDefaultFieldProperties(button);
+            ApplyAccessibilityProperties(button, doc);
             button.GetFirstFormAnnotation().SetFormFieldElement((Button)modelElement);
             button.EnableFieldRegeneration();
             PdfAcroForm forms = PdfFormCreator.GetAcroForm(doc, true);
             // Fields can be already added on split, e.g. when button split into multiple pages. But now we merge fields
             // with the same names (and add all the widgets as kids to that merged field), so we can add it anyway.
             forms.AddField(button, page);
-            WriteAcroFormFieldLangAttribute(doc);
-            ApplyProperties(margins);
+            FormFieldRendererUtil.ReapplyProperties(modelElement, properties);
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary><inheritDoc/></summary>
         internal override void SetContentHeight(IRenderer flatRenderer, float height) {
             Rectangle bBox = flatRenderer.GetOccupiedArea().GetBBox();
@@ -284,5 +286,6 @@ namespace iText.Forms.Form.Renderer {
             bBox.SetHeight(height);
             flatRenderer.Move(0, -dy);
         }
+//\endcond
     }
 }

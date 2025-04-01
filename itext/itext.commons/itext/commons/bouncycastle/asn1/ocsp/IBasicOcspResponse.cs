@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -53,7 +53,15 @@ namespace iText.Commons.Bouncycastle.Asn1.Ocsp {
         /// </summary>
         /// <returns>list of wrapped certificates.</returns>
         IEnumerable<IX509Certificate> GetCerts();
-        
+
+        /// <summary>
+        /// Gets actual
+        /// <c>Certs</c>
+        /// field for the wrapped BasicOCSPResponse object.
+        /// </summary>
+        /// <returns>list of wrapped certificates.</returns>
+        IX509Certificate[] GetOcspCerts();
+
         /// <summary>
         /// Calls actual
         /// <c>GetEncoded</c>
@@ -69,5 +77,23 @@ namespace iText.Commons.Bouncycastle.Asn1.Ocsp {
         /// </summary>
         /// <returns>wrapped SingleResp list.</returns>
         ISingleResponse[] GetResponses();
+
+        /// <summary>
+        /// Calls actual
+        /// <c>GetProducedAt</c>
+        /// method for the wrapped BasicOCSPResponse object.
+        /// </summary>
+        /// <returns>date BasicOCSPResponse was produced at.</returns>
+        DateTime GetProducedAt();
+
+        /// <summary>
+        /// Calls actual
+        /// <c>GetExtensionParsedValue</c>
+        /// method for the wrapped BasicOCSPResponse object.
+        /// </summary>
+        /// <returns>Parsed extension value.</returns>
+        IAsn1Encodable GetExtensionParsedValue(IDerObjectIdentifier getIdPkixOcspArchiveCutoff);
+
+        IRespID GetResponderId();
     }
 }

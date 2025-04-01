@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -31,6 +31,7 @@ using iText.Layout.Element;
 using iText.Layout.Properties;
 
 namespace iText.Layout.Renderer {
+//\cond DO_NOT_DOCUMENT
     internal class SeparatedTableBorders : TableBorders {
         public SeparatedTableBorders(IList<CellRenderer[]> rows, int numberOfColumns, Border[] tableBoundingBorders
             )
@@ -157,8 +158,7 @@ namespace iText.Layout.Renderer {
             return new float[] { 0, 0, 0, 0 };
         }
 
-        protected internal override void BuildBordersArrays(CellRenderer cell, int row, int col, int[] rowspansToDeduct
-            ) {
+        protected internal override void BuildBordersArrays(CellRenderer cell, int row, int col) {
             int colspan = (int)cell.GetPropertyAsInteger(Property.COLSPAN);
             int rowspan = (int)cell.GetPropertyAsInteger(Property.ROWSPAN);
             int colN = ((Cell)cell.GetModelElement()).GetCol();
@@ -244,4 +244,5 @@ namespace iText.Layout.Renderer {
             return null == tableBoundingBorders[3] ? 0 : tableBoundingBorders[3].GetWidth();
         }
     }
+//\endcond
 }

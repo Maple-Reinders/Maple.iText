@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -67,6 +67,11 @@ namespace iText.Bouncycastle.Cert.Ocsp {
         /// </returns>
         public virtual RespID GetRespID() {
             return respID;
+        }
+
+        /// <summary><inheritDoc/></summary>
+        public virtual IResponderID ToASN1Primitive() {
+            return new ResponderIDBC(respID.ToAsn1Object());
         }
 
         /// <summary>Indicates whether some other object is "equal to" this one.</summary>

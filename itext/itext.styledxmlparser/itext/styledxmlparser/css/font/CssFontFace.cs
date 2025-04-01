@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -56,7 +56,7 @@ namespace iText.StyledXmlParser.Css.Font {
             String fontFamily = null;
             String srcs = null;
             foreach (CssDeclaration descriptor in properties) {
-                if ("font-family".Equals(descriptor.GetProperty())) {
+                if (CommonCssConstants.FONT_FAMILY.Equals(descriptor.GetProperty())) {
                     // TODO DEVSIX-2534
                     fontFamily = FontFamilySplitterUtil.RemoveQuotes(descriptor.GetExpression());
                 }
@@ -208,14 +208,20 @@ namespace iText.StyledXmlParser.Css.Font {
             /// <summary>The Constant FormatGroup.</summary>
             public const int FormatGroup = 9;
 
+//\cond DO_NOT_DOCUMENT
             /// <summary>The font format.</summary>
             internal readonly CssFontFace.FontFormat format;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             /// <summary>The source path.</summary>
             internal readonly String src;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
             /// <summary>Indicates if the font is local.</summary>
             internal readonly bool isLocal;
+//\endcond
 
             public virtual CssFontFace.FontFormat GetFormat() {
                 return format;

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -64,7 +64,7 @@ namespace iText.Kernel.Utils {
             String cmpPdf = sourceFolder + "cmp_simple_pdf.pdf";
             String result = compareTool.CompareByContent(outPdf, cmpPdf, destinationFolder);
             System.Console.Out.WriteLine("\nRESULT:\n" + result);
-            NUnit.Framework.Assert.IsNotNull(result, "CompareTool must return differences found between the files");
+            NUnit.Framework.Assert.IsNotNull("CompareTool must return differences found between the files", result);
             NUnit.Framework.Assert.IsTrue(result.Contains("differs on page [1, 2]."));
             // Comparing the report to the reference one.
             NUnit.Framework.Assert.IsTrue(compareTool.CompareXmls(destinationFolder + "simple_pdf.report.xml", sourceFolder
@@ -80,7 +80,7 @@ namespace iText.Kernel.Utils {
             String cmpPdf = sourceFolder + "cmp_tagged_pdf.pdf";
             String result = compareTool.CompareByContent(outPdf, cmpPdf, destinationFolder);
             System.Console.Out.WriteLine("\nRESULT:\n" + result);
-            NUnit.Framework.Assert.IsNotNull(result, "CompareTool must return differences found between the files");
+            NUnit.Framework.Assert.IsNotNull("CompareTool must return differences found between the files", result);
             NUnit.Framework.Assert.IsTrue(result.Contains("Compare by content fails. No visual differences"));
             // Comparing the report to the reference one.
             NUnit.Framework.Assert.IsTrue(compareTool.CompareXmls(destinationFolder + "tagged_pdf.report.xml", sourceFolder
@@ -96,7 +96,7 @@ namespace iText.Kernel.Utils {
             String cmpPdf = sourceFolder + "cmp_screenAnnotation.pdf";
             String result = compareTool.CompareByContent(outPdf, cmpPdf, destinationFolder);
             System.Console.Out.WriteLine("\nRESULT:\n" + result);
-            NUnit.Framework.Assert.IsNotNull(result, "CompareTool must return differences found between the files");
+            NUnit.Framework.Assert.IsNotNull("CompareTool must return differences found between the files", result);
             NUnit.Framework.Assert.IsTrue(result.Contains("Compare by content fails. No visual differences"));
             // Comparing the report to the reference one.
             NUnit.Framework.Assert.IsTrue(compareTool.CompareXmls(destinationFolder + "screenAnnotation.report.xml", sourceFolder
@@ -113,7 +113,7 @@ namespace iText.Kernel.Utils {
             String cmpPdf = sourceFolder + "cmp_simple_pdf_with_space .pdf";
             String result = compareTool.CompareByContent(outPdf, cmpPdf, destinationFolder);
             System.Console.Out.WriteLine("\nRESULT:\n" + result);
-            NUnit.Framework.Assert.IsNotNull(result, "CompareTool must return differences found between the files");
+            NUnit.Framework.Assert.IsNotNull("CompareTool must return differences found between the files", result);
             NUnit.Framework.Assert.IsTrue(result.Contains("differs on page [1, 2]."));
             // Comparing the report to the reference one.
             NUnit.Framework.Assert.IsTrue(compareTool.CompareXmls(destinationFolder + "simple_pdf.report.xml", sourceFolder
@@ -141,6 +141,14 @@ namespace iText.Kernel.Utils {
             String cmpPdf = sourceFolder + "cmp_simple_pdf.pdf";
             new CompareTool(null, null).CompareVisually(outPdf, cmpPdf, destinationFolder, "diff_");
             NUnit.Framework.Assert.IsTrue(new FileInfo(destinationFolder + "diff_1.png").Exists);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CompareXmpThrows() {
+            CompareTool compareTool = new CompareTool();
+            String outPdf = sourceFolder + "simple_pdf.pdf";
+            String cmpPdf = sourceFolder + "cmp_simple_pdf.pdf";
+            NUnit.Framework.Assert.AreEqual("XMP parsing failure!", compareTool.CompareXmp(outPdf, cmpPdf));
         }
 
         [NUnit.Framework.Test]
@@ -252,7 +260,7 @@ namespace iText.Kernel.Utils {
         [NUnit.Framework.Test]
         public virtual void ConvertDocInfoToStringsTest() {
             String inPdf = sourceFolder + "test.pdf";
-            CompareTool compareTool = new _T1233382286(this);
+            CompareTool compareTool = new _T798358249(this);
             using (PdfReader reader = new PdfReader(inPdf, compareTool.GetOutReaderProperties())) {
                 using (PdfDocument doc = new PdfDocument(reader)) {
                     String[] docInfo = compareTool.ConvertDocInfoToStrings(doc.GetDocumentInfo());
@@ -265,17 +273,19 @@ namespace iText.Kernel.Utils {
             }
         }
 
-        internal class _T1233382286 : CompareTool {
+//\cond DO_NOT_DOCUMENT
+        internal class _T798358249 : CompareTool {
             protected internal override String[] ConvertDocInfoToStrings(PdfDocumentInfo info) {
                 return base.ConvertDocInfoToStrings(info);
             }
 
-            internal _T1233382286(CompareToolTest _enclosing) {
+            internal _T798358249(CompareToolTest _enclosing) {
                 this._enclosing = _enclosing;
             }
 
             private readonly CompareToolTest _enclosing;
         }
+//\endcond
 
         [NUnit.Framework.Test]
         public virtual void MemoryFirstWriterNoFileTest() {
@@ -296,6 +306,21 @@ namespace iText.Kernel.Utils {
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(firstPdf, secondPdf, destinationFolder));
             NUnit.Framework.Assert.IsFalse(new FileInfo(firstPdf).Exists);
             NUnit.Framework.Assert.IsFalse(new FileInfo(secondPdf).Exists);
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void MemoryFirstWriterCmpMissingTest() {
+            String firstPdf = destinationFolder + "memoryFirstWriterCmpMissingTest.pdf";
+            String secondPdf = destinationFolder + "cmp_memoryFirstWriterCmpMissingTest.pdf";
+            PdfDocument firstDocument = new PdfDocument(CompareTool.CreateTestPdfWriter(firstPdf));
+            PdfPage page1FirstDocument = firstDocument.AddNewPage();
+            page1FirstDocument.AddAnnotation(new PdfLinkAnnotation(new Rectangle(100, 560, 400, 50)).SetDestination(PdfExplicitDestination
+                .CreateFit(page1FirstDocument)).SetBorder(new PdfArray(new float[] { 0, 0, 1 })));
+            page1FirstDocument.Flush();
+            firstDocument.Close();
+            NUnit.Framework.Assert.Catch(typeof(System.IO.IOException), () => new CompareTool().CompareByContent(firstPdf
+                , secondPdf, destinationFolder));
+            NUnit.Framework.Assert.IsTrue(new FileInfo(firstPdf).Exists);
         }
 
         [NUnit.Framework.Test]

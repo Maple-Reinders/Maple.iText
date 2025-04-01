@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -24,8 +24,8 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using iText.Commons;
-using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Bouncycastle.Math;
+using iText.Commons.Digest;
 using iText.Commons.Utils;
 using iText.IO.Util;
 using iText.Kernel.Crypto;
@@ -40,9 +40,9 @@ namespace iText.Kernel.Crypto.Securityhandler {
 
         private const int SALT_LENGTH = 8;
 
-        private bool isPdf2;
-
         protected internal bool encryptMetadata;
+
+        private bool isPdf2;
 
         public StandardHandlerUsingAes256(PdfDictionary encryptionDictionary, byte[] userPassword, byte[] ownerPassword
             , int permissions, bool encryptMetadata, bool embeddedFilesOnly, PdfVersion version) {
@@ -55,6 +55,14 @@ namespace iText.Kernel.Crypto.Securityhandler {
             InitKeyAndReadDictionary(encryptionDictionary, password);
         }
 
+        /// <summary>Checks whether the document-level metadata stream will be encrypted.</summary>
+        /// <returns>
+        /// 
+        /// <see langword="true"/>
+        /// if the document-level metadata stream shall be encrypted,
+        /// <see langword="false"/>
+        /// otherwise
+        /// </returns>
         public virtual bool IsEncryptMetadata() {
             return encryptMetadata;
         }
@@ -71,6 +79,69 @@ namespace iText.Kernel.Crypto.Securityhandler {
             return new AesDecryptor(nextObjectKey, 0, nextObjectKeySize);
         }
 
+        /// <summary><inheritDoc/></summary>
+        public override void SetPermissions(int permissions, PdfDictionary encryptionDictionary) {
+            base.SetPermissions(permissions, encryptionDictionary);
+            byte[] aes256Perms = GetAes256Perms(permissions, IsEncryptMetadata());
+            encryptionDictionary.Put(PdfName.Perms, new PdfLiteral(StreamUtil.CreateEscapedString(aes256Perms)));
+        }
+
+//\cond DO_NOT_DOCUMENT
+        internal virtual void SetAES256DicEntries(PdfDictionary encryptionDictionary, byte[] oeKey, byte[] ueKey, 
+            byte[] aes256Perms, bool encryptMetadata, bool embeddedFilesOnly) {
+            int version = 5;
+            int rAes256 = 5;
+            int rAes256Pdf2 = 6;
+            int revision = isPdf2 ? rAes256Pdf2 : rAes256;
+            PdfName cryptoFilter = PdfName.AESV3;
+            SetEncryptionDictionaryEntries(encryptionDictionary, oeKey, ueKey, aes256Perms, encryptMetadata, embeddedFilesOnly
+                , version, revision, cryptoFilter);
+        }
+//\endcond
+
+//\cond DO_NOT_DOCUMENT
+        internal virtual void SetEncryptionDictionaryEntries(PdfDictionary encryptionDictionary, byte[] oeKey, byte
+            [] ueKey, byte[] aes256Perms, bool encryptMetadata, bool embeddedFilesOnly, int version, int revision, 
+            PdfName cryptoFilter) {
+            encryptionDictionary.Put(PdfName.OE, new PdfLiteral(StreamUtil.CreateEscapedString(oeKey)));
+            encryptionDictionary.Put(PdfName.UE, new PdfLiteral(StreamUtil.CreateEscapedString(ueKey)));
+            encryptionDictionary.Put(PdfName.Perms, new PdfLiteral(StreamUtil.CreateEscapedString(aes256Perms)));
+            encryptionDictionary.Put(PdfName.R, new PdfNumber(revision));
+            encryptionDictionary.Put(PdfName.V, new PdfNumber(version));
+            PdfDictionary stdcf = new PdfDictionary();
+            stdcf.Put(PdfName.Length, new PdfNumber(32));
+            if (!encryptMetadata) {
+                encryptionDictionary.Put(PdfName.EncryptMetadata, PdfBoolean.FALSE);
+            }
+            if (embeddedFilesOnly) {
+                stdcf.Put(PdfName.AuthEvent, PdfName.EFOpen);
+                encryptionDictionary.Put(PdfName.EFF, PdfName.StdCF);
+                encryptionDictionary.Put(PdfName.StrF, PdfName.Identity);
+                encryptionDictionary.Put(PdfName.StmF, PdfName.Identity);
+            }
+            else {
+                stdcf.Put(PdfName.AuthEvent, PdfName.DocOpen);
+                encryptionDictionary.Put(PdfName.StrF, PdfName.StdCF);
+                encryptionDictionary.Put(PdfName.StmF, PdfName.StdCF);
+            }
+            stdcf.Put(PdfName.CFM, cryptoFilter);
+            PdfDictionary cf = new PdfDictionary();
+            cf.Put(PdfName.StdCF, stdcf);
+            encryptionDictionary.Put(PdfName.CF, cf);
+        }
+//\endcond
+
+//\cond DO_NOT_DOCUMENT
+        internal virtual bool IsPdf2(PdfDictionary encryptionDictionary) {
+            return encryptionDictionary.GetAsNumber(PdfName.R).GetValue() == 6;
+        }
+//\endcond
+
+        /// <summary><inheritDoc/></summary>
+        protected internal override void InitMd5MessageDigest() {
+        }
+
+        //Do nothing to not initialize md5 message digest, since it's not used by AES256 handler
         private void InitKeyAndFillDictionary(PdfDictionary encryptionDictionary, byte[] userPassword, byte[] ownerPassword
             , int permissions, bool encryptMetadata, bool embeddedFilesOnly) {
             ownerPassword = GenerateOwnerPasswordIfNullOrEmpty(ownerPassword);
@@ -116,21 +187,7 @@ namespace iText.Kernel.Crypto.Securityhandler {
                 ac = new AESCipherCBCnoPad(true, hash);
                 oeKey = ac.ProcessBlock(nextObjectKey, 0, nextObjectKey.Length);
                 // Algorithm 10
-                byte[] permsp = IVGenerator.GetIV(16);
-                permsp[0] = (byte)permissions;
-                permsp[1] = (byte)(permissions >> 8);
-                permsp[2] = (byte)(permissions >> 16);
-                permsp[3] = (byte)(permissions >> 24);
-                permsp[4] = (byte)(255);
-                permsp[5] = (byte)(255);
-                permsp[6] = (byte)(255);
-                permsp[7] = (byte)(255);
-                permsp[8] = encryptMetadata ? (byte)'T' : (byte)'F';
-                permsp[9] = (byte)'a';
-                permsp[10] = (byte)'d';
-                permsp[11] = (byte)'b';
-                ac = new AESCipherCBCnoPad(true, nextObjectKey);
-                aes256Perms = ac.ProcessBlock(permsp, 0, permsp.Length);
+                aes256Perms = GetAes256Perms(permissions, encryptMetadata);
                 this.permissions = permissions;
                 this.encryptMetadata = encryptMetadata;
                 SetStandardHandlerDicEntries(encryptionDictionary, userKey, ownerKey);
@@ -141,36 +198,25 @@ namespace iText.Kernel.Crypto.Securityhandler {
             }
         }
 
-        private void SetAES256DicEntries(PdfDictionary encryptionDictionary, byte[] oeKey, byte[] ueKey, byte[] aes256Perms
-            , bool encryptMetadata, bool embeddedFilesOnly) {
-            int vAes256 = 5;
-            int rAes256 = 5;
-            int rAes256Pdf2 = 6;
-            encryptionDictionary.Put(PdfName.OE, new PdfLiteral(StreamUtil.CreateEscapedString(oeKey)));
-            encryptionDictionary.Put(PdfName.UE, new PdfLiteral(StreamUtil.CreateEscapedString(ueKey)));
-            encryptionDictionary.Put(PdfName.Perms, new PdfLiteral(StreamUtil.CreateEscapedString(aes256Perms)));
-            encryptionDictionary.Put(PdfName.R, new PdfNumber(isPdf2 ? rAes256Pdf2 : rAes256));
-            encryptionDictionary.Put(PdfName.V, new PdfNumber(vAes256));
-            PdfDictionary stdcf = new PdfDictionary();
-            stdcf.Put(PdfName.Length, new PdfNumber(32));
-            if (!encryptMetadata) {
-                encryptionDictionary.Put(PdfName.EncryptMetadata, PdfBoolean.FALSE);
-            }
-            if (embeddedFilesOnly) {
-                stdcf.Put(PdfName.AuthEvent, PdfName.EFOpen);
-                encryptionDictionary.Put(PdfName.EFF, PdfName.StdCF);
-                encryptionDictionary.Put(PdfName.StrF, PdfName.Identity);
-                encryptionDictionary.Put(PdfName.StmF, PdfName.Identity);
-            }
-            else {
-                stdcf.Put(PdfName.AuthEvent, PdfName.DocOpen);
-                encryptionDictionary.Put(PdfName.StrF, PdfName.StdCF);
-                encryptionDictionary.Put(PdfName.StmF, PdfName.StdCF);
-            }
-            stdcf.Put(PdfName.CFM, PdfName.AESV3);
-            PdfDictionary cf = new PdfDictionary();
-            cf.Put(PdfName.StdCF, stdcf);
-            encryptionDictionary.Put(PdfName.CF, cf);
+        private byte[] GetAes256Perms(int permissions, bool encryptMetadata) {
+            byte[] aes256Perms;
+            AESCipherCBCnoPad ac;
+            byte[] permsp = IVGenerator.GetIV(16);
+            permsp[0] = (byte)permissions;
+            permsp[1] = (byte)(permissions >> 8);
+            permsp[2] = (byte)(permissions >> 16);
+            permsp[3] = (byte)(permissions >> 24);
+            permsp[4] = (byte)(255);
+            permsp[5] = (byte)(255);
+            permsp[6] = (byte)(255);
+            permsp[7] = (byte)(255);
+            permsp[8] = encryptMetadata ? (byte)'T' : (byte)'F';
+            permsp[9] = (byte)'a';
+            permsp[10] = (byte)'d';
+            permsp[11] = (byte)'b';
+            ac = new AESCipherCBCnoPad(true, nextObjectKey);
+            aes256Perms = ac.ProcessBlock(permsp, 0, permsp.Length);
+            return aes256Perms;
         }
 
         private void InitKeyAndReadDictionary(PdfDictionary encryptionDictionary, byte[] password) {
@@ -183,19 +229,19 @@ namespace iText.Kernel.Crypto.Securityhandler {
                         password = JavaUtil.ArraysCopyOf(password, 127);
                     }
                 }
-                isPdf2 = encryptionDictionary.GetAsNumber(PdfName.R).GetValue() == 6;
-                //truncate user and owner passwords to 48 bytes where the first 32 bytes
-                //are a hash value, next 8 bytes are validation salt and final 8 bytes are the key salt
+                isPdf2 = IsPdf2(encryptionDictionary);
+                // Truncate user and owner passwords to 48 bytes where the first 32 bytes
+                // are a hash value, next 8 bytes are validation salt and final 8 bytes are the key salt
                 byte[] oValue = TruncateArray(GetIsoBytes(encryptionDictionary.GetAsString(PdfName.O)));
                 byte[] uValue = TruncateArray(GetIsoBytes(encryptionDictionary.GetAsString(PdfName.U)));
                 byte[] oeValue = GetIsoBytes(encryptionDictionary.GetAsString(PdfName.OE));
                 byte[] ueValue = GetIsoBytes(encryptionDictionary.GetAsString(PdfName.UE));
                 byte[] perms = GetIsoBytes(encryptionDictionary.GetAsString(PdfName.Perms));
                 PdfNumber pValue = (PdfNumber)encryptionDictionary.Get(PdfName.P);
-                this.permissions = pValue.LongValue();
+                this.permissions = pValue.IntValue();
                 byte[] hash;
                 hash = ComputeHash(password, oValue, VALIDATION_SALT_OFFSET, SALT_LENGTH, uValue);
-                usedOwnerPassword = CompareArray(hash, oValue, 32);
+                usedOwnerPassword = EqualsArray(hash, oValue, 32);
                 if (usedOwnerPassword) {
                     hash = ComputeHash(password, oValue, KEY_SALT_OFFSET, SALT_LENGTH, uValue);
                     AESCipherCBCnoPad ac = new AESCipherCBCnoPad(false, hash);
@@ -203,7 +249,7 @@ namespace iText.Kernel.Crypto.Securityhandler {
                 }
                 else {
                     hash = ComputeHash(password, uValue, VALIDATION_SALT_OFFSET, SALT_LENGTH);
-                    if (!CompareArray(hash, uValue, 32)) {
+                    if (!EqualsArray(hash, uValue, 32)) {
                         throw new BadPasswordException(KernelExceptionMessageConstant.BAD_USER_PASSWORD);
                     }
                     hash = ComputeHash(password, uValue, KEY_SALT_OFFSET, SALT_LENGTH);
@@ -243,8 +289,8 @@ namespace iText.Kernel.Crypto.Securityhandler {
         }
 
         private byte[] ComputeHash(byte[] password, byte[] salt, int saltOffset, int saltLen, byte[] userKey) {
-            IDigest mdSha256 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest("SHA-256"
-                );
+            IMessageDigest mdSha256 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest
+                ("SHA-256");
             mdSha256.Update(password);
             mdSha256.Update(salt, saltOffset, saltLen);
             if (userKey != null) {
@@ -253,10 +299,10 @@ namespace iText.Kernel.Crypto.Securityhandler {
             byte[] k = mdSha256.Digest();
             if (isPdf2) {
                 // See 7.6.4.3.3 "Algorithm 2.B"
-                IDigest mdSha384 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest("SHA-384"
-                    );
-                IDigest mdSha512 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest("SHA-512"
-                    );
+                IMessageDigest mdSha384 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest
+                    ("SHA-384");
+                IMessageDigest mdSha512 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateIDigest
+                    ("SHA-512");
                 int userKeyLen = userKey != null ? userKey.Length : 0;
                 int passAndUserKeyLen = password.Length + userKeyLen;
                 // k1 repetition length
@@ -279,7 +325,7 @@ namespace iText.Kernel.Crypto.Securityhandler {
                         (k, 16, 32));
                     byte[] e = cipher.ProcessBlock(k1, 0, k1.Length);
                     // c)
-                    IDigest md = null;
+                    IMessageDigest md = null;
                     IBigInteger i_1 = iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateBigInteger(1, 
                         JavaUtil.ArraysCopyOf(e, 16));
                     int remainder = i_1.Remainder(iText.Bouncycastleconnector.BouncyCastleFactoryCreator.GetFactory().CreateBigInteger().ValueOf
@@ -301,6 +347,7 @@ namespace iText.Kernel.Crypto.Securityhandler {
                         }
                     }
                     // d)
+                    System.Diagnostics.Debug.Assert(md != null);
                     k = md.Digest(e);
                     ++roundNum;
                     if (roundNum > 63) {
@@ -315,15 +362,6 @@ namespace iText.Kernel.Crypto.Securityhandler {
                 k = k.Length == 32 ? k : JavaUtil.ArraysCopyOf(k, 32);
             }
             return k;
-        }
-
-        private static bool CompareArray(byte[] a, byte[] b, int len) {
-            for (int k = 0; k < len; ++k) {
-                if (a[k] != b[k]) {
-                    return false;
-                }
-            }
-            return true;
         }
 
         private byte[] TruncateArray(byte[] array) {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -61,6 +61,12 @@ namespace iText.Forms.Fields {
         }
 
         [NUnit.Framework.Test]
+        public virtual void CreateCheckBoxWithIncorrectNameTest() {
+            NUnit.Framework.Assert.DoesNotThrow(() => new CheckBoxFormFieldBuilder(DUMMY_DOCUMENT, "incorrect.name").SetWidgetRectangle
+                (DUMMY_RECTANGLE).CreateCheckBox());
+        }
+
+        [NUnit.Framework.Test]
         public virtual void CreateCheckBoxWithoutWidgetTest() {
             PdfButtonFormField checkBoxFormField = new CheckBoxFormFieldBuilder(DUMMY_DOCUMENT, DUMMY_NAME).CreateCheckBox
                 ();
@@ -70,7 +76,7 @@ namespace iText.Forms.Fields {
         [NUnit.Framework.Test]
         public virtual void CreateCheckBoxWithConformanceLevelTest() {
             PdfButtonFormField checkBoxFormField = new CheckBoxFormFieldBuilder(DUMMY_DOCUMENT, DUMMY_NAME).SetWidgetRectangle
-                (DUMMY_RECTANGLE).SetConformanceLevel(PdfAConformanceLevel.PDF_A_1A).CreateCheckBox();
+                (DUMMY_RECTANGLE).SetConformance(PdfConformance.PDF_A_1A).CreateCheckBox();
             CompareCheckBoxes(checkBoxFormField, true);
         }
 

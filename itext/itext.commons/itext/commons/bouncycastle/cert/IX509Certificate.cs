@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -145,11 +145,35 @@ namespace iText.Commons.Bouncycastle.Cert {
         DateTime GetNotBefore();
 
         /// <summary>
+        /// Returns actual
+        /// <c>NotAfter</c>
+        /// property for the wrapped X509Certificate object.
+        /// </summary>
+        /// <returns>DateTime value.</returns>
+        DateTime GetNotAfter();
+
+        /// <summary>
         /// Calls actual
         /// <c>GetExtendedKeyUsage</c>
         /// method for the wrapped X509Certificate object.
         /// </summary>
         /// <returns>List of object identifiers represented as Strings.</returns>
         IList GetExtendedKeyUsage();
+
+        /// <summary>
+        /// Calls actual
+        /// <c>GetKeyUsage</c>
+        /// method for the wrapped X509Certificate object.
+        /// </summary>
+        /// <returns>bool array representing certificate key usage</returns>
+        bool[] GetKeyUsage();
+
+        /// <summary>
+        /// Call actual
+        /// <c>GetBasicConstraints</c>
+        /// method for the wrapped X509Certificate object.
+        /// </summary>
+        /// <returns>int value representing basic constraints extension</returns>
+        int GetBasicConstraints();
     }
 }

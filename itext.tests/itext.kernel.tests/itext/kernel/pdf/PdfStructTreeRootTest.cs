@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -87,6 +87,13 @@ namespace iText.Kernel.Pdf {
             PdfReader r = new PdfReader(new MemoryStream(os.ToArray()));
             PdfDocument readPdfDoc = new PdfDocument(r);
             NUnit.Framework.Assert.IsFalse(readPdfDoc.GetStructTreeRoot().GetPdfObject().ContainsKey(PdfName.IDTree));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CyclicReferencesTest() {
+            String inFile = sourceFolder + "cyclicReferences.pdf";
+            PdfDocument pdfDoc = new PdfDocument(new PdfReader(inFile), new PdfWriter(new MemoryStream()));
+            NUnit.Framework.Assert.DoesNotThrow(() => pdfDoc.Close());
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -78,9 +78,11 @@ namespace iText.Layout.Properties {
         // Standard nonseparable blend modes
         private readonly PdfName pdfRepresentation;
 
+//\cond DO_NOT_DOCUMENT
         internal BlendMode(PdfName pdfRepresentation) {
             this.pdfRepresentation = pdfRepresentation;
         }
+//\endcond
 
         /// <summary>Get the pdf representation of the current blend mode.</summary>
         /// <returns>

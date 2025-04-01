@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,12 +33,18 @@ using iText.Kernel.Pdf.Xobject;
 namespace iText.Barcodes {
     /// <summary>A QRCode implementation based on the zxing code.</summary>
     public class BarcodeQRCode : Barcode2D {
+//\cond DO_NOT_DOCUMENT
         internal ByteMatrix bm;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>modifiers to change the way the barcode is create.</summary>
         internal IDictionary<EncodeHintType, Object> hints;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal String code;
+//\endcond
 
         /// <summary>Creates the QR barcode.</summary>
         /// <param name="code">the text to be encoded</param>

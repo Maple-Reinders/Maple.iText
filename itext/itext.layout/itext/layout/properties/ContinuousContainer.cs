@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -23,7 +23,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using iText.Layout;
-using iText.Layout.Borders;
 using iText.Layout.Renderer;
 
 namespace iText.Layout.Properties {
@@ -38,7 +37,7 @@ namespace iText.Layout.Properties {
     public sealed class ContinuousContainer {
         /// <summary>Properties needed to be removed/added for continuous container.</summary>
         private static readonly int[] PROPERTIES_NEEDED_FOR_CONTINUOUS_CONTAINER = new int[] { Property.MARGIN_BOTTOM
-            , Property.BORDER_BOTTOM, Property.PADDING_BOTTOM, Property.BORDER };
+            , Property.BORDER_BOTTOM, Property.PADDING_BOTTOM };
 
         private readonly Dictionary<int, Object> properties = new Dictionary<int, Object>();
 
@@ -95,11 +94,13 @@ namespace iText.Layout.Properties {
             foreach (int property in PROPERTIES_NEEDED_FOR_CONTINUOUS_CONTAINER) {
                 blockRenderer.SetProperty(property, properties.Get(property));
             }
-            Border allBorders = (Border)properties.Get(Property.BORDER);
-            Border bottomBorder = (Border)properties.Get(Property.BORDER_BOTTOM);
-            if (allBorders != null && bottomBorder == null) {
-                blockRenderer.SetProperty(Property.BORDER_BOTTOM, allBorders);
-            }
+        }
+
+        /// <summary>Updates values of the saved property.</summary>
+        /// <param name="property">the property to be updated</param>
+        /// <param name="value">the new value</param>
+        public void UpdateValueOfSavedProperty(int property, Object value) {
+            properties.Put(property, value);
         }
     }
 }

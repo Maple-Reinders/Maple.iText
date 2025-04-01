@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -91,6 +91,7 @@ namespace iText.Kernel.Font {
             return this.fontMatrix;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Creates a Type 3 font.</summary>
         /// <param name="colorized">defines whether the glyph color is specified in the glyph descriptions in the font.
         ///     </param>
@@ -103,7 +104,9 @@ namespace iText.Kernel.Font {
             fontEncoding = FontEncoding.CreateEmptyFontEncoding();
             SetGlyphSpaceNormalizationFactor(1.0f);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Creates a Type 3 font.</summary>
         /// <param name="document">the target document of the new font.</param>
         /// <param name="fontName">the PostScript name of the font, shall not be null or empty.</param>
@@ -115,7 +118,9 @@ namespace iText.Kernel.Font {
             ((Type3Font)fontProgram).SetFontFamily(fontFamily);
             SetGlyphSpaceNormalizationFactor(1.0f);
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Creates a Type 3 font based on an existing font dictionary, which must be an indirect object.</summary>
         /// <param name="fontDictionary">a dictionary of type <c>/Font</c>, must have an indirect reference.</param>
         internal PdfType3Font(PdfDictionary fontDictionary)
@@ -150,6 +155,7 @@ namespace iText.Kernel.Font {
             AddGlyphsFromDifferences(differences, charProcsDic, widths);
             AddGlyphsFromCharProcs(charProcsDic, widths);
         }
+//\endcond
 
         /// <summary>Sets the PostScript name of the font.</summary>
         /// <param name="fontName">the PostScript name of the font, shall not be null or empty.</param>
@@ -328,9 +334,9 @@ namespace iText.Kernel.Font {
                 }
                 int flags = fontProgram.GetPdfFontFlags();
                 // reset both flags
-                flags &= ~(FontDescriptorFlags.Symbolic | FontDescriptorFlags.Nonsymbolic);
+                flags &= ~(FontDescriptorFlags.SYMBOLIC | FontDescriptorFlags.NONSYMBOLIC);
                 // set fontSpecific based on font encoding
-                flags |= fontEncoding.IsFontSpecific() ? FontDescriptorFlags.Symbolic : FontDescriptorFlags.Nonsymbolic;
+                flags |= fontEncoding.IsFontSpecific() ? FontDescriptorFlags.SYMBOLIC : FontDescriptorFlags.NONSYMBOLIC;
                 fontDescriptor.Put(PdfName.Flags, new PdfNumber(flags));
                 return fontDescriptor;
             }
@@ -368,13 +374,17 @@ namespace iText.Kernel.Font {
             return GetPdfObject().GetIndirectReference().GetDocument();
         }
 
+//\cond DO_NOT_DOCUMENT
         internal double GetGlyphSpaceNormalizationFactor() {
             return glyphSpaceNormalizationFactor;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal void SetGlyphSpaceNormalizationFactor(double glyphSpaceNormalizationFactor) {
             this.glyphSpaceNormalizationFactor = glyphSpaceNormalizationFactor;
         }
+//\endcond
 
         private void AddGlyphsFromDifferences(PdfArray differences, PdfDictionary charProcsDic, int[] widths) {
             if (differences == null || charProcsDic == null) {
@@ -432,6 +442,7 @@ namespace iText.Kernel.Font {
                 catch (Exception) {
                 }
             }
+            /*ignored*/
             foreach (PdfName glyphName in charProcsDic.KeySet()) {
                 int unicode = AdobeGlyphList.NameToUnicode(glyphName.GetValue());
                 int code = -1;

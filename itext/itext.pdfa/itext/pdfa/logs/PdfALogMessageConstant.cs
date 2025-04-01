@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,6 +30,8 @@ namespace iText.Pdfa.Logs {
 
         public const String PDFA_OBJECT_FLUSHING_WAS_NOT_PERFORMED = "Object flushing was not performed. Object in PDF/A mode can only be flushed if the document is closed or "
              + "if this object has already been checked for compliance with PDF/A rules.";
+
+        public const String WRITER_PROPERTIES_PDF_VERSION_WAS_OVERRIDDEN = "Pdf version from writer properties isn't compatible with specified PDF/A conformance, it was overridden to {0} version.";
 
         private PdfALogMessageConstant() {
         }

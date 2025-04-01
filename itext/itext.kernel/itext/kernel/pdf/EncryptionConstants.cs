@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -46,37 +46,44 @@ namespace iText.Kernel.Pdf {
         /// <remarks>Type of encryption. AES encryption algorithm will be used with the key length of 256 bits.</remarks>
         public const int ENCRYPTION_AES_256 = 3;
 
+        /// <summary>Type of encryption.</summary>
+        /// <remarks>Type of encryption. Advanced Encryption Standard-Galois/Counter Mode (AES-GCM) encryption algorithm.
+        ///     </remarks>
+        public const int ENCRYPTION_AES_GCM = 4;
+
         /// <summary>Add this to the mode to keep the metadata in clear text.</summary>
         public const int DO_NOT_ENCRYPT_METADATA = 8;
 
-        /// <summary>Add this to the mode to keep encrypt only the embedded files.</summary>
+        /// <summary>Add this to the mode to encrypt only the embedded files.</summary>
         public const int EMBEDDED_FILES_ONLY = 24;
 
-        /// <summary>The operation permitted when the document is opened with the user password.</summary>
+        /// <summary>The operation is permitted when the document is opened with the user password.</summary>
         public const int ALLOW_PRINTING = 4 + 2048;
 
-        /// <summary>The operation permitted when the document is opened with the user password.</summary>
+        /// <summary>The operation is permitted when the document is opened with the user password.</summary>
         public const int ALLOW_MODIFY_CONTENTS = 8;
 
-        /// <summary>The operation permitted when the document is opened with the user password.</summary>
+        /// <summary>The operation is permitted when the document is opened with the user password.</summary>
         public const int ALLOW_COPY = 16;
 
-        /// <summary>The operation permitted when the document is opened with the user password.</summary>
+        /// <summary>The operation is permitted when the document is opened with the user password.</summary>
         public const int ALLOW_MODIFY_ANNOTATIONS = 32;
 
-        /// <summary>The operation permitted when the document is opened with the user password.</summary>
+        /// <summary>The operation is permitted when the document is opened with the user password.</summary>
         public const int ALLOW_FILL_IN = 256;
 
-        /// <summary>The operation permitted when the document is opened with the user password.</summary>
+        /// <summary>The operation is permitted when the document is opened with the user password.</summary>
         public const int ALLOW_SCREENREADERS = 512;
 
-        /// <summary>The operation permitted when the document is opened with the user password.</summary>
+        /// <summary>The operation is permitted when the document is opened with the user password.</summary>
         public const int ALLOW_ASSEMBLY = 1024;
 
-        /// <summary>The operation permitted when the document is opened with the user password.</summary>
+        /// <summary>The operation is permitted when the document is opened with the user password.</summary>
         public const int ALLOW_DEGRADED_PRINTING = 4;
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Mask to separate the encryption type from the encryption mode.</summary>
         internal const int ENCRYPTION_MASK = 7;
+//\endcond
     }
 }

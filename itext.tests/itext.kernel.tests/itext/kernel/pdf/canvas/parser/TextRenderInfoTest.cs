@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -107,7 +107,9 @@ namespace iText.Kernel.Pdf.Canvas.Parser {
         }
 
         private class TextPositionEventListener : IEventListener {
+//\cond DO_NOT_DOCUMENT
             internal IList<LineSegment> lineSegments = new List<LineSegment>();
+//\endcond
 
             public virtual void EventOccurred(IEventData data, EventType type) {
                 if (type.Equals(EventType.RENDER_TEXT)) {

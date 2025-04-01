@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -70,6 +70,23 @@ namespace iText.Signatures {
             // VerifySignatureIntegrityAndAuthenticity fails in BCFIPS mode
             if ("BC".Equals(BOUNCY_CASTLE_FACTORY.GetProviderName())) {
                 VerifyIsoExtensionExample("SHA3-256withRSA", "sample-rsa-sha3_256.pdf");
+            }
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void VerifyRsaPssSha3SignatureTest() {
+            VerifyIsoExtensionExample("RSASSA-PSS", "sample-pss-sha3_256.pdf");
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void VerifyEd448SignatureTest() {
+            // SHAKE256 is not available in BCFIPS
+            if ("BCFIPS".Equals(BOUNCY_CASTLE_FACTORY.GetProviderName())) {
+                NUnit.Framework.Assert.Catch(typeof(PdfException), () => VerifyIsoExtensionExample("Ed448", "sample-ed448-shake256.pdf"
+                    ));
+            }
+            else {
+                VerifyIsoExtensionExample("Ed448", "sample-ed448-shake256.pdf");
             }
         }
     }

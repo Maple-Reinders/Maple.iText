@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -124,10 +124,12 @@ namespace iText.Layout.Renderer {
             return symbolRenderer;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal static Object GetListItemOrListProperty(IRenderer listItem, IRenderer list, int propertyId) {
             return listItem.HasProperty(propertyId) ? listItem.GetProperty<Object>(propertyId) : list.GetProperty<Object
                 >(propertyId);
         }
+//\endcond
 
         private IRenderer CreateListSymbolRenderer(int index, IRenderer renderer) {
             Object defaultListSymbol = GetListItemOrListProperty(renderer, this, Property.LIST_SYMBOL);

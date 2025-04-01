@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,6 +28,7 @@ using iText.IO.Font.Constants;
 using iText.Kernel.Exceptions;
 using iText.Kernel.Font;
 using iText.Layout.Exceptions;
+using iText.Layout.Font.Selectorstrategy;
 
 namespace iText.Layout.Font {
     /// <summary>Main entry point of font selector logic.</summary>
@@ -63,7 +64,7 @@ namespace iText.Layout.Font {
     /// ,
     /// <see cref="GetPdfFont(FontInfo, FontSet)"/>
     /// ,
-    /// <see cref="GetStrategy(System.String, System.Collections.Generic.IList{E}, FontCharacteristics, FontSet)"/
+    /// <see cref="CreateFontSelectorStrategy(System.Collections.Generic.IList{E}, FontCharacteristics, FontSet)"/
     ///     >.
     /// <para />
     /// Note, FontProvider does not close created
@@ -86,6 +87,8 @@ namespace iText.Layout.Font {
         protected internal readonly String defaultFontFamily;
 
         protected internal readonly IDictionary<FontInfo, PdfFont> pdfFonts;
+
+        private IFontSelectorStrategyFactory fontSelectorStrategyFactory;
 
         /// <summary>Creates a new instance of FontProvider.</summary>
         /// <param name="fontSet">predefined set of fonts, could be null.</param>
@@ -112,6 +115,8 @@ namespace iText.Layout.Font {
             pdfFonts = new Dictionary<FontInfo, PdfFont>();
             fontSelectorCache = new FontSelectorCache(this.fontSet);
             this.defaultFontFamily = defaultFontFamily;
+            this.fontSelectorStrategyFactory = new BestMatchFontSelectorStrategy.BestMatchFontSelectorStrategyFactory(
+                );
         }
 
         /// <summary>
@@ -188,9 +193,14 @@ namespace iText.Layout.Font {
         /// cache.
         /// </summary>
         /// <param name="fontPath">
-        /// path to the font file to add. Can be a path to file or font name,
-        /// see
-        /// <see cref="iText.IO.Font.FontProgramFactory.CreateFont(System.String)"/>.
+        /// path to the font file to add. Can be a path to file or font name.
+        /// As a font name one of 14 built in fonts can be used, see
+        /// <see cref="iText.IO.Font.Constants.StandardFonts"/>.
+        /// If file is a true type collection, fonts in it should be addressed by index
+        /// such as "msgothic.ttc,1", starting with index 0.
+        /// See
+        /// <see cref="iText.IO.Font.FontProgramFactory.CreateFont(System.String)"/>
+        /// for more information.
         /// </param>
         /// <param name="encoding">
         /// font encoding to create
@@ -212,9 +222,14 @@ namespace iText.Layout.Font {
         /// cache.
         /// </summary>
         /// <param name="fontPath">
-        /// path to the font file to add. Can be a path to file or font name,
-        /// see
-        /// <see cref="iText.IO.Font.FontProgramFactory.CreateFont(System.String)"/>.
+        /// path to the font file to add. Can be a path to file or font name.
+        /// As a font name one of 14 built in fonts can be used, see
+        /// <see cref="iText.IO.Font.Constants.StandardFonts"/>.
+        /// If file is a true type collection, fonts in it should be addressed by index
+        /// such as "msgothic.ttc,1", starting with index 0.
+        /// See
+        /// <see cref="iText.IO.Font.FontProgramFactory.CreateFont(System.String)"/>
+        /// for more information.
         /// </param>
         /// <param name="encoding">
         /// font encoding to create
@@ -235,9 +250,14 @@ namespace iText.Layout.Font {
         /// cache.
         /// </summary>
         /// <param name="fontPath">
-        /// path to the font file to add. Can be a path to file or font name,
-        /// see
-        /// <see cref="iText.IO.Font.FontProgramFactory.CreateFont(System.String)"/>.
+        /// path to the font file to add. Can be a path to file or font name.
+        /// As a font name one of 14 built in fonts can be used, see
+        /// <see cref="iText.IO.Font.Constants.StandardFonts"/>.
+        /// If file is a true type collection, fonts in it should be addressed by index
+        /// such as "msgothic.ttc,1", starting with index 0.
+        /// See
+        /// <see cref="iText.IO.Font.FontProgramFactory.CreateFont(System.String)"/>
+        /// for more information.
         /// </param>
         /// <returns>true, if font was successfully added, otherwise false.</returns>
         public virtual bool AddFont(String fontPath) {
@@ -397,19 +417,29 @@ namespace iText.Layout.Font {
         }
 
         /// <summary>
-        /// Gets the
-        /// <see cref="FontSelectorStrategy"/>
-        /// to split specified text into sequences of glyphs, already tied
+        /// Sets factory which will be used in
+        /// <see cref="CreateFontSelectorStrategy(System.Collections.Generic.IList{E}, FontCharacteristics, FontSet)"/
+        ///     >
+        /// method.
+        /// </summary>
+        /// <param name="factory">the factory which will be used to create font selector strategies</param>
+        public virtual void SetFontSelectorStrategyFactory(IFontSelectorStrategyFactory factory) {
+            this.fontSelectorStrategyFactory = factory;
+        }
+
+        /// <summary>
+        /// Creates the
+        /// <see cref="iText.Layout.Font.Selectorstrategy.IFontSelectorStrategy"/>
+        /// to split text into sequences of glyphs, already tied
         /// to the fonts which contain them.
         /// </summary>
         /// <remarks>
-        /// Gets the
-        /// <see cref="FontSelectorStrategy"/>
-        /// to split specified text into sequences of glyphs, already tied
+        /// Creates the
+        /// <see cref="iText.Layout.Font.Selectorstrategy.IFontSelectorStrategy"/>
+        /// to split text into sequences of glyphs, already tied
         /// to the fonts which contain them. The fonts can be taken from the added fonts to the font provider and
         /// are chosen based on font-families list and desired font characteristics.
         /// </remarks>
-        /// <param name="text">for splitting into sequences of glyphs.</param>
         /// <param name="fontFamilies">
         /// target font families to create
         /// <see cref="FontSelector"/>
@@ -430,77 +460,13 @@ namespace iText.Layout.Font {
         /// </param>
         /// <returns>
         /// 
-        /// <see cref="FontSelectorStrategy"/>
-        /// instance.
+        /// <see cref="iText.Layout.Font.Selectorstrategy.IFontSelectorStrategy"/>
+        /// instance
         /// </returns>
-        public virtual FontSelectorStrategy GetStrategy(String text, IList<String> fontFamilies, FontCharacteristics
+        public virtual IFontSelectorStrategy CreateFontSelectorStrategy(IList<String> fontFamilies, FontCharacteristics
              fc, FontSet additionalFonts) {
-            return new ComplexFontSelectorStrategy(text, GetFontSelector(fontFamilies, fc, additionalFonts), this, additionalFonts
-                );
-        }
-
-        /// <summary>
-        /// Gets the
-        /// <see cref="FontSelectorStrategy"/>
-        /// to split specified text into sequences of glyphs, already tied
-        /// to the fonts which contain them.
-        /// </summary>
-        /// <remarks>
-        /// Gets the
-        /// <see cref="FontSelectorStrategy"/>
-        /// to split specified text into sequences of glyphs, already tied
-        /// to the fonts which contain them. The fonts can be taken from the added fonts to the font provider and
-        /// are chosen based on font-families list and desired font characteristics.
-        /// </remarks>
-        /// <param name="text">for splitting into sequences of glyphs.</param>
-        /// <param name="fontFamilies">
-        /// target font families to create
-        /// <see cref="FontSelector"/>
-        /// for sequences of glyphs.
-        /// </param>
-        /// <param name="fc">
-        /// instance of
-        /// <see cref="FontCharacteristics"/>
-        /// to create
-        /// <see cref="FontSelector"/>
-        /// for sequences of glyphs.
-        /// </param>
-        /// <returns>
-        /// 
-        /// <see cref="FontSelectorStrategy"/>
-        /// instance.
-        /// </returns>
-        public virtual FontSelectorStrategy GetStrategy(String text, IList<String> fontFamilies, FontCharacteristics
-             fc) {
-            return GetStrategy(text, fontFamilies, fc, null);
-        }
-
-        /// <summary>
-        /// Gets the
-        /// <see cref="FontSelectorStrategy"/>
-        /// to split specified text into sequences of glyphs, already tied
-        /// to the fonts which contain them.
-        /// </summary>
-        /// <remarks>
-        /// Gets the
-        /// <see cref="FontSelectorStrategy"/>
-        /// to split specified text into sequences of glyphs, already tied
-        /// to the fonts which contain them. The fonts can be taken from the added fonts to the font provider and
-        /// are chosen based on font-families list and desired font characteristics.
-        /// </remarks>
-        /// <param name="text">for splitting into sequences of glyphs.</param>
-        /// <param name="fontFamilies">
-        /// target font families to create
-        /// <see cref="FontSelector"/>
-        /// for sequences of glyphs.
-        /// </param>
-        /// <returns>
-        /// 
-        /// <see cref="FontSelectorStrategy"/>
-        /// instance.
-        /// </returns>
-        public virtual FontSelectorStrategy GetStrategy(String text, IList<String> fontFamilies) {
-            return GetStrategy(text, fontFamilies, null);
+            FontSelector fontSelector = GetFontSelector(fontFamilies, fc, additionalFonts);
+            return fontSelectorStrategyFactory.CreateFontSelectorStrategy(this, fontSelector, additionalFonts);
         }
 
         /// <summary>

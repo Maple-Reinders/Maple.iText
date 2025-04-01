@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -30,6 +30,8 @@ using iText.Signatures.Exceptions;
 
 namespace iText.Signatures {
     /// <summary>An exception that is thrown when something is wrong with a certificate.</summary>
+    [System.ObsoleteAttribute(@"starting from 9.0.0 since all the classes that use this one are also deprecated in favour of new signature validation logic in the iText.Signatures.Validation package."
+        )]
     public class VerificationException : AbstractGeneralSecurityException {
         private static readonly IBouncyCastleFactory BOUNCY_CASTLE_FACTORY = BouncyCastleFactoryCreator.GetFactory
             ();

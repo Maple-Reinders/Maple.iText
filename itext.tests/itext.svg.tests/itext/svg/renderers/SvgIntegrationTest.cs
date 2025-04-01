@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
 using System.IO;
+using iText.Commons.Utils;
+using iText.IO.Util;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Kernel.Utils;
@@ -42,15 +44,15 @@ namespace iText.Svg.Renderers {
         }
 
         public virtual void Convert(String svg, String output) {
-            Convert(svg, output, PageSize.DEFAULT);
+            Convert(svg, output, PageSize.DEFAULT, new SvgConverterProperties());
         }
 
-        public virtual void Convert(String svg, String output, PageSize size) {
+        public virtual void Convert(String svg, String output, PageSize size, SvgConverterProperties properties) {
             using (PdfDocument doc = new PdfDocument(new PdfWriter(output, new WriterProperties().SetCompressionLevel(
                 0)))) {
                 doc.AddNewPage(size);
-                ISvgConverterProperties properties = new SvgConverterProperties().SetBaseUri(svg);
-                SvgConverter.DrawOnDocument(new FileStream(svg, FileMode.Open, FileAccess.Read), doc, 1, properties);
+                properties.SetBaseUri(svg);
+                SvgConverter.DrawOnDocument(FileUtil.GetInputStreamForFile(svg), doc, 1, properties);
             }
         }
 
@@ -58,7 +60,7 @@ namespace iText.Svg.Renderers {
             PdfDocument doc = new PdfDocument(new PdfWriter(output, new WriterProperties().SetCompressionLevel(0)));
             doc.AddNewPage();
             ISvgConverterProperties properties = new SvgConverterProperties().SetBaseUri(svg);
-            SvgConverter.DrawOnDocument(new FileStream(svg, FileMode.Open, FileAccess.Read), doc, 1, properties);
+            SvgConverter.DrawOnDocument(FileUtil.GetInputStreamForFile(svg), doc, 1, properties);
             return doc;
         }
 
@@ -98,25 +100,38 @@ namespace iText.Svg.Renderers {
             ConvertAndCompare(src, dest, fileName, PageSize.DEFAULT);
         }
 
+        public virtual void ConvertAndCompare(String src, String dest, String fileName, SvgConverterProperties properties
+            ) {
+            ConvertAndCompare(src, dest, fileName, PageSize.DEFAULT, properties);
+        }
+
         public virtual void ConvertAndCompare(String src, String dest, String fileName, PageSize size) {
-            Convert(src + fileName + ".svg", dest + fileName + ".pdf", size);
+            Convert(src + fileName + ".svg", dest + fileName + ".pdf", size, new SvgConverterProperties());
+            Compare(fileName, src, dest);
+        }
+
+        public virtual void ConvertAndCompare(String src, String dest, String fileName, PageSize size, SvgConverterProperties
+             properties) {
+            Convert(src + fileName + ".svg", dest + fileName + ".pdf", size, properties);
             Compare(fileName, src, dest);
         }
 
         public virtual void ConvertAndCompareSinglePage(String src, String dest, String fileName) {
-            ConvertToSinglePage(new FileStream(src + fileName + ".svg", FileMode.Open, FileAccess.Read), new FileStream
-                (dest + fileName + ".pdf", FileMode.Create));
+            ConvertToSinglePage(FileUtil.GetInputStreamForFile(src + fileName + ".svg"), FileUtil.GetFileOutputStream(
+                dest + fileName + ".pdf"));
             Compare(fileName, src, dest);
         }
 
         public virtual void ConvertAndCompareSinglePage(String src, String dest, String fileName, ISvgConverterProperties
              properties) {
-            ConvertToSinglePage(new FileStream(src + fileName + ".svg", FileMode.Open, FileAccess.Read), new FileStream
-                (dest + fileName + ".pdf", FileMode.Create), properties);
+            ConvertToSinglePage(FileUtil.GetInputStreamForFile(src + fileName + ".svg"), FileUtil.GetFileOutputStream(
+                dest + fileName + ".pdf"), properties);
             Compare(fileName, src, dest);
         }
 
         protected internal virtual void Compare(String filename, String sourceFolder, String destinationFolder) {
+            System.Console.Out.WriteLine("SVG: " + UrlUtil.GetNormalizedFileUriString(sourceFolder + filename + ".svg"
+                ) + "\n");
             NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(destinationFolder + filename + ".pdf", sourceFolder
                  + "cmp_" + filename + ".pdf", destinationFolder, "diff_"));
         }

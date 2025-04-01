@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,7 +28,9 @@ using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Crypto;
 using iText.Commons.Bouncycastle.Math;
 using iText.Commons.Bouncycastle.Tsp;
+using iText.Commons.Digest;
 using iText.Commons.Utils;
+using iText.Kernel.Crypto;
 using iText.Signatures;
 using iText.Signatures.Testutils;
 using iText.Signatures.Testutils.Builder;
@@ -53,7 +55,7 @@ namespace iText.Signatures.Testutils.Client {
             return 4096;
         }
 
-        public virtual IDigest GetMessageDigest() {
+        public virtual IMessageDigest GetMessageDigest() {
             return SignTestPortUtil.GetMessageDigest(DIGEST_ALG);
         }
 

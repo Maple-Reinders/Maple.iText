@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -28,6 +28,7 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Tagging;
 
 namespace iText.Kernel.Pdf.Tagutils {
+//\cond DO_NOT_DOCUMENT
     internal class RootTagNormalizer {
         private TagStructureContext context;
 
@@ -35,13 +36,16 @@ namespace iText.Kernel.Pdf.Tagutils {
 
         private PdfDocument document;
 
+//\cond DO_NOT_DOCUMENT
         internal RootTagNormalizer(TagStructureContext context, PdfStructElem rootTagElement, PdfDocument document
             ) {
             this.context = context;
             this.rootTagElement = rootTagElement;
             this.document = document;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual PdfStructElem MakeSingleStandardRootTag(IList<IStructureNode> rootKids) {
             document.GetStructTreeRoot().MakeIndirect(document);
             if (rootTagElement == null) {
@@ -55,6 +59,7 @@ namespace iText.Kernel.Pdf.Tagutils {
             AddStructTreeRootKidsToTheRootTag(rootKids);
             return rootTagElement;
         }
+//\endcond
 
         private void CreateNewRootTag() {
             IRoleMappingResolver mapping;
@@ -108,8 +113,10 @@ namespace iText.Kernel.Pdf.Tagutils {
                 }
                 // This boolean is used to "flatten" possible deep "stacking" of the tag structure in case of the multiple pages copying operations.
                 // This could happen due to the wrapping of all the kids in the createNewRootTag or ensureExistingRootTagIsDocument methods.
-                // And therefore, we don't need here to resolve mappings, because we exactly know which role we set.
-                bool kidIsDocument = PdfName.Document.Equals(kid.GetRole());
+                IRoleMappingResolver mapping = kid.GetRole() == null ? null : context.ResolveMappingToStandardOrDomainSpecificRole
+                    (kid.GetRole().GetValue(), rootTagElement.GetNamespace());
+                bool kidIsDocument = mapping != null && mapping.CurrentRoleIsStandard() && StandardRoles.DOCUMENT.Equals(mapping
+                    .GetRole());
                 if (kidIsDocument && kid.GetNamespace() != null && context.TargetTagStructureVersionIs2()) {
                     // we flatten only tags of document role in standard structure namespace
                     String kidNamespaceName = kid.GetNamespace().GetNamespaceName();
@@ -144,8 +151,7 @@ namespace iText.Kernel.Pdf.Tagutils {
         }
 
         private void RemoveOldRoot(PdfStructElem oldRoot) {
-            TagTreePointer tagPointer = new TagTreePointer(document);
-            tagPointer.SetCurrentStructElem(oldRoot).RemoveTag();
+            new TagTreePointer(oldRoot, document).RemoveTag();
         }
 
         private void LogCreatedRootTagHasMappingIssue(PdfNamespace rootTagOriginalNs, IRoleMappingResolver mapping
@@ -170,4 +176,5 @@ namespace iText.Kernel.Pdf.Tagutils {
                 , mappingRole));
         }
     }
+//\endcond
 }

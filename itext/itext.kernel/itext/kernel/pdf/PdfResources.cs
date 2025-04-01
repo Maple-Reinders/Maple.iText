@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using iText.Commons.Utils;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf.Colorspace;
+using iText.Kernel.Pdf.Colorspace.Shading;
 using iText.Kernel.Pdf.Extgstate;
 using iText.Kernel.Pdf.Xobject;
 
@@ -335,16 +336,16 @@ namespace iText.Kernel.Pdf {
 
         /// <summary>
         /// Adds
-        /// <see cref="iText.Kernel.Pdf.Colorspace.PdfShading"/>
+        /// <see cref="iText.Kernel.Pdf.Colorspace.Shading.AbstractPdfShading"/>
         /// object to the resources.
         /// </summary>
         /// <param name="shading">
         /// the
-        /// <see cref="iText.Kernel.Pdf.Colorspace.PdfShading"/>
+        /// <see cref="iText.Kernel.Pdf.Colorspace.Shading.AbstractPdfShading"/>
         /// to add.
         /// </param>
         /// <returns>added shading resource name.</returns>
-        public virtual PdfName AddShading(PdfShading shading) {
+        public virtual PdfName AddShading(AbstractPdfShading shading) {
             return AddResource(shading, shadingNamesGen);
         }
 
@@ -363,9 +364,9 @@ namespace iText.Kernel.Pdf {
             return AddResource(shading, shadingNamesGen);
         }
 
-        public virtual PdfShading GetShading(PdfName name) {
+        public virtual AbstractPdfShading GetShading(PdfName name) {
             PdfObject shading = GetResourceObject(PdfName.Shading, name);
-            return shading is PdfDictionary ? PdfShading.MakeShading((PdfDictionary)shading) : null;
+            return shading is PdfDictionary ? AbstractPdfShading.MakeShading((PdfDictionary)shading) : null;
         }
 
         protected internal virtual bool IsReadOnly() {
@@ -586,11 +587,13 @@ namespace iText.Kernel.Pdf {
             return false;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual PdfName AddResource<T>(PdfObjectWrapper<T> resource, PdfResources.ResourceNameGenerator nameGen
             )
             where T : PdfObject {
             return AddResource(resource.GetPdfObject(), nameGen);
         }
+//\endcond
 
         protected internal virtual void AddResource(PdfObject resource, PdfName resType, PdfName resName) {
             if (resType.Equals(PdfName.XObject)) {
@@ -617,6 +620,7 @@ namespace iText.Kernel.Pdf {
             SetModified();
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual PdfName AddResource(PdfObject resource, PdfResources.ResourceNameGenerator nameGen) {
             PdfName resName = GetResourceName(resource);
             if (resName == null) {
@@ -625,6 +629,7 @@ namespace iText.Kernel.Pdf {
             }
             return resName;
         }
+//\endcond
 
         protected internal virtual void BuildResources(PdfDictionary dictionary) {
             foreach (PdfName resourceType in dictionary.KeySet()) {
@@ -663,6 +668,7 @@ namespace iText.Kernel.Pdf {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Represents a resource name generator.</summary>
         /// <remarks>
         /// Represents a resource name generator. The generator takes into account
@@ -767,5 +773,6 @@ namespace iText.Kernel.Pdf {
                 return newName;
             }
         }
+//\endcond
     }
 }

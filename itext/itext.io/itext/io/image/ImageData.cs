@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -313,6 +313,7 @@ namespace iText.IO.Image {
             return true;
         }
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>Load data from URL.</summary>
         /// <remarks>
         /// Load data from URL. url must be not null.
@@ -326,6 +327,7 @@ namespace iText.IO.Image {
             raf.Close();
             data = stream.ToArray();
         }
+//\endcond
 
         /// <summary>Creates a new serial id.</summary>
         /// <returns>the new serialId</returns>

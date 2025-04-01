@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using iText.Bouncycastlefips.Cert;
 using iText.Commons.Bouncycastle;
@@ -31,6 +31,7 @@ using Org.BouncyCastle.Cms;
 using Org.BouncyCastle.OpenSsl;
 
 namespace iText.Bouncycastlefips {
+    //\cond DO_NOT_DOCUMENT
     internal class BouncyCastleFipsUtil : IBouncyCastleUtil {
         
         internal BouncyCastleFipsUtil() {
@@ -56,4 +57,5 @@ namespace iText.Bouncycastlefips {
             }
         }
     }
+    //\endcond
 }

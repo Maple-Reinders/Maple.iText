@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -41,10 +41,9 @@ namespace iText.IO.Util {
         ///     </summary>
         public const String MAGICK_COMPARE_ENVIRONMENT_VARIABLE = "ITEXT_MAGICK_COMPARE_EXEC";
 
-        [Obsolete]
-        internal const String MAGICK_COMPARE_ENVIRONMENT_VARIABLE_LEGACY = "compareExec";
-
+//\cond DO_NOT_DOCUMENT
         internal const String MAGICK_COMPARE_KEYWORD = "ImageMagick Studio LLC";
+//\endcond
 
         private const String TEMP_FILE_PREFIX = "itext_im_io_temp";
 
@@ -71,9 +70,6 @@ namespace iText.IO.Util {
             compareExec = newCompareExec;
             if (compareExec == null) {
                 compareExec = SystemUtil.GetEnvironmentVariable(MAGICK_COMPARE_ENVIRONMENT_VARIABLE);
-                if (compareExec == null) {
-                    compareExec = SystemUtil.GetEnvironmentVariable(MAGICK_COMPARE_ENVIRONMENT_VARIABLE_LEGACY);
-                }
             }
             if (!CliCommandUtil.IsVersionCommandExecutable(compareExec, MAGICK_COMPARE_KEYWORD)) {
                 throw new ArgumentException(IoExceptionMessageConstant.COMPARE_COMMAND_SPECIFIED_INCORRECTLY);
@@ -213,6 +209,7 @@ namespace iText.IO.Util {
             }
         }
 
+//\cond DO_NOT_DOCUMENT
         internal static bool ValidateFuzziness(String fuzziness) {
             if (null == fuzziness) {
                 return true;
@@ -228,6 +225,7 @@ namespace iText.IO.Util {
                 }
             }
         }
+//\endcond
 
         private static long ParseImageMagickProcessOutput(String processOutput) {
             if (null == processOutput) {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,6 +25,7 @@ using iText.Kernel.Geom;
 using iText.Layout.Layout;
 
 namespace iText.Layout.Renderer {
+//\cond DO_NOT_DOCUMENT
     internal class RootRendererAreaStateHandler {
         private RootLayoutArea storedPreviousArea;
 
@@ -67,4 +68,5 @@ namespace iText.Layout.Renderer {
             return this;
         }
     }
+//\endcond
 }

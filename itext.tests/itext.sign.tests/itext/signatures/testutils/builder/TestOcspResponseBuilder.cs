@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -31,7 +31,6 @@ using iText.Commons.Bouncycastle.Asn1.X509;
 using iText.Commons.Bouncycastle.Cert;
 using iText.Commons.Bouncycastle.Cert.Ocsp;
 using iText.Commons.Bouncycastle.Crypto;
-using iText.Commons.Utils;
 
 namespace iText.Signatures.Testutils.Builder {
     public class TestOcspResponseBuilder {
@@ -48,6 +47,15 @@ namespace iText.Signatures.Testutils.Builder {
         private DateTime thisUpdate = TimeTestUtil.TEST_DATE_TIME.AddDays(-1);
 
         private DateTime nextUpdate = TimeTestUtil.TEST_DATE_TIME.AddDays(30);
+
+        private DateTime producedAt = TimeTestUtil.TEST_DATE_TIME;
+
+        private IX509Certificate[] chain;
+
+        private bool chainSet = false;
+        
+        private Dictionary<IDerObjectIdentifier, IX509Extension> extensions = new Dictionary<IDerObjectIdentifier, IX509Extension>();
+
 
         public TestOcspResponseBuilder(IX509Certificate issuerCert, IPrivateKey issuerPrivateKey,
             ICertStatus certificateStatus)
@@ -80,6 +88,14 @@ namespace iText.Signatures.Testutils.Builder {
             this.nextUpdate = nextUpdate;
         }
 
+        public virtual void SetProducedAt(DateTime producedAt) {
+            this.producedAt = producedAt;
+        }
+
+        public virtual void AddResponseExtension(IDerObjectIdentifier objectIdentifier, IDerOctetString extensionValue) {
+            this.extensions.Add(objectIdentifier, FACTORY.CreateExtension(false, extensionValue));
+        }
+
         public virtual byte[] MakeOcspResponse(byte[] requestBytes) {
             IBasicOcspResponse ocspResponse = MakeOcspResponseObject(requestBytes);
             return ocspResponse.GetEncoded();
@@ -92,21 +108,27 @@ namespace iText.Signatures.Testutils.Builder {
             IX509Extension extNonce = ocspRequest.GetExtension(FACTORY.CreateOCSPObjectIdentifiers()
                 .GetIdPkixOcspNonce());
             if (!FACTORY.IsNullExtension(extNonce)) {
-                // TODO ensure
-                IX509Extensions responseExtensions = FACTORY.CreateExtensions(new Dictionary<IDerObjectIdentifier, IX509Extension>() {
-                {
-                    FACTORY.CreateOCSPObjectIdentifiers().GetIdPkixOcspNonce(), extNonce
-                }});
-                responseBuilder.SetResponseExtensions(responseExtensions);
+               extensions.Add(FACTORY.CreateOCSPObjectIdentifiers().GetIdPkixOcspNonce(), extNonce);
             }
+
+            IX509Extensions responseExtensions = FACTORY.CreateExtensions(extensions);
+            responseBuilder.SetResponseExtensions(responseExtensions);
+            extensions.Clear();
 
             foreach (IReq req in requestList) {
                 responseBuilder.AddResponse(req.GetCertID(), certificateStatus, thisUpdate.ToUniversalTime(), nextUpdate.ToUniversalTime(), 
                     FACTORY.CreateExtensions());
             }
 
-            DateTime time = TimeTestUtil.TEST_DATE_TIME;
-            return responseBuilder.Build(FACTORY.CreateContentSigner(SIGN_ALG, issuerPrivateKey), new IX509Certificate[] { issuerCert }, time);
+            if (!chainSet) {
+                chain = new IX509Certificate[] { issuerCert };
+            }
+            return responseBuilder.Build(FACTORY.CreateContentSigner(SIGN_ALG, issuerPrivateKey), chain, producedAt);
+        }
+
+        public void SetOcspCertsChain(IX509Certificate[] ocspCertsChain) {
+            chain = ocspCertsChain;
+            chainSet = true;
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -33,13 +33,17 @@ namespace iText.Signatures {
     /// Class that allows you to verify a certificate against
     /// one or more Certificate Revocation Lists.
     /// </summary>
+    [System.ObsoleteAttribute(@"starting from 8.0.5.iText.Signatures.Validation.CRLValidator should be used instead."
+        )]
     public class CRLVerifier : RootStoreVerifier {
         /// <summary>The Logger instance</summary>
         protected internal static readonly ILogger LOGGER = ITextLogManager.GetLogger(typeof(iText.Signatures.CRLVerifier
             ));
 
+//\cond DO_NOT_DOCUMENT
         /// <summary>The list of CRLs to check for revocation date.</summary>
         internal IList<IX509Crl> crls;
+//\endcond
 
         /// <summary>Creates a CRLVerifier instance.</summary>
         /// <param name="verifier">the next verifier in the chain</param>
@@ -49,9 +53,9 @@ namespace iText.Signatures {
             this.crls = crls;
         }
 
-        /// <summary>Verifies if a a valid CRL is found for the certificate.</summary>
+        /// <summary>Verifies whether a valid CRL is found for the certificate.</summary>
         /// <remarks>
-        /// Verifies if a a valid CRL is found for the certificate.
+        /// Verifies whether a valid CRL is found for the certificate.
         /// If this method returns false, it doesn't mean the certificate isn't valid.
         /// It means we couldn't verify it against any CRL that was available.
         /// </remarks>
@@ -120,20 +124,17 @@ namespace iText.Signatures {
 
         /// <summary>Fetches a CRL for a specific certificate online (without further checking).</summary>
         /// <param name="signCert">the certificate</param>
-        /// <param name="issuerCert">its issuer</param>
-        /// <returns>an X509CRL object</returns>
+        /// <param name="issuerCert">its issuer left for backwards compatibility</param>
+        /// <returns>an X509CRL object.</returns>
         public virtual IX509Crl GetCRL(IX509Certificate signCert, IX509Certificate issuerCert) {
-            if (issuerCert == null) {
-                issuerCert = signCert;
-            }
             try {
                 // gets the URL from the certificate
-                String crlurl = CertificateUtil.GetCRLURL(signCert);
-                if (crlurl == null) {
+                IList<String> crlurl = CertificateUtil.GetCRLURLs(signCert);
+                if (crlurl.IsEmpty()) {
                     return null;
                 }
-                LOGGER.LogInformation("Getting CRL from " + crlurl);
-                return (IX509Crl)SignUtils.ParseCrlFromStream(UrlUtil.OpenStream(new Uri(crlurl)));
+                LOGGER.LogInformation("Getting CRL from " + crlurl[0]);
+                return (IX509Crl)SignUtils.ParseCrlFromStream(UrlUtil.OpenStream(new Uri(crlurl[0])));
             }
             catch (System.IO.IOException) {
                 return null;

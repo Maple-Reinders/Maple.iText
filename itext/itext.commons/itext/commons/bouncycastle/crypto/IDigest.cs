@@ -1,6 +1,6 @@
 /*
     This file is part of the iText (R) project.
-    Copyright (c) 1998-2024 Apryse Group NV
+    Copyright (c) 1998-2025 Apryse Group NV
     Authors: Apryse Software.
 
     This program is offered under a commercial and under the AGPL license.
@@ -20,71 +20,14 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+using iText.Commons.Digest;
+
 namespace iText.Commons.Bouncycastle.Crypto {
     /// <summary>
     /// This interface represents the wrapper for IDigest that provides the ability
     /// to switch between bouncy-castle and bouncy-castle FIPS implementations.
     /// </summary>
-    public interface IDigest {
-        /// <summary>
-        /// Calls actual
-        /// <c>Digest</c>
-        /// method for the wrapped IDigest object.
-        /// </summary>
-        /// <param name="enc2">byte array</param>
-        /// <returns>
-        /// byte array.
-        /// </returns>
-        byte[] Digest(byte[] enc2);
-        
-        /// <summary>
-        /// Calls actual
-        /// <c>Digest</c>
-        /// method for the wrapped IDigest object.
-        /// Leaves the digest reset.
-        /// </summary>
-        /// <returns>
-        /// byte array.
-        /// </returns>
-        byte[] Digest();
-
-        /// <summary>
-        /// Gets byte length of wrapped digest algorithm.
-        /// </summary>
-        /// <returns>digest length</returns>
-        int GetDigestLength();
-        
-        /// <summary>
-        /// Calls actual
-        /// <c>Update</c>
-        /// method for the wrapped IDigest object.
-        /// </summary>
-        /// <param name="buf">byte array buffer</param>
-        /// <param name="off">offset</param>
-        /// <param name="len">buffer length</param>
-        void Update(byte[] buf, int off, int len);
-        
-        /// <summary>
-        /// Calls actual
-        /// <c>Update</c>
-        /// method for the wrapped IDigest object.
-        /// </summary>
-        /// <param name="buf">byte array buffer</param>
-        void Update(byte[] buf);
-
-        /// <summary>
-        /// Calls actual
-        /// <c>Reset</c>
-        /// method for the wrapped IDigest object.
-        /// </summary>
-        void Reset();
-
-        /// <summary>
-        /// Gets actual
-        /// <c>AlgorithmName</c>
-        /// for the wrapped IDigest object.
-        /// </summary>
-        /// <returns>algorithm name.</returns>
-        string GetAlgorithmName();
+    public interface IDigest : IMessageDigest {
     }
 }

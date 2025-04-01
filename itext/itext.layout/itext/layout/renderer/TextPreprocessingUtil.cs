@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -48,7 +48,8 @@ namespace iText.Layout.Renderer {
                     int? xAdvance = CalculateXAdvancement(spaceWidth, isMonospaceFont, glyph);
                     bool isSpecialWhitespaceGlyph = xAdvance != null;
                     if (isSpecialWhitespaceGlyph) {
-                        Glyph newGlyph = new Glyph(space, glyph.GetUnicode());
+                        Glyph newGlyph = new Glyph(space);
+                        newGlyph.SetChars(glyph.GetChars());
                         System.Diagnostics.Debug.Assert(xAdvance <= short.MaxValue && xAdvance >= short.MinValue);
                         newGlyph.SetXAdvance((short)(int)xAdvance);
                         line.Set(i, newGlyph);
@@ -58,11 +59,17 @@ namespace iText.Layout.Renderer {
             return line;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal const int NON_MONO_SPACE_ENSP_WIDTH = 500;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal const int NON_MONO_SPACE_THINSP_WIDTH = 200;
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal const int AMOUNT_OF_SPACE_IN_TAB = 3;
+//\endcond
 
         private static int? CalculateXAdvancement(int spaceWidth, bool isMonospaceFont, Glyph glyph) {
             int? xAdvance = null;

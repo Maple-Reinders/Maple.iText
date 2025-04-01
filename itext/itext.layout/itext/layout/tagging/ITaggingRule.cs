@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,6 +21,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 namespace iText.Layout.Tagging {
+//\cond DO_NOT_DOCUMENT
     /// <summary>
     /// Implementation of the interface is used to create required children
     /// structure for the specified role.
@@ -42,4 +43,5 @@ namespace iText.Layout.Tagging {
         /// </returns>
         bool OnTagFinish(LayoutTaggingHelper taggingHelper, TaggingHintKey taggingHintKey);
     }
+//\endcond
 }

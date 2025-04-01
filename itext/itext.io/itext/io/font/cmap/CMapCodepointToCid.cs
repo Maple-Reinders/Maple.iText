@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -43,6 +43,7 @@ namespace iText.IO.Font.Cmap {
             map = reverseMap.GetReversMap();
         }
 
+//\cond DO_NOT_DOCUMENT
         internal override void AddChar(String mark, CMapObject code) {
             if (code.IsNumber()) {
                 byte[] ser = DecodeStringToByte(mark);
@@ -54,6 +55,7 @@ namespace iText.IO.Font.Cmap {
                 map.Put(byteCode, (int)code.GetValue());
             }
         }
+//\endcond
 
         public virtual int Lookup(int codepoint) {
             return this.map.Get(codepoint);

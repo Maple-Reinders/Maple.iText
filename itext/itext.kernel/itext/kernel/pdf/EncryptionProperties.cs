@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System.Security.Cryptography;
 using iText.Commons.Bouncycastle.Cert;
+using iText.Kernel.Mac;
 
 namespace iText.Kernel.Pdf {
     /// <summary>Allows configuration of output PDF encryption.</summary>
@@ -39,6 +40,17 @@ namespace iText.Kernel.Pdf {
         protected internal IX509Certificate[] publicCertificates;
 
         protected internal int[] publicKeyEncryptPermissions;
+
+        /// <summary>
+        /// <see cref="iText.Kernel.Mac.MacProperties"/>
+        /// class to configure MAC integrity protection properties.
+        /// </summary>
+        protected internal MacProperties macProperties;
+
+//\cond DO_NOT_DOCUMENT
+        internal static readonly MacProperties DEFAULT_MAC_PROPERTIES = new MacProperties(MacProperties.MacDigestAlgorithm
+            .SHA3_512);
+//\endcond
 
         /// <summary>Sets the encryption options for the document.</summary>
         /// <param name="userPassword">
@@ -75,8 +87,10 @@ namespace iText.Kernel.Pdf {
         /// <see cref="EncryptionConstants.STANDARD_ENCRYPTION_128"/>
         /// ,
         /// <see cref="EncryptionConstants.ENCRYPTION_AES_128"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ENCRYPTION_AES_256"/>
         /// or
-        /// <see cref="EncryptionConstants.ENCRYPTION_AES_256"/>.
+        /// <see cref="EncryptionConstants.ENCRYPTION_AES_GCM"/>.
         /// Optionally
         /// <see cref="EncryptionConstants.DO_NOT_ENCRYPT_METADATA"/>
         /// can be OEed
@@ -101,6 +115,81 @@ namespace iText.Kernel.Pdf {
         /// </returns>
         public virtual EncryptionProperties SetStandardEncryption(byte[] userPassword, byte[] ownerPassword, int permissions
             , int encryptionAlgorithm) {
+            return SetStandardEncryption(userPassword, ownerPassword, permissions, encryptionAlgorithm, DEFAULT_MAC_PROPERTIES
+                );
+        }
+
+        /// <summary>Sets the encryption options for the document.</summary>
+        /// <param name="userPassword">
+        /// the user password. Can be null or of zero length, which is equal to
+        /// omitting the user password
+        /// </param>
+        /// <param name="ownerPassword">
+        /// the owner password. If it's null or empty, iText will generate
+        /// a random string to be used as the owner password
+        /// </param>
+        /// <param name="permissions">
+        /// the user permissions. The open permissions for the document can be
+        /// <see cref="EncryptionConstants.ALLOW_PRINTING"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ALLOW_MODIFY_CONTENTS"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ALLOW_COPY"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ALLOW_MODIFY_ANNOTATIONS"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ALLOW_FILL_IN"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ALLOW_SCREENREADERS"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ALLOW_ASSEMBLY"/>
+        /// and
+        /// <see cref="EncryptionConstants.ALLOW_DEGRADED_PRINTING"/>.
+        /// The permissions can be combined by ORing them
+        /// </param>
+        /// <param name="encryptionAlgorithm">
+        /// the type of encryption. It can be one of
+        /// <see cref="EncryptionConstants.STANDARD_ENCRYPTION_40"/>
+        /// ,
+        /// <see cref="EncryptionConstants.STANDARD_ENCRYPTION_128"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ENCRYPTION_AES_128"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ENCRYPTION_AES_256"/>
+        /// or
+        /// <see cref="EncryptionConstants.ENCRYPTION_AES_GCM"/>.
+        /// Optionally
+        /// <see cref="EncryptionConstants.DO_NOT_ENCRYPT_METADATA"/>
+        /// can be OEed
+        /// to output the metadata in cleartext.
+        /// <see cref="EncryptionConstants.EMBEDDED_FILES_ONLY"/>
+        /// can be ORed as well.
+        /// Please be aware that the passed encryption types may override permissions:
+        /// <see cref="EncryptionConstants.STANDARD_ENCRYPTION_40"/>
+        /// implicitly sets
+        /// <see cref="EncryptionConstants.DO_NOT_ENCRYPT_METADATA"/>
+        /// and
+        /// <see cref="EncryptionConstants.EMBEDDED_FILES_ONLY"/>
+        /// as false;
+        /// <see cref="EncryptionConstants.STANDARD_ENCRYPTION_128"/>
+        /// implicitly sets
+        /// <see cref="EncryptionConstants.EMBEDDED_FILES_ONLY"/>
+        /// as false;
+        /// </param>
+        /// <param name="macProperties">
+        /// 
+        /// <see cref="iText.Kernel.Mac.MacProperties"/>
+        /// class to configure MAC integrity protection properties.
+        /// Pass
+        /// <see langword="null"/>
+        /// if you want to disable MAC protection for any reason
+        /// </param>
+        /// <returns>
+        /// this
+        /// <see cref="EncryptionProperties"/>
+        /// </returns>
+        public virtual EncryptionProperties SetStandardEncryption(byte[] userPassword, byte[] ownerPassword, int permissions
+            , int encryptionAlgorithm, MacProperties macProperties) {
             ClearEncryption();
             this.userPassword = userPassword;
             if (ownerPassword != null) {
@@ -112,6 +201,7 @@ namespace iText.Kernel.Pdf {
             }
             this.standardEncryptPermissions = permissions;
             this.encryptionAlgorithm = encryptionAlgorithm;
+            this.macProperties = macProperties;
             return this;
         }
 
@@ -150,8 +240,10 @@ namespace iText.Kernel.Pdf {
         /// <see cref="EncryptionConstants.STANDARD_ENCRYPTION_128"/>
         /// ,
         /// <see cref="EncryptionConstants.ENCRYPTION_AES_128"/>
+        /// ,
+        /// <see cref="EncryptionConstants.ENCRYPTION_AES_256"/>
         /// or
-        /// <see cref="EncryptionConstants.ENCRYPTION_AES_256"/>.
+        /// <see cref="EncryptionConstants.ENCRYPTION_AES_GCM"/>.
         /// Optionally
         /// <see cref="EncryptionConstants.DO_NOT_ENCRYPT_METADATA"/>
         /// can be ORed to output the metadata in cleartext.
@@ -169,32 +261,46 @@ namespace iText.Kernel.Pdf {
         /// <see cref="EncryptionConstants.EMBEDDED_FILES_ONLY"/>
         /// as false;
         /// </param>
+        /// <param name="macProperties">
+        /// 
+        /// <see cref="iText.Kernel.Mac.MacProperties"/>
+        /// class to configure MAC integrity protection properties.
+        /// Pass
+        /// <see langword="null"/>
+        /// if you want to disable MAC protection for any reason
+        /// </param>
         /// <returns>
         /// this
         /// <see cref="EncryptionProperties"/>
         /// </returns>
         public virtual EncryptionProperties SetPublicKeyEncryption(IX509Certificate[] certs, int[] permissions, int
-             encryptionAlgorithm) {
+             encryptionAlgorithm, MacProperties macProperties) {
             ClearEncryption();
             this.publicCertificates = certs;
             this.publicKeyEncryptPermissions = permissions;
             this.encryptionAlgorithm = encryptionAlgorithm;
+            this.macProperties = macProperties;
             return this;
         }
 
+//\cond DO_NOT_DOCUMENT
         internal virtual bool IsStandardEncryptionUsed() {
             return ownerPassword != null;
         }
+//\endcond
 
+//\cond DO_NOT_DOCUMENT
         internal virtual bool IsPublicKeyEncryptionUsed() {
             return publicCertificates != null;
         }
+//\endcond
 
         private void ClearEncryption() {
             this.publicCertificates = null;
             this.publicKeyEncryptPermissions = null;
             this.userPassword = null;
             this.ownerPassword = null;
+            this.macProperties = null;
         }
 
         private static void RandomBytes(byte[] bytes) {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -21,7 +21,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System;
-using System.IO;
+using iText.Commons.Utils;
 using iText.Kernel.Pdf;
 using iText.Kernel.Utils;
 using iText.Test;
@@ -49,7 +49,7 @@ namespace iText.Pdfa {
             String outPdf = DESTINATION_FOLDER + "pdfA4CheckThatAsKeyIsAllowedTest.pdf";
             String cmpPdf = CMP_FOLDER + "cmp_pdfA4CheckThatAsKeyIsAllowedTest.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
-            using (PdfADocument doc = new PdfADocument(writer, PdfAConformanceLevel.PDF_A_4, CreateOutputIntent())) {
+            using (PdfADocument doc = new PdfADocument(writer, PdfAConformance.PDF_A_4, CreateOutputIntent())) {
                 doc.AddNewPage();
                 PdfArray configs = new PdfArray();
                 PdfDictionary config = new PdfDictionary();
@@ -69,8 +69,8 @@ namespace iText.Pdfa {
         }
 
         private PdfOutputIntent CreateOutputIntent() {
-            return new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", new FileStream(SOURCE_FOLDER
-                 + "sRGB Color Space Profile.icm", FileMode.Open, FileAccess.Read));
+            return new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1", FileUtil.GetInputStreamForFile
+                (SOURCE_FOLDER + "sRGB Color Space Profile.icm"));
         }
 
         private void CompareResult(String outPdf, String cmpPdf) {

@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -138,7 +138,7 @@ namespace iText.Signatures {
             }
 
             /// <summary>A Map with values.</summary>
-            public IDictionary<String, IList<String>> values = new Dictionary<String, IList<String>>();
+            private readonly IDictionary<String, IList<String>> values = new Dictionary<String, IList<String>>();
 
             /// <summary>Constructs an X509 name.</summary>
             /// <param name="seq">an ASN1 Sequence</param>

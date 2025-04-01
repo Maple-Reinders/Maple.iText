@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -25,9 +25,12 @@ using iText.Commons.Utils;
 using iText.Layout.Properties;
 
 namespace iText.Layout.Renderer {
+//\cond DO_NOT_DOCUMENT
     internal class BottomToTopFlexItemMainDirector : FlexColumnItemMainDirector {
+//\cond DO_NOT_DOCUMENT
         internal BottomToTopFlexItemMainDirector() {
         }
+//\endcond
 
         /// <summary><inheritDoc/></summary>
         public override void ApplyDirectionForLine<T>(IList<T> renderers) {
@@ -63,4 +66,5 @@ namespace iText.Layout.Renderer {
         }
         // We don't need to do anything in these cases
     }
+//\endcond
 }

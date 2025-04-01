@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -106,6 +106,42 @@ namespace iText.Kernel.Pdf {
                 canvas.ShowText(jpFont.CreateGlyphLine(s)).MoveText(0, -16);
             }
             canvas.EndText().RestoreState();
+            canvas.Rectangle(100, 500, 100, 100).Fill();
+            canvas.Release();
+            pdfDoc.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(filename, cmpFilename, DESTINATION_FOLDER
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CmapPlatform0PlatEnc3Format4FontTest() {
+            String filename = DESTINATION_FOLDER + "cmapPlatform0PlatEnc3Format4FontTest.pdf";
+            String cmpFilename = SOURCE_FOLDER + "cmp_cmapPlatform0PlatEnc3Format4FontTest.pdf";
+            PdfWriter writer = CompareTool.CreateTestPdfWriter(filename);
+            writer.SetCompressionLevel(CompressionConstants.NO_COMPRESSION);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            PdfFont font = PdfFontFactory.CreateFont(FONTS_FOLDER + "glyphs.ttf");
+            PdfCanvas canvas = new PdfCanvas(pdfDoc.AddNewPage());
+            canvas.SaveState().BeginText().SetFontAndSize(font, 20).MoveText(36, 700).ShowText("===fff===iii===ﬁ").EndText
+                ().RestoreState();
+            canvas.Rectangle(100, 500, 100, 100).Fill();
+            canvas.Release();
+            pdfDoc.Close();
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(filename, cmpFilename, DESTINATION_FOLDER
+                ));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void CmapPlatform0PlatEnc3Format6FontTest() {
+            String filename = DESTINATION_FOLDER + "cmapPlatform0PlatEnc3Format6FontTest.pdf";
+            String cmpFilename = SOURCE_FOLDER + "cmp_cmapPlatform0PlatEnc3Format6FontTest.pdf";
+            PdfWriter writer = CompareTool.CreateTestPdfWriter(filename);
+            writer.SetCompressionLevel(CompressionConstants.NO_COMPRESSION);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            PdfFont font = PdfFontFactory.CreateFont(FONTS_FOLDER + "glyphs-fmt-6.ttf");
+            PdfCanvas canvas = new PdfCanvas(pdfDoc.AddNewPage());
+            canvas.SaveState().BeginText().SetFontAndSize(font, 20).MoveText(36, 700).ShowText("===fff===iii===").EndText
+                ().RestoreState();
             canvas.Rectangle(100, 500, 100, 100).Fill();
             canvas.Release();
             pdfDoc.Close();

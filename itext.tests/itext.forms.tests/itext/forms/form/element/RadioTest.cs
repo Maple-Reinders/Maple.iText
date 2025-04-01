@@ -1,6 +1,6 @@
 /*
 This file is part of the iText (R) project.
-Copyright (c) 1998-2024 Apryse Group NV
+Copyright (c) 1998-2025 Apryse Group NV
 Authors: Apryse Software.
 
 This program is offered under a commercial and under the AGPL license.
@@ -59,6 +59,26 @@ namespace iText.Forms.Form.Element {
             String outPdf = DESTINATION_FOLDER + "basicRadio.pdf";
             String cmpPdf = SOURCE_FOLDER + "cmp_basicRadio.pdf";
             using (Document document = new Document(new PdfDocument(new PdfWriter(outPdf)))) {
+                Radio formRadio1 = CreateRadioButton("form radio button 1", "form radio group", null, null, true, false);
+                document.Add(formRadio1);
+                Radio formRadio2 = CreateRadioButton("form radio button 2", "form radio group", null, null, false, false);
+                document.Add(formRadio2);
+                Radio flattenRadio1 = CreateRadioButton("flatten radio button 1", "flatten radio group", null, null, true, 
+                    true);
+                document.Add(flattenRadio1);
+                Radio flattenRadio2 = CreateRadioButton("flatten radio button 2", "flatten radio group", null, null, false
+                    , true);
+                document.Add(flattenRadio2);
+            }
+            NUnit.Framework.Assert.IsNull(new CompareTool().CompareByContent(outPdf, cmpPdf, DESTINATION_FOLDER));
+        }
+
+        [NUnit.Framework.Test]
+        public virtual void BasicRadioTaggedTest() {
+            String outPdf = DESTINATION_FOLDER + "basicRadioTagged.pdf";
+            String cmpPdf = SOURCE_FOLDER + "cmp_basicRadioTagged.pdf";
+            using (Document document = new Document(new PdfDocument(new PdfWriter(outPdf)))) {
+                document.GetPdfDocument().SetTagged();
                 Radio formRadio1 = CreateRadioButton("form radio button 1", "form radio group", null, null, true, false);
                 document.Add(formRadio1);
                 Radio formRadio2 = CreateRadioButton("form radio button 2", "form radio group", null, null, false, false);
