@@ -27,6 +27,8 @@ namespace iText.Kernel.Exceptions {
     public sealed class KernelExceptionMessageConstant {
         public const String ALGORITHM_IS_NOT_SUPPORTED = "Algorithm {0} is not supported.";
 
+        public const String ALREADY_CLOSED = "Already closed";
+
         public const String AMOUNT_OF_BYTES_LESS_THAN_ZERO = "Amount of bytes in the PDF document cannot be less than zero";
 
         public const String ANNOTATION_SHALL_HAVE_REFERENCE_TO_PAGE = "Annotation shall have reference to page.";
@@ -156,6 +158,8 @@ namespace iText.Kernel.Exceptions {
         public const String CANNOT_WRITE_OBJECT_AFTER_IT_WAS_RELEASED = "Cannot write object after it was " + "released. In normal situation the object must be read once again before being written.";
 
         public const String CANNOT_WRITE_TO_PDF_STREAM = "Cannot write to PdfStream.";
+
+        public const String CANNOT_RESIZE_PAGE_WITH_NEGATIVE_OR_INFINITE_SCALE = "Can't resize page to the given size {0} because it is negative or zero";
 
         public const String CERTIFICATE_IS_NOT_PROVIDED_DOCUMENT_IS_ENCRYPTED_WITH_PUBLIC_KEY_CERTIFICATE = "Certificate is not provided. Document is encrypted with public key certificate, it should be passed "
              + "to PdfReader constructor with properties. See ReaderProperties#setPublicKeySecurityParams() " + "method.";
@@ -460,6 +464,8 @@ namespace iText.Kernel.Exceptions {
 
         public const String PAGE_IS_NOT_SET_FOR_THE_PDF_TAG_STRUCTURE = "Page is not set for the pdf tag structure.";
 
+        public const String PASSED_BYTE_BUFFER_CAN_NOT_BE_NULL = "Passed byte buffer can not be null.";
+
         public const String PDF_DECRYPTION = "Exception occurred with PDF document decryption. One of the possible "
              + "reasons is wrong password or wrong public key certificate and private key.";
 
@@ -663,6 +669,8 @@ namespace iText.Kernel.Exceptions {
 
         public const String XREF_STREAM_HAS_CYCLED_REFERENCES = "Xref stream has cycled references. Prev pointer indicates an already visited xref stream.";
 
+        public const String XREF_STREAM_HAS_SELF_REFERENCED_OBJECT = "Xref stream has self referenced object. Objet {0} refers to itself.";
+
         public const String XREF_STRUCTURE_SIZE_EXCEEDED_THE_LIMIT = "Xref structure contains too many elements " 
             + "and may cause OOM exception. You can increase number of elements by setting custom " + "MemoryLimitsAwareHandler.";
 
@@ -681,6 +689,26 @@ namespace iText.Kernel.Exceptions {
 
         public const String PARENT_CHILD_ROLE_RELATION_IS_NOT_ALLOWED = "Parent-child ({0}:{1}) relation is not " 
             + "allowed.";
+
+        public const String INVALID_DATA_LENGTH = "Invalid data length, expected length = {0}, actual length = {1}";
+
+        public const String PIXEL_OUT_OF_BORDERS = "Pixel ({0}, {1}) is out of borders of the image with parameter {2} x {3}";
+
+        public const String LENGTH_OF_ARRAY_SHOULD_MATCH_NUMBER_OF_COMPONENTS = "Length of pixel array ({0}) should match number of components ({1})";
+
+        public const String COLOR_DEPTH_IS_NOT_SUPPORTED_FOR_COLORSPACE = "The color depth {0} is not supported for color space {1}.";
+
+        public const String COLOR_DEPTH_IS_NOT_SUPPORTED_FOR_SEPARATION_ALTERNATE_COLORSPACE = "The color depth {0} is not supported for separation target color space {1}.";
+
+        public const String N_VALUE_IS_NOT_SUPPORTED = "N value {0} is not supported.";
+
+        public const String COLOR_DEPTH_IS_NOT_SUPPORTED = "The color depth {0} is not supported.";
+
+        public const String COLOR_SPACE_IS_NOT_SUPPORTED = "The color space {0} is not supported.";
+
+        public const String PNG_CHANNEL_ERROR = "PngGeneration does not support {0} color components.";
+
+        public const String PALLET_CONTENT_ERROR = "Indexed color spaces require four array entries.";
 
         private KernelExceptionMessageConstant() {
         }

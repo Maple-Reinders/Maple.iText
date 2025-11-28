@@ -135,6 +135,8 @@ namespace iText.Layout.Properties {
 
         public const int FLEX_DIRECTION = 139;
 
+        public const int FLEX_FORCE_START_ON_TOP = 158;
+
         public const int FLOAT = 99;
 
         public const int FLUSH_ON_DRAW = 19;
@@ -283,6 +285,8 @@ namespace iText.Layout.Properties {
         public const int OBJECT_FIT = 125;
 
         public const int OPACITY = 92;
+
+        public const int ORDER = 159;
 
         public const int ORPHANS_CONTROL = 121;
 
