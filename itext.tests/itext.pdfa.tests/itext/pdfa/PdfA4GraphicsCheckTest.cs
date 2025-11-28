@@ -311,7 +311,6 @@ namespace iText.Pdfa {
         [NUnit.Framework.Test]
         public virtual void ColorCheckTest5() {
             String outPdf = DESTINATION_FOLDER + "pdfA4_colorCheckTest5.pdf";
-            String cmpPdf = CMP_FOLDER + "cmp_pdfA4_colorCheckTest5.pdf";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
             Stream @is = FileUtil.GetInputStreamForFile(SOURCE_FOLDER + "sRGB Color Space Profile.icm");
             PdfOutputIntent outputIntent = new PdfOutputIntent("Custom", "", "http://www.color.org", "sRGB IEC61966-2.1"
@@ -323,14 +322,15 @@ namespace iText.Pdfa {
             PdfCanvas canvas = new PdfCanvas(page);
             canvas.SetFillColor(ColorConstants.BLUE);
             canvas.SetStrokeColor(new DeviceCmyk(0.1f, 0.1f, 0.1f, 0.1f));
-            canvas.MoveTo(doc.GetDefaultPageSize().GetLeft(), doc.GetDefaultPageSize().GetBottom());
-            canvas.LineTo(doc.GetDefaultPageSize().GetRight(), doc.GetDefaultPageSize().GetBottom());
-            canvas.LineTo(doc.GetDefaultPageSize().GetRight(), doc.GetDefaultPageSize().GetTop());
+            PageSize defaultSize = doc.GetDefaultPageSize();
+            canvas.MoveTo(defaultSize.GetLeft(), defaultSize.GetBottom());
+            canvas.LineTo(defaultSize.GetRight(), defaultSize.GetBottom());
+            canvas.LineTo(defaultSize.GetRight(), defaultSize.GetTop());
             canvas.Fill();
             canvas.SetFillColor(DeviceGray.BLACK);
-            canvas.MoveTo(doc.GetDefaultPageSize().GetLeft(), doc.GetDefaultPageSize().GetBottom());
-            canvas.LineTo(doc.GetDefaultPageSize().GetRight(), doc.GetDefaultPageSize().GetBottom());
-            canvas.LineTo(doc.GetDefaultPageSize().GetRight(), doc.GetDefaultPageSize().GetTop());
+            canvas.MoveTo(defaultSize.GetLeft(), defaultSize.GetBottom());
+            canvas.LineTo(defaultSize.GetRight(), defaultSize.GetBottom());
+            canvas.LineTo(defaultSize.GetRight(), defaultSize.GetTop());
             canvas.Fill();
             // Here we use RGB and CMYK at the same time. And only page output intent is taken into account not both.
             // So it throws on device RGB color.
@@ -573,7 +573,7 @@ namespace iText.Pdfa {
 
         [NUnit.Framework.Test]
         public virtual void DefaultStrokeColorCheckTest() {
-            String outPdf = DESTINATION_FOLDER + "defaultColorCheck.pdf";
+            String outPdf = DESTINATION_FOLDER + "defaultStrokeColorCheck.pdf";
             PdfDocument pdfDocument = new PdfADocument(new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion
                 .PDF_2_0)), PdfAConformance.PDF_A_4, null);
             PdfPage page = pdfDocument.AddNewPage();
@@ -1056,7 +1056,7 @@ namespace iText.Pdfa {
 
         [NUnit.Framework.Test]
         public virtual void DestOutputIntentColorSpaceNotAllowedTest() {
-            String outPdf = DESTINATION_FOLDER + "pdfA4DestOutputIntentProfileNotAllowed.pdf";
+            String outPdf = DESTINATION_FOLDER + "pdfA4DestOutputIntentCSNotAllowed.pdf";
             String isoFilePath = SOURCE_FOLDER + "ISOcoated_v2_300_bas.icc";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
             PdfADocument pdfDoc = new PdfADocument(writer, PdfAConformance.PDF_A_4, null);
@@ -1074,7 +1074,7 @@ namespace iText.Pdfa {
 
         [NUnit.Framework.Test]
         public virtual void DestOutputIntentColorSpaceNotAllowedInPageTest() {
-            String outPdf = DESTINATION_FOLDER + "pdfA4DestOutputIntentProfileNotAllowedInPage.pdf";
+            String outPdf = DESTINATION_FOLDER + "pdfA4DestOutputIntentCSNotAllowedInPage.pdf";
             String isoFilePath = SOURCE_FOLDER + "ISOcoated_v2_300_bas.icc";
             PdfWriter writer = new PdfWriter(outPdf, new WriterProperties().SetPdfVersion(PdfVersion.PDF_2_0));
             PdfADocument pdfDoc = new PdfADocument(writer, PdfAConformance.PDF_A_4, null);

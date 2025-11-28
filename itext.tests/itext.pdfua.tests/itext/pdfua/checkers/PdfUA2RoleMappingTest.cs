@@ -41,7 +41,7 @@ namespace iText.Pdfua.Checkers {
         private static readonly String FONT = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
             .CurrentContext.TestDirectory) + "/resources/itext/pdfua/font/FreeSans.ttf";
 
-        private static readonly String DESTINATION_FOLDER = TestUtil.GetOutputPath() + "/pdfua/PdfUARoleMappingTest/";
+        private static readonly String DESTINATION_FOLDER = TestUtil.GetOutputPath() + "/pdfua/PdfUA2RoleMappingTest/";
 
         [NUnit.Framework.OneTimeSetUp]
         public static void Before() {
@@ -164,7 +164,7 @@ namespace iText.Pdfua.Checkers {
         // Android-Conversion-Skip-Line (TODO DEVSIX-7377 introduce pdf\a validation on Android)
         [NUnit.Framework.Test]
         public virtual void StandardStructureTypeIsRemappedThroughNonStandardOneTest() {
-            String outPdf = DESTINATION_FOLDER + "standardStructureTypeIsRemappedThroughNonStandardOneTest.pdf";
+            String outPdf = DESTINATION_FOLDER + "stStructTypeRemappedNonStandardOne.pdf";
             PdfUA2TestPdfDocument pdfDoc = new PdfUA2TestPdfDocument(new PdfWriter(outPdf, new WriterProperties().SetPdfVersion
                 (PdfVersion.PDF_2_0)));
             PdfPage page1 = pdfDoc.AddNewPage();

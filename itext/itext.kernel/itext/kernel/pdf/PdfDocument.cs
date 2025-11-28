@@ -129,6 +129,7 @@ namespace iText.Kernel.Pdf {
 
         protected internal TagStructureContext tagStructureContext;
 
+        [Obsolete]
         protected internal DocumentInfoHelper documentInfoHelper = new DocumentInfoHelper();
 
         protected internal DefaultFontStrategy defaultFontStrategy;
@@ -923,11 +924,18 @@ namespace iText.Kernel.Pdf {
                     }
                     PdfObject crypto = null;
                     ICollection<PdfIndirectReference> forbiddenToFlush = new HashSet<PdfIndirectReference>();
-                    documentInfoHelper.AdjustDocumentInfo(GetDocumentInfo());
                     // The following 2 operators prevent the possible inconsistency between root and info
                     // entries existing in the trailer object and corresponding fields. This inconsistency
                     // may appear when user gets trailer and explicitly sets new root or info dictionaries.
-                    if (documentInfoHelper.ShouldAddDocumentInfoToTrailer()) {
+                    PdfAConformance pdfAConformance = this.GetConformance().GetAConformance();
+                    if (pdfAConformance != null && "4".Equals(pdfAConformance.GetPart())) {
+                        if (this.GetCatalog().GetPdfObject().Get(PdfName.PieceInfo) != null) {
+                            // Leave only ModDate as required by 6.1.3 File trailer of pdf/a-4 spec
+                            GetDocumentInfo().RemoveCreationDate();
+                            trailer.Put(PdfName.Info, GetDocumentInfo().GetPdfObject());
+                        }
+                    }
+                    else {
                         trailer.Put(PdfName.Info, GetDocumentInfo().GetPdfObject());
                     }
                     trailer.Put(PdfName.Root, catalog.GetPdfObject());
@@ -1696,6 +1704,14 @@ namespace iText.Kernel.Pdf {
             outputIntents.Add(outputIntent.GetPdfObject());
         }
 
+        /// <summary>
+        /// Checks ISO conformance of the passed context against
+        /// registered
+        /// <see cref="iText.Kernel.Validation.ValidationContainer"/>
+        /// inside the
+        /// <c>PdfDocument</c>.
+        /// </summary>
+        /// <param name="validationContext">the context to check</param>
         public virtual void CheckIsoConformance(IValidationContext validationContext) {
             if (!this.GetDiContainer().IsRegistered(typeof(ValidationContainer))) {
                 return;
@@ -2372,9 +2388,10 @@ namespace iText.Kernel.Pdf {
             if (page.IsFlushed()) {
                 throw new PdfException(KernelExceptionMessageConstant.FLUSHED_PAGE_CANNOT_BE_ADDED_OR_INSERTED, page);
             }
-            if (page.GetDocument() != null && this != page.GetDocument()) {
+            iText.Kernel.Pdf.PdfDocument document = page.GetDocument();
+            if (document != null && this != document) {
                 throw new PdfException(KernelExceptionMessageConstant.PAGE_CANNOT_BE_ADDED_TO_DOCUMENT_BECAUSE_IT_BELONGS_TO_ANOTHER_DOCUMENT
-                    ).SetMessageParams(page.GetDocument(), page.GetDocument().GetPageNumber(page), this);
+                    ).SetMessageParams(document, document.GetPageNumber(page), this);
             }
             catalog.GetPageTree().AddPage(index, page);
         }
